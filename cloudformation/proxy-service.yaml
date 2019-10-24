@@ -1,0 +1,281 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Proxy server service - privacy layer to front ad related vendors.
+Parameters:
+  EcsNginxRepositoryName:
+    Type: String
+    Default: nginx
+
+  EcsNginxGitSHA:
+    Type: String
+    Description: The sha to use
+    Default: latest
+
+  EcsProxyRepositoryName:
+    Type: String
+    Default: proxy
+
+  EcsProxyGitSHA:
+    Type: String
+    Description: The sha to use
+    Default: latest
+
+  EcsTaskMemory:
+    Type: String
+    Default: 2GB
+
+  EcsTaskCpu:
+    Type: String
+    Default: 1024
+
+  EcsServiceTaskCount:
+    Type: String
+    Default: 300
+
+  EcsAppEnv:
+    Type: String
+    Default: production
+
+  EcsAppGeoipS3Bucket:
+    Type: String
+    Default: pocket-proxy-geoip
+
+  EcsAppAdzerkSecretName:
+    Type: String
+    Default: prod/adzerk
+
+  SSLCertificateArn:
+    Type: String
+    Description: Certificate ARN for ALB listener
+
+  VPCStackName:
+    Type: String
+    Description: Stack name of VPC
+    Default: VPC
+
+Resources:
+  Alb:
+    Type: 'AWS::ElasticLoadBalancingV2::LoadBalancer'
+    Properties:
+      Name: !Ref "AWS::StackName"
+      Subnets: !Split [",", 'Fn::ImportValue': !Sub "${VPCStackName}-PublicSubnetIds"]
+
+      SecurityGroups:
+        - !Ref AlbSecurityGroup
+      Tags:
+        - Key: "Name"
+          Value: !Sub "${AWS::StackName}"
+
+  AlbListener:
+    Type: 'AWS::ElasticLoadBalancingV2::Listener'
+    Properties:
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn:
+            Ref: AlbTargetGroup
+      LoadBalancerArn: !Ref Alb
+      Port: 443
+      Protocol: HTTPS
+      Certificates:
+        - CertificateArn: !Ref SSLCertificateArn
+
+  AlbTargetGroup:
+    Type: 'AWS::ElasticLoadBalancingV2::TargetGroup'
+    Properties:
+      HealthCheckIntervalSeconds: 30
+      HealthCheckPath: /pulse
+      HealthCheckProtocol: HTTP
+      HealthyThresholdCount: 5
+      UnhealthyThresholdCount: 2
+      HealthCheckTimeoutSeconds: 3
+      TargetType: ip
+      Protocol: HTTP
+      Port: 80
+      VpcId: { 'Fn::ImportValue': !Sub "${VPCStackName}-VpcId" }
+
+      Tags:
+        - Key: "Name"
+          Value: !Sub "${AWS::StackName}"
+
+  AlbSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties: 
+      GroupDescription: !Sub "${AWS::StackName} alb security group"
+      GroupName: !Sub "${AWS::StackName}-alb"
+      SecurityGroupEgress: 
+      - IpProtocol: tcp
+        FromPort: 80
+        ToPort: 80
+        DestinationSecurityGroupId: !Ref "EcsSecurityGroup"
+      SecurityGroupIngress: 
+      - IpProtocol: tcp
+        FromPort: 443
+        ToPort: 443
+        CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: "Name"
+          Value: !Sub "${AWS::StackName}-alb"
+      VpcId: { 'Fn::ImportValue': !Sub "${VPCStackName}-VpcId" }
+
+  EcsTaskDefinition:
+    Type: 'AWS::ECS::TaskDefinition'
+    Properties:
+      ContainerDefinitions:
+        - Name: nginx
+          Image: !Sub "${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${EcsNginxRepositoryName}:${EcsNginxGitSHA}"
+          Essential: true
+          HealthCheck:
+            Command: 
+              - CMD-SHELL
+              - curl -f http://127.0.0.1/pulse || exit 1
+            Interval: 30
+            Retries: 3
+            Timeout: 5
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !Sub '/ecs/${AWS::StackName}/nginx'
+              awslogs-region: us-east-1
+              awslogs-stream-prefix: ecs
+          PortMappings:
+            - Protocol: tcp
+              ContainerPort: 80
+          Ulimits:
+            - Name: nofile
+              SoftLimit: 16384
+              HardLimit: 16384
+
+        - Name: proxy
+          Image: !Sub "${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${EcsProxyRepositoryName}:${EcsProxyGitSHA}"
+          Essential: true
+          HealthCheck:
+            Command:
+              - CMD-SHELL
+              - curl -f http://127.0.0.1:8000/pulse || exit 1
+            Interval: 30
+            Retries: 3
+            Timeout: 5
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !Sub '/ecs/${AWS::StackName}/proxy'
+              awslogs-region: us-east-1
+              awslogs-stream-prefix: ecs
+              awslogs-datetime-format: '\[%Y-%m-%d %H:%M:%S %z\]'
+          Environment:
+            - Name: APP_ENV
+              Value: !Ref EcsAppEnv
+            - Name: GEOIP_S3_BUCKET
+              Value: !Ref EcsAppGeoipS3Bucket
+            - Name: ADZERK_SECRET_NAME
+              Value: !Ref EcsAppAdzerkSecretName
+          PortMappings:
+            - Protocol: tcp
+              ContainerPort: 8000
+          Ulimits:
+            - Name: nofile
+              SoftLimit: 16384
+              HardLimit: 16384
+
+      Cpu: !Ref EcsTaskCpu
+      Memory: !Ref EcsTaskMemory
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+        - FARGATE
+      Family: !Sub "${AWS::StackName}"
+      ExecutionRoleArn: !GetAtt EcsTaskExecutionRole.Arn
+      TaskRoleArn: !GetAtt EcsTaskRole.Arn
+
+  EcsService:
+    Type: 'AWS::ECS::Service'
+    DependsOn: AlbListener
+    Properties:
+      Cluster: !Ref "EcsCluster"
+      LaunchType: FARGATE
+      DesiredCount: !Ref "EcsServiceTaskCount"
+      LoadBalancers:
+        - ContainerPort: 80
+          ContainerName: nginx
+          TargetGroupArn: !Ref "AlbTargetGroup"
+      TaskDefinition: !Ref "EcsTaskDefinition"
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: DISABLED
+          SecurityGroups:
+            - !Ref "EcsSecurityGroup"
+          Subnets: !Split [",", 'Fn::ImportValue': !Join ["-", [ !Ref VPCStackName, 'PrivateSubnetIds' ]]]
+
+  EcsCluster:
+    Type: 'AWS::ECS::Cluster'
+    Properties:
+      ClusterName: !Ref AWS::StackName
+      Tags:
+        - Key: "Name"
+          Value: !Sub "${AWS::StackName}"
+
+  EcsTaskExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${AWS::StackName}ExecutionRole"
+      Path: /
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+      - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+
+  EcsTaskRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${AWS::StackName}TaskRole"
+      Path: /
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: !Sub "${AWS::StackName}TaskPolicy"
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                Resource:
+                  - !Sub "arn:aws:s3:::${EcsAppGeoipS3Bucket}"
+                  - !Sub "arn:aws:s3:::${EcsAppGeoipS3Bucket}/*"
+              - Effect: Allow
+                Action:
+                  - secretsmanager:GetSecretValue
+                Resource:
+                  - !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${EcsAppAdzerkSecretName}-??????"
+
+  EcsSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: !Sub "${AWS::StackName} ecs security group"
+      GroupName: !Sub "${AWS::StackName}-ecs"
+      SecurityGroupEgress:
+      - IpProtocol: tcp
+        FromPort: 443
+        ToPort: 443
+        CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: "Name"
+          Value: !Sub "${AWS::StackName}-ecs"
+      VpcId: { 'Fn::ImportValue': !Sub "${VPCStackName}-VpcId" }
+
+  EcsSecurityGroupIngress:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref EcsSecurityGroup
+      IpProtocol: tcp
+      FromPort: 80
+      ToPort: 80
+      SourceSecurityGroupId: !Ref "AlbSecurityGroup"

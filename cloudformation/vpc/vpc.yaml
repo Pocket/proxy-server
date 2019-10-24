@@ -1,0 +1,432 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: VPC with public and private subnets across arbitrary availability zones
+Parameters:
+  VPCName:
+    Description: VPC Name
+    Type: String
+
+  EnableIpv6:
+    Description: Boolean for amazon provided IPv6 CIDR block
+    Type: String
+    Default: 'false'
+
+  VPCSubnetCidr:
+    Description: VPC Subnet CIDR specification
+    Type: String
+    MinLength: '9'
+    MaxLength: '19'
+    AllowedPattern: >-
+      ^([0-9]|[1-9][0-9]|1[0-9]{2}|2([0-4][0-9]|5[0-5])).([0-9]|[1-9][0-9]|1[0-9]{2}|2([0-4][0-9]|5[0-5])).([0-9]|[1-9][0-9]|1[0-9]{2}|2([0-4][0-9]|5[0-5])).([0-9]|[1-9][0-9]|1[0-9]{2}|2([0-4][0-9]|5[0-5]))/([0-9]|[12][0-9]|3[0-2])
+    ConstraintDescription: Must be a valid IP CIDR range of the form x.x.x.x/x
+
+  PublicSubnet1:
+    Description: The CIDR for the public subnet in availability zone 1
+    Type: String
+    MinLength: '9'
+    MaxLength: '19'
+    AllowedPattern: >-
+      ^([0-9]|[1-9][0-9]|1[0-9]{2}|2([0-4][0-9]|5[0-5])).([0-9]|[1-9][0-9]|1[0-9]{2}|2([0-4][0-9]|5[0-5])).([0-9]|[1-9][0-9]|1[0-9]{2}|2([0-4][0-9]|5[0-5])).([0-9]|[1-9][0-9]|1[0-9]{2}|2([0-4][0-9]|5[0-5]))/([0-9]|[12][0-9]|3[0-2])
+    ConstraintDescription: Must be a valid IP CIDR range of the form x.x.x.x/x
+
+  PublicSubnet2:
+    Description: The CIDR for the public subnet in availability zone 2
+    Type: String
+    MinLength: '9'
+    MaxLength: '19'
+    AllowedPattern: >-
+      ^([0-9]|[1-9][0-9]|1[0-9]{2}|2([0-4][0-9]|5[0-5])).([0-9]|[1-9][0-9]|1[0-9]{2}|2([0-4][0-9]|5[0-5])).([0-9]|[1-9][0-9]|1[0-9]{2}|2([0-4][0-9]|5[0-5])).([0-9]|[1-9][0-9]|1[0-9]{2}|2([0-4][0-9]|5[0-5]))/([0-9]|[12][0-9]|3[0-2])
+    ConstraintDescription: Must be a valid IP CIDR range of the form x.x.x.x/x
+
+  PublicSubnet3:
+    Description: The CIDR for the public subnet in availability zone 3
+    Type: String
+    MinLength: '9'
+    MaxLength: '19'
+    AllowedPattern: >-
+      ^([0-9]|[1-9][0-9]|1[0-9]{2}|2([0-4][0-9]|5[0-5])).([0-9]|[1-9][0-9]|1[0-9]{2}|2([0-4][0-9]|5[0-5])).([0-9]|[1-9][0-9]|1[0-9]{2}|2([0-4][0-9]|5[0-5])).([0-9]|[1-9][0-9]|1[0-9]{2}|2([0-4][0-9]|5[0-5]))/([0-9]|[12][0-9]|3[0-2])
+    ConstraintDescription: Must be a valid IP CIDR range of the form x.x.x.x/x
+    Default: '0.0.0.0/32'
+
+  PublicSubnet4:
+    Description: The CIDR for the public subnet in availability zone 4
+    Type: String
+    MinLength: '9'
+    MaxLength: '19'
+    AllowedPattern: >-
+      ^([0-9]|[1-9][0-9]|1[0-9]{2}|2([0-4][0-9]|5[0-5])).([0-9]|[1-9][0-9]|1[0-9]{2}|2([0-4][0-9]|5[0-5])).([0-9]|[1-9][0-9]|1[0-9]{2}|2([0-4][0-9]|5[0-5])).([0-9]|[1-9][0-9]|1[0-9]{2}|2([0-4][0-9]|5[0-5]))/([0-9]|[12][0-9]|3[0-2])
+    ConstraintDescription: Must be a valid IP CIDR range of the form x.x.x.x/x
+    Default: '0.0.0.0/32'
+
+  PrivateSubnet1:
+    Description: The CIDR for the private subnet in availability zone 1
+    Type: String
+    MinLength: '9'
+    MaxLength: '19'
+    AllowedPattern: >-
+      ^([0-9]|[1-9][0-9]|1[0-9]{2}|2([0-4][0-9]|5[0-5])).([0-9]|[1-9][0-9]|1[0-9]{2}|2([0-4][0-9]|5[0-5])).([0-9]|[1-9][0-9]|1[0-9]{2}|2([0-4][0-9]|5[0-5])).([0-9]|[1-9][0-9]|1[0-9]{2}|2([0-4][0-9]|5[0-5]))/([0-9]|[12][0-9]|3[0-2])
+    ConstraintDescription: Must be a valid IP CIDR range of the form x.x.x.x/x
+    Default: '0.0.0.0/32'
+
+  PrivateSubnet2:
+    Description: The CIDR for the private subnet in availability zone 2
+    Type: String
+    MinLength: '9'
+    MaxLength: '19'
+    AllowedPattern: >-
+      ^([0-9]|[1-9][0-9]|1[0-9]{2}|2([0-4][0-9]|5[0-5])).([0-9]|[1-9][0-9]|1[0-9]{2}|2([0-4][0-9]|5[0-5])).([0-9]|[1-9][0-9]|1[0-9]{2}|2([0-4][0-9]|5[0-5])).([0-9]|[1-9][0-9]|1[0-9]{2}|2([0-4][0-9]|5[0-5]))/([0-9]|[12][0-9]|3[0-2])
+    ConstraintDescription: Must be a valid IP CIDR range of the form x.x.x.x/x
+    Default: '0.0.0.0/32'
+
+  PrivateSubnet3:
+    Description: The CIDR for the private subnet in availability zone 3
+    Type: String
+    MinLength: '9'
+    MaxLength: '19'
+    AllowedPattern: >-
+      ^([0-9]|[1-9][0-9]|1[0-9]{2}|2([0-4][0-9]|5[0-5])).([0-9]|[1-9][0-9]|1[0-9]{2}|2([0-4][0-9]|5[0-5])).([0-9]|[1-9][0-9]|1[0-9]{2}|2([0-4][0-9]|5[0-5])).([0-9]|[1-9][0-9]|1[0-9]{2}|2([0-4][0-9]|5[0-5]))/([0-9]|[12][0-9]|3[0-2])
+    ConstraintDescription: Must be a valid IP CIDR range of the form x.x.x.x/x
+    Default: '0.0.0.0/32'
+
+  PrivateSubnet4:
+    Description: The CIDR for the private subnet in availability zone 4
+    Type: String
+    MinLength: '9'
+    MaxLength: '19'
+    AllowedPattern: >-
+      ^([0-9]|[1-9][0-9]|1[0-9]{2}|2([0-4][0-9]|5[0-5])).([0-9]|[1-9][0-9]|1[0-9]{2}|2([0-4][0-9]|5[0-5])).([0-9]|[1-9][0-9]|1[0-9]{2}|2([0-4][0-9]|5[0-5])).([0-9]|[1-9][0-9]|1[0-9]{2}|2([0-4][0-9]|5[0-5]))/([0-9]|[12][0-9]|3[0-2])
+    ConstraintDescription: Must be a valid IP CIDR range of the form x.x.x.x/x
+    Default: '0.0.0.0/32'
+
+  StacksURL:
+    Description: The S3 URL to pocket-cloudformation
+    Type: String
+    Default: https://s3.amazonaws.com/pocket-proxy-cloudformation
+
+Conditions:
+  EnableIpv6_IsSet: !Not
+    - !Equals
+      - !Ref 'EnableIpv6'
+      - 'false'
+
+  PublicSubnet3_IsSet: !Not
+    - !Equals
+      - !Ref 'PublicSubnet3'
+      - '0.0.0.0/32'
+
+  PublicSubnet4_IsSet: !Not
+    - !Equals
+      - !Ref 'PublicSubnet4'
+      - '0.0.0.0/32'
+
+  PrivateSubnet3_IsSet: !Not
+    - !Equals
+      - !Ref 'PrivateSubnet3'
+      - '0.0.0.0/32'
+
+  PrivateSubnet4_IsSet: !Not
+    - !Equals
+      - !Ref 'PrivateSubnet4'
+      - '0.0.0.0/32'
+
+Resources:
+  VPCIpv6CidrBlock:
+    Type: AWS::EC2::VPCCidrBlock
+    Condition: EnableIpv6_IsSet
+    Properties:
+      AmazonProvidedIpv6CidrBlock: true
+      VpcId: !Ref 'VPC'
+
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      EnableDnsSupport: 'true'
+      EnableDnsHostnames: 'true'
+      CidrBlock: !Ref 'VPCSubnetCidr'
+      Tags:
+        - Key: Name
+          Value: !Ref 'VPCName'
+
+  PublicSubnet:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Join
+        - /
+        - - !Ref 'StacksURL'
+          - public-subnet.yaml
+      TimeoutInMinutes: '60'
+      Parameters:
+        VpcId: !Ref 'VPC'
+        VPCName: !Ref 'VPCName'
+        EnableIpv6: !Ref 'EnableIpv6'
+        Ipv6CidrBlocks: !If
+          - EnableIpv6_IsSet
+          - !Join
+            - ','
+            - !GetAtt 'VPC.Ipv6CidrBlocks'
+          - !Ref 'AWS::NoValue'
+        VPCIpv6CidrBlock: !If
+          - EnableIpv6_IsSet
+          - !Ref 'VPCIpv6CidrBlock'
+          - !Ref 'AWS::NoValue'
+        PublicSubnet1: !Ref 'PublicSubnet1'
+        PublicSubnet2: !Ref 'PublicSubnet2'
+        PublicSubnet3: !Ref 'PublicSubnet3'
+        PublicSubnet4: !Ref 'PublicSubnet4'
+
+  PrivateSubnet:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Join
+        - /
+        - - !Ref 'StacksURL'
+          - private-subnet.yaml
+      TimeoutInMinutes: '60'
+      Parameters:
+        VpcId: !Ref 'VPC'
+        VPCName: !Ref 'VPCName'
+        PrivateSubnet1: !Ref 'PrivateSubnet1'
+        PrivateSubnet2: !Ref 'PrivateSubnet2'
+        PrivateSubnet3: !Ref 'PrivateSubnet3'
+        PrivateSubnet4: !Ref 'PrivateSubnet4'
+
+  NAT:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Join
+        - /
+        - - !Ref 'StacksURL'
+          - nat.yaml
+      TimeoutInMinutes: '60'
+      Parameters:
+        VpcId: !Ref 'VPC'
+        VPCName: !Ref 'VPCName'
+        PrivateSubnet1Id: !GetAtt 'PrivateSubnet.Outputs.PrivateSubnet1Id'
+        PrivateSubnet2Id: !GetAtt 'PrivateSubnet.Outputs.PrivateSubnet2Id'
+        PrivateSubnet3Id: !If
+          - PrivateSubnet3_IsSet
+          - !GetAtt 'PrivateSubnet.Outputs.PrivateSubnet3Id'
+          - !Ref 'AWS::NoValue'
+        PrivateSubnet4Id: !If
+          - PrivateSubnet4_IsSet
+          - !GetAtt 'PrivateSubnet.Outputs.PrivateSubnet4Id'
+          - !Ref 'AWS::NoValue'
+        PublicSubnet1Id: !GetAtt 'PublicSubnet.Outputs.PublicSubnet1Id'
+        PublicSubnet2Id: !GetAtt 'PublicSubnet.Outputs.PublicSubnet2Id'
+        PublicSubnet3Id: !If
+          - PublicSubnet3_IsSet
+          - !GetAtt 'PublicSubnet.Outputs.PublicSubnet3Id'
+          - !Ref 'AWS::NoValue'
+        PublicSubnet4Id: !If
+          - PublicSubnet4_IsSet
+          - !GetAtt 'PublicSubnet.Outputs.PublicSubnet4Id'
+          - !Ref 'AWS::NoValue'
+        PrivateRouteTable1: !GetAtt 'PrivateSubnet.Outputs.PrivateRouteTable1'
+        PrivateRouteTable2: !GetAtt 'PrivateSubnet.Outputs.PrivateRouteTable2'
+        PrivateRouteTable3: !If
+          - PrivateSubnet3_IsSet
+          - !GetAtt 'PrivateSubnet.Outputs.PrivateRouteTable3'
+          - !Ref 'AWS::NoValue'
+        PrivateRouteTable4: !If
+          - PrivateSubnet4_IsSet
+          - !GetAtt 'PrivateSubnet.Outputs.PrivateRouteTable4'
+          - !Ref 'AWS::NoValue'
+
+Outputs:
+  VPCName:
+    Description: VPC Name
+    Value: !Ref 'VPCName'
+    Export:
+      Name: !Sub "${AWS::StackName}-VPCName"
+
+  VpcId:
+    Description: The ID of the VPC that was created.
+    Value: !Ref 'VPC'
+    Export:
+      Name: !Sub "${AWS::StackName}-VpcId"
+
+  Ipv6CidrBlocks:
+    Condition: EnableIpv6_IsSet
+    Description: Amazon assigned IPv6 CIDR blocks
+    Value: !Join
+      - ','
+      - !GetAtt 'VPC.Ipv6CidrBlocks'
+    Export:
+      Name: !Sub '${VPCName}-ipv6cidrblocks'
+
+  PublicSubnet1Cidr:
+    Description: The CIDR notated address of PublicSubnet1
+    Value: !GetAtt 'PublicSubnet.Outputs.PublicSubnet1Cidr'
+    Export:
+      Name: !Sub "${AWS::StackName}-PublicSubnet1Cidr"
+
+  PublicSubnet1Id:
+    Description: The subnet ID of PublicSubnet1
+    Value: !GetAtt 'PublicSubnet.Outputs.PublicSubnet1Id'
+    Export:
+      Name: !Sub "${AWS::StackName}-PublicSubnet1Id"
+
+  PublicSubnet1AZ:
+    Description: The availability zone of PublicSubnet1
+    Value: !GetAtt 'PublicSubnet.Outputs.PublicSubnet1AZ'
+    Export:
+      Name: !Sub "${AWS::StackName}-PublicSubnet1AZ"
+
+  PublicSubnet2Cidr:
+    Description: The CIDR notated address of PublicSubnet2
+    Value: !GetAtt 'PublicSubnet.Outputs.PublicSubnet2Cidr'
+    Export:
+      Name: !Sub "${AWS::StackName}-PublicSubnet2Cidr"
+
+  PublicSubnet2Id:
+    Description: The subnet ID of PublicSubnet2
+    Value: !GetAtt 'PublicSubnet.Outputs.PublicSubnet2Id'
+    Export:
+      Name: !Sub "${AWS::StackName}-PublicSubnet2Id"
+
+  PublicSubnet2AZ:
+    Description: The availability zone of PublicSubnet2
+    Value: !GetAtt 'PublicSubnet.Outputs.PublicSubnet2AZ'
+    Export:
+      Name: !Sub "${AWS::StackName}-PublicSubnet2AZ"
+
+  PublicSubnet3Cidr:
+    Description: The CIDR notated address of PublicSubnet3
+    Condition: PublicSubnet3_IsSet
+    Value: !GetAtt 'PublicSubnet.Outputs.PublicSubnet3Cidr'
+    Export:
+      Name: !Sub "${AWS::StackName}-PublicSubnet3Cidr"
+
+  PublicSubnet3Id:
+    Description: The subnet ID of PublicSubnet3
+    Condition: PublicSubnet3_IsSet
+    Value: !GetAtt 'PublicSubnet.Outputs.PublicSubnet3Id'
+    Export:
+      Name: !Sub "${AWS::StackName}-PublicSubnet3Id"
+
+  PublicSubnet3AZ:
+    Description: The availability zone of PublicSubnet3
+    Condition: PublicSubnet3_IsSet
+    Value: !GetAtt 'PublicSubnet.Outputs.PublicSubnet3AZ'
+    Export:
+      Name: !Sub "${AWS::StackName}-PublicSubnet3AZ"
+
+  PublicSubnet4Cidr:
+    Description: The CIDR notated address of PublicSubnet4
+    Condition: PublicSubnet4_IsSet
+    Value: !GetAtt 'PublicSubnet.Outputs.PublicSubnet4Cidr'
+    Export:
+      Name: !Sub "${AWS::StackName}-PublicSubnet4Cidr"
+
+  PublicSubnet4Id:
+    Description: The subnet ID of PublicSubnet4
+    Condition: PublicSubnet4_IsSet
+    Value: !GetAtt 'PublicSubnet.Outputs.PublicSubnet4Id'
+    Export:
+      Name: !Sub "${AWS::StackName}-PublicSubnet4Id"
+
+  PublicSubnet4AZ:
+    Description: The availability zone of PublicSubnet4
+    Condition: PublicSubnet4_IsSet
+    Value: !GetAtt 'PublicSubnet.Outputs.PublicSubnet4AZ'
+    Export:
+      Name: !Sub "${AWS::StackName}-PublicSubnet4AZ"
+
+  PrivateSubnet1Cidr:
+    Description: The CIDR notated address of PrivateSubnet1
+    Value: !GetAtt 'PrivateSubnet.Outputs.PrivateSubnet1Cidr'
+    Export:
+      Name: !Sub "${AWS::StackName}-PrivateSubnet1Cidr"
+
+  PrivateSubnet1Id:
+    Description: The subnet ID of PrivateSubnet1
+    Value: !GetAtt 'PrivateSubnet.Outputs.PrivateSubnet1Id'
+    Export:
+      Name: !Sub "${AWS::StackName}-PrivateSubnet1Id"
+
+  PrivateSubnet1AZ:
+    Description: The availability zone of PrivateSubnet1
+    Value: !GetAtt 'PrivateSubnet.Outputs.PrivateSubnet1AZ'
+    Export:
+      Name: !Sub "${AWS::StackName}-PrivateSubnet1AZ"
+
+  PrivateSubnet2Cidr:
+    Description: The CIDR notated address of PrivateSubnet2
+    Value: !GetAtt 'PrivateSubnet.Outputs.PrivateSubnet2Cidr'
+    Export:
+      Name: !Sub "${AWS::StackName}-PrivateSubnet2Cidr"
+
+  PrivateSubnet2Id:
+    Description: The subnet ID of PrivateSubnet2
+    Value: !GetAtt 'PrivateSubnet.Outputs.PrivateSubnet2Id'
+    Export:
+      Name: !Sub "${AWS::StackName}-PrivateSubnet2Id"
+
+  PrivateSubnet2AZ:
+    Description: The availability zone of PrivateSubnet2
+    Value: !GetAtt 'PrivateSubnet.Outputs.PrivateSubnet2AZ'
+    Export:
+      Name: !Sub "${AWS::StackName}-PrivateSubnet2AZ"
+
+  PrivateSubnet3Cidr:
+    Description: The CIDR notated address of PrivateSubnet3
+    Condition: PrivateSubnet3_IsSet
+    Value: !GetAtt 'PrivateSubnet.Outputs.PrivateSubnet3Cidr'
+    Export:
+      Name: !Sub "${AWS::StackName}-PrivateSubnet3Cidr"
+
+  PrivateSubnet3Id:
+    Description: The subnet ID of PrivateSubnet3
+    Condition: PrivateSubnet3_IsSet
+    Value: !GetAtt 'PrivateSubnet.Outputs.PrivateSubnet3Id'
+    Export:
+      Name: !Sub "${AWS::StackName}-PrivateSubnet3Id"
+
+  PrivateSubnet3AZ:
+    Description: The availability zone of PrivateSubnet3
+    Condition: PrivateSubnet3_IsSet
+    Value: !GetAtt 'PrivateSubnet.Outputs.PrivateSubnet3AZ'
+    Export:
+      Name: !Sub "${AWS::StackName}-PrivateSubnet3AZ"
+
+  PrivateSubnet4Cidr:
+    Description: The CIDR notated address of PrivateSubnet4
+    Condition: PrivateSubnet4_IsSet
+    Value: !GetAtt 'PrivateSubnet.Outputs.PrivateSubnet4Cidr'
+    Export:
+      Name: !Sub "${AWS::StackName}-PrivateSubnet4Cidr"
+
+  PrivateSubnet4Id:
+    Description: The subnet ID of PrivateSubnet4
+    Condition: PrivateSubnet4_IsSet
+    Value: !GetAtt 'PrivateSubnet.Outputs.PrivateSubnet4Id'
+    Export:
+      Name: !Sub "${AWS::StackName}-PrivateSubnet4Id"
+
+  PrivateSubnet4AZ:
+    Description: The availability zone of PrivateSubnet4
+    Condition: PrivateSubnet4_IsSet
+    Value: !GetAtt 'PrivateSubnet.Outputs.PrivateSubnet4AZ'
+    Export:
+      Name: !Sub "${AWS::StackName}-PrivateSubnet4AZ"
+
+  PublicSubnetIds:
+    Description: Comma delimited list of public subnet IDs
+    Value: !Join
+      - ','
+      - - !GetAtt 'PublicSubnet.Outputs.PublicSubnet1Id'
+        - !GetAtt 'PublicSubnet.Outputs.PublicSubnet2Id'
+        - !If [PublicSubnet3_IsSet, !GetAtt 'PublicSubnet.Outputs.PublicSubnet3Id', !Ref 'AWS::NoValue']
+        - !If [PublicSubnet4_IsSet, !GetAtt 'PublicSubnet.Outputs.PublicSubnet4Id', !Ref 'AWS::NoValue']
+    Export:
+      Name: !Sub "${AWS::StackName}-PublicSubnetIds"
+
+  PrivateSubnetIds:
+    Description: Comma delimited list of private subnet IDs
+    Value: !Join
+      - ','
+      - - !GetAtt 'PrivateSubnet.Outputs.PrivateSubnet1Id'
+        - !GetAtt 'PrivateSubnet.Outputs.PrivateSubnet2Id'
+        - !If [PrivateSubnet3_IsSet, !GetAtt 'PrivateSubnet.Outputs.PrivateSubnet3Id', !Ref 'AWS::NoValue']
+        - !If [PrivateSubnet4_IsSet, !GetAtt 'PrivateSubnet.Outputs.PrivateSubnet4Id', !Ref 'AWS::NoValue']
+    Export:
+      Name: !Sub "${AWS::StackName}-PrivateSubnetIds"

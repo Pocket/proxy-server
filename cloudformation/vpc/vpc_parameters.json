@@ -1,0 +1,42 @@
+[
+    {
+        "ParameterKey": "VPCName",
+        "ParameterValue": "PocketProxy"
+    },
+    {
+        "ParameterKey": "VPCSubnetCidr",
+        "ParameterValue": "172.30.0.0/16"
+    },
+    {
+        "ParameterKey": "PublicSubnet1",
+        "ParameterValue": "172.30.0.0/20"
+    },
+    {
+        "ParameterKey": "PublicSubnet2",
+        "ParameterValue": "172.30.16.0/20"
+    },
+    {
+        "ParameterKey": "PublicSubnet3",
+        "ParameterValue": "172.30.32.0/20"
+    },
+    {
+        "ParameterKey": "PublicSubnet4",
+        "ParameterValue": "172.30.48.0/20"
+    },
+    {
+        "ParameterKey": "PrivateSubnet1",
+        "ParameterValue": "172.30.128.0/20"
+    },
+    {
+        "ParameterKey": "PrivateSubnet2",
+        "ParameterValue": "172.30.144.0/20"
+    },
+    {
+        "ParameterKey": "PrivateSubnet3",
+        "ParameterValue": "172.30.160.0/20"
+    },
+    {
+        "ParameterKey": "PrivateSubnet4",
+        "ParameterValue": "172.30.176.0/20"
+    }
+]

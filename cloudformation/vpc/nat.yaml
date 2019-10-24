@@ -1,0 +1,181 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: NAT Gateways
+Parameters:
+  VPCName:
+    Description: VPC Name
+    Type: String
+
+  PublicSubnet1Id:
+    Description: Public subnet id 1
+    Type: String
+
+  PublicSubnet2Id:
+    Description: Public subnet id 2
+    Type: String
+    Default: ''
+
+  PublicSubnet3Id:
+    Description: Public subnet id 3
+    Type: String
+    Default: ''
+
+  PublicSubnet4Id:
+    Description: Public subnet id 4
+    Type: String
+    Default: ''
+
+  PrivateSubnet1Id:
+    Description: Private subnet id 1
+    Type: String
+
+  PrivateSubnet2Id:
+    Description: Private subnet id 2
+    Type: String
+    Default: ''
+
+  PrivateSubnet3Id:
+    Description: Private subnet id 3
+    Type: String
+    Default: ''
+
+  PrivateSubnet4Id:
+    Description: Private subnet id 4
+    Type: String
+    Default: ''
+
+  PrivateRouteTable1:
+    Description: Private route table 1
+    Type: String
+
+  PrivateRouteTable2:
+    Description: Private route table 2
+    Type: String
+    Default: ''
+
+  PrivateRouteTable3:
+    Description: Private route table 3
+    Type: String
+    Default: ''
+
+  PrivateRouteTable4:
+    Description: Private route table 4
+    Type: String
+    Default: ''
+
+  VpcId:
+    Description: The VPC ID to create subnets in
+    Type: AWS::EC2::VPC::Id
+
+Conditions:
+  PublicSubnet2Id_IsSet: !Not
+    - !Equals
+      - !Ref 'PublicSubnet2Id'
+      - ''
+
+  PublicSubnet3Id_IsSet: !Not
+    - !Equals
+      - !Ref 'PublicSubnet3Id'
+      - ''
+
+  PublicSubnet4Id_IsSet: !Not
+    - !Equals
+      - !Ref 'PublicSubnet4Id'
+      - ''
+
+Resources:
+  Eip1:
+    Type: AWS::EC2::EIP
+
+  Eip2:
+    Type: AWS::EC2::EIP
+    Condition: PublicSubnet2Id_IsSet
+
+  Eip3:
+    Type: AWS::EC2::EIP
+    Condition: PublicSubnet3Id_IsSet
+
+  Eip4:
+    Type: AWS::EC2::EIP
+    Condition: PublicSubnet4Id_IsSet
+
+  NATGateway1:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId: !GetAtt Eip1.AllocationId
+      SubnetId: !Ref PublicSubnet1Id
+      Tags:
+        - Key: Name
+          Value: !Join
+            - '-'
+            - - !Ref 'VPCName'
+              - nat-1
+
+  NATGateway2:
+    Type: AWS::EC2::NatGateway
+    Condition: PublicSubnet2Id_IsSet
+    Properties:
+      AllocationId: !GetAtt Eip2.AllocationId
+      SubnetId: !Ref PublicSubnet2Id
+      Tags:
+        - Key: Name
+          Value: !Join
+            - '-'
+            - - !Ref 'VPCName'
+              - nat-2
+
+  NATGateway3:
+    Type: AWS::EC2::NatGateway
+    Condition: PublicSubnet3Id_IsSet
+    Properties:
+      AllocationId: !GetAtt Eip3.AllocationId
+      SubnetId: !Ref PublicSubnet3Id
+      Tags:
+        - Key: Name
+          Value: !Join
+            - '-'
+            - - !Ref 'VPCName'
+              - nat-3
+
+  NATGateway4:
+    Type: AWS::EC2::NatGateway
+    Condition: PublicSubnet4Id_IsSet
+    Properties:
+      AllocationId: !GetAtt Eip4.AllocationId
+      SubnetId: !Ref PublicSubnet4Id
+      Tags:
+        - Key: Name
+          Value: !Join
+            - '-'
+            - - !Ref 'VPCName'
+              - nat-4
+
+  PrivateRouteTable1DefaultRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref 'PrivateRouteTable1'
+      DestinationCidrBlock: '0.0.0.0/0'
+      NatGatewayId: !Ref 'NATGateway1'
+
+  PrivateRouteTable2DefaultRoute:
+    Type: AWS::EC2::Route
+    Condition: PublicSubnet2Id_IsSet
+    Properties:
+      RouteTableId: !Ref 'PrivateRouteTable2'
+      DestinationCidrBlock: '0.0.0.0/0'
+      NatGatewayId: !Ref 'NATGateway2'
+
+  PrivateRouteTable3DefaultRoute:
+    Type: AWS::EC2::Route
+    Condition: PublicSubnet3Id_IsSet
+    Properties:
+      RouteTableId: !Ref 'PrivateRouteTable3'
+      DestinationCidrBlock: '0.0.0.0/0'
+      NatGatewayId: !Ref 'NATGateway3'
+
+  PrivateRouteTable4DefaultRoute:
+    Type: AWS::EC2::Route
+    Condition: PublicSubnet4Id_IsSet
+    Properties:
+      RouteTableId: !Ref 'PrivateRouteTable4'
+      DestinationCidrBlock: '0.0.0.0/0'
+      NatGatewayId: !Ref 'NATGateway4'

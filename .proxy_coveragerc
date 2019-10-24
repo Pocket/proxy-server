@@ -1,0 +1,13 @@
+# .coveragerc to control coverage.py
+
+[run]
+branch = True
+omit =
+    # omit anything in base virtual env
+    venv/*
+    # leave out scripts not run as part of PFM service
+    gunicorn.py
+    telemetry/*
+    tests/*
+[html]
+directory = proxy-server-coverage

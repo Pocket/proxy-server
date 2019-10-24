@@ -1,0 +1,7 @@
+# Exclude all files starting with a dot
+**.*
+
+aws-cloudformation*
+deploy.sh
+docker-compose*
+*.md

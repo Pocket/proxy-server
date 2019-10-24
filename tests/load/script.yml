@@ -1,0 +1,30 @@
+# Thank you for trying serverless-artillery!
+# This default script is intended to get you started quickly.
+# There is a lot more that Artillery can do.
+# You can find great documentation of the possibilities at:
+# https://artillery.io/docs/
+config:
+  # this hostname will be used as a prefix for each URI in the flow unless a complete URI is specified
+  target: "https://spocs.getpocket.com"
+  phases:
+    - duration: 3600
+      arrivalRate: 10
+      rampTo: 7000
+      name: "Warm up AdZerk"
+    - duration: 10800
+      arrivalRate: 7000
+      name: "Sustained 100% of max load"
+  plugins:
+    cloudwatch:
+      namespace: "serverless-artillery-myperftestservice-loadtest"
+
+scenarios:
+  - flow:
+      - post:
+          url: "/spocs"
+          json:
+            version: 1
+            consumer_key: "40249-e88c401e1b1f2242d9e441c4"
+            pocket_id: "{12345678-1234-5678-90ab-1234567890ab}"
+          qs:
+            slsart: 1
