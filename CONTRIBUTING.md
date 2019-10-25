@@ -1,6 +1,6 @@
 ## Contributing
 
-Thank you for checking out our Pocket Extensions work. We welcome contributions from everyone! By participating in this project, you agree to abide by the Mozilla [Community Participation Guidelines](https://www.mozilla.org/about/governance/policies/participation/).
+Thank you for checking out our Pocket Proxy Server work. We welcome contributions from everyone! By participating in this project, you agree to abide by the Mozilla [Community Participation Guidelines](https://www.mozilla.org/about/governance/policies/participation/).
 
 ### Asking questions / receiving updates
 
@@ -83,4 +83,3 @@ The tl;dr is:
 ### Understanding How Pocket Triages
 
 The project team meets weekly (in a closed meeting, for the time being), to discuss project priorities, to triage new tickets, and to redistribute the work amongst team members. Any contributors tickets or PRs are carefully considered, prioritized, and if needed, assigned a reviewer.
-
