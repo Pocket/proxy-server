@@ -2,6 +2,7 @@ from copy import deepcopy
 
 mock_spoc_2 = {
     "id": 2,
+    "flight_id": 8525375,
     "campaign_id": 887195,
     "title": "Refresh Your Space for Spring",
     "url": "https://example.com/?key=foobar",
@@ -19,8 +20,12 @@ mock_spoc_2 = {
     },
     "parameter_set": "default",
     "caps": {
-        "lifetime": 10,
+        "lifetime": 20,
         "campaign": {
+            "count": 10,
+            "period": 86400
+        },
+        "flight": {
             "count": 10,
             "period": 86400
         }
