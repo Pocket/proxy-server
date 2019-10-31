@@ -5,6 +5,10 @@ production = development = {
             'count': 10,
             'period': 86400,
         },
+        'flight': {
+            'count': 10,
+            'period': 86400,
+        },
     },
     'settings': {
         "spocsPerNewTabs": 1,
