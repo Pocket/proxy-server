@@ -20,7 +20,7 @@ mock_spoc_2 = {
     },
     "parameter_set": "default",
     "caps": {
-        "lifetime": 20,
+        "lifetime": 50,
         "campaign": {
             "count": 10,
             "period": 86400
