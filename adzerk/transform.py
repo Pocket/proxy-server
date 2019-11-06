@@ -13,6 +13,7 @@ def to_spoc(decision):
 
     spoc = {
         'id':                decision['adId'],
+        'flight_id':         decision['flightId'],
         'campaign_id':       decision['campaignId'],
         'title':             custom_data['ctTitle'],
         'url':               custom_data['ctUrl'],
