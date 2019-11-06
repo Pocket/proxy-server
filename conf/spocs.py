@@ -1,6 +1,6 @@
 production = development = {
     'caps': {
-        'lifetime': 20,
+        'lifetime': 50,
         'campaign': {
             'count': 10,
             'period': 86400,
