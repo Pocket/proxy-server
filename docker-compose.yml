@@ -25,12 +25,6 @@ services:
     network_mode: host
     depends_on:
       - s3
-#    entrypoint:
-#      - gunicorn
-#      - -b
-#      - 0.0.0.0:8000
-#      - --reload
-#      - app.main:app
 
   s3:
     image: pocket/fake-s3:20190604
