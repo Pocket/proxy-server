@@ -27,7 +27,27 @@ Parameters:
     Type: String
     Default: 1024
 
-  EcsServiceTaskCount:
+  EcsServiceTaskDesiredCount:
+    Type: String
+    Default: 125
+
+  EcsServiceTaskMaxCount:
+    Type: String
+    Default: 250
+
+  EcsScaleTaskUpCount:
+    Type: String
+    Default: 10
+
+  EcsScaleTaskDownCount:
+    Type: String
+    Default: 3
+
+  EcsScaleTaskUpCooldown:
+    Type: String
+    Default: 60
+
+  EcsScaleTaskDownCooldown:
     Type: String
     Default: 300
 
@@ -42,6 +62,28 @@ Parameters:
   EcsAppAdzerkSecretName:
     Type: String
     Default: prod/adzerk
+
+  ServiceScaleEvaluationPeriods:
+    Description: "The number of periods over which data is compared to the specified threshold"
+    Type: Number
+    Default: 2
+    MinValue: 2
+
+  ServiceCpuScaleUpThreshold:
+    Type: Number
+    Description: "Average CPU value to trigger auto scaling up"
+    Default: 50
+    MinValue: 0
+    MaxValue: 100
+    ConstraintDescription: Value must be between 0 and 100
+
+  ServiceCpuScaleDownThreshold:
+    Type: Number
+    Description: "Average CPU value to trigger auto scaling down"
+    Default: 35
+    MinValue: 0
+    MaxValue: 100
+    ConstraintDescription: Value must be between 0 and 100
 
   SSLCertificateArn:
     Type: String
@@ -191,7 +233,7 @@ Resources:
     Properties:
       Cluster: !Ref "EcsCluster"
       LaunchType: FARGATE
-      DesiredCount: !Ref "EcsServiceTaskCount"
+      DesiredCount: !Ref "EcsServiceTaskDesiredCount"
       LoadBalancers:
         - ContainerPort: 80
           ContainerName: nginx
@@ -271,6 +313,7 @@ Resources:
           Value: !Sub "${AWS::StackName}-ecs"
       VpcId: { 'Fn::ImportValue': !Sub "${VPCStackName}-VpcId" }
 
+
   EcsSecurityGroupIngress:
     Type: AWS::EC2::SecurityGroupIngress
     Properties:
@@ -279,3 +322,111 @@ Resources:
       FromPort: 80
       ToPort: 80
       SourceSecurityGroupId: !Ref "AlbSecurityGroup"
+
+  EcsAutoScalingRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${AWS::StackName}-AutoScalingRole"
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: application-autoscaling.amazonaws.com
+            Action: sts:AssumeRole
+      Path: /
+      Policies:
+        - PolicyName: !Sub "${AWS::StackName}-AutoScalingPolicy"
+          PolicyDocument:
+            Statement:
+              - Effect: Allow
+                Action:
+                  - application-autoscaling:*
+                  - cloudwatch:DescribeAlarms
+                  - cloudwatch:PutMetricAlarm
+                  - ecs:DescribeServices
+                  - ecs:UpdateService
+                Resource:
+                  - !Sub "arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:service/${AWS::StackName}-*"
+                  - !Sub "arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:task-definition/${AWS::StackName}:*"
+                  - !Sub "arn:aws:cloudwatch:${AWS::Region}:${AWS::AccountId}:alarm:${AWS::StackName}-*"
+
+  ServiceScalingTarget:
+    Type: "AWS::ApplicationAutoScaling::ScalableTarget"
+    Properties:
+      MinCapacity: !Ref "EcsServiceTaskDesiredCount" 
+      MaxCapacity: !Ref "EcsServiceTaskMaxCount"
+      ResourceId: !Sub
+        - "service/${EcsClusterName}/${EcsServiceName}"
+        - EcsClusterName: !Ref "EcsCluster"
+          EcsServiceName: !GetAtt EcsService.Name
+      RoleARN: !GetAtt EcsAutoScalingRole.Arn
+      ScalableDimension: ecs:service:DesiredCount
+      ServiceNamespace: ecs
+
+  ServiceScaleUpPolicy:
+    Type: AWS::ApplicationAutoScaling::ScalingPolicy
+    Properties:
+      PolicyName: ScaleOutPolicy
+      PolicyType: StepScaling
+      ScalingTargetId: !Ref ServiceScalingTarget
+      StepScalingPolicyConfiguration:
+        AdjustmentType: ChangeInCapacity
+        Cooldown: !Ref EcsScaleTaskUpCooldown
+        MetricAggregationType: Average
+        StepAdjustments:
+          - ScalingAdjustment: !Ref EcsScaleTaskUpCount
+            MetricIntervalLowerBound: 0
+
+  ServiceScaleDownPolicy:
+    Type: AWS::ApplicationAutoScaling::ScalingPolicy
+    Properties:
+      PolicyName: ScaleInPolicy
+      PolicyType: StepScaling
+      ScalingTargetId: !Ref ServiceScalingTarget
+      StepScalingPolicyConfiguration:
+        AdjustmentType: ChangeInCapacity
+        Cooldown: !Ref EcsScaleTaskDownCooldown
+        MetricAggregationType: Average
+        StepAdjustments:
+          - ScalingAdjustment: !Ref EcsScaleTaskDownCount
+            MetricIntervalUpperBound: 0
+
+  ServiceCPUScaleUpAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      EvaluationPeriods: !Ref ServiceScaleEvaluationPeriods
+      Statistic: Average
+      TreatMissingData: notBreaching
+      Threshold: !Ref ServiceCpuScaleUpThreshold
+      AlarmDescription: Alarm to add capacity if CPU is high
+      Period: 60
+      AlarmActions:
+        - !Ref ServiceScaleUpPolicy
+      Namespace: AWS/ECS
+      Dimensions:
+        - Name: ClusterName
+          Value: !Ref "EcsCluster"
+        - Name: ServiceName
+          Value: !GetAtt EcsService.Name
+      ComparisonOperator: GreaterThanThreshold
+      MetricName: CPUUtilization
+
+  ServiceCPUScaleDownAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      EvaluationPeriods: !Ref ServiceScaleEvaluationPeriods
+      Statistic: Average
+      TreatMissingData: notBreaching
+      Threshold: !Ref ServiceCpuScaleDownThreshold
+      AlarmDescription: Alarm to reduce capacity if container CPU is low
+      Period: 300
+      AlarmActions:
+        - !Ref ServiceScaleDownPolicy
+      Namespace: AWS/ECS
+      Dimensions:
+        - Name: ClusterName
+          Value: !Ref "EcsCluster"
+        - Name: ServiceName
+          Value: !GetAtt EcsService.Name
+      ComparisonOperator: LessThanThreshold
+      MetricName: CPUUtilization
