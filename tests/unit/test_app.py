@@ -3,8 +3,8 @@ from unittest.mock import patch
 from copy import deepcopy
 
 from app.main import create_app
-from tests.fixtures.mock_decision import mock_response, mock_response_900
-from tests.fixtures.mock_placements import mock_placements
+from tests.fixtures.mock_decision import mock_response, mock_response_900, mock_collection_response
+from tests.fixtures.mock_placements import mock_placements, mock_collection_placements
 
 
 class TestApp(unittest.TestCase):
@@ -14,6 +14,7 @@ class TestApp(unittest.TestCase):
     """
     mock_response_map = {'default': [mock_response]}
     mock_placement_map = {'top-sites': [mock_response], 'text-promo': [mock_response_900]}
+    mock_collection_placement_map = {'sponsored-collection': [mock_collection_response], 'spocs': [mock_response]}
 
     @classmethod
     def create_client_no_geo_locs(cls):
@@ -22,7 +23,7 @@ class TestApp(unittest.TestCase):
         return app.test_client()
 
     @classmethod
-    def get_request_body(cls, without=None, placements=None):
+    def get_request_body(cls, without=None, placements=None, update=None):
         ret = {
             "version": "1",
             "consumer_key": "12345-test-consumer-key",
@@ -32,6 +33,8 @@ class TestApp(unittest.TestCase):
             ret['placements'] = placements
         if without:
             ret.pop(without)
+        if update:
+            ret.update(update)
         return ret
 
 
@@ -53,6 +56,35 @@ class TestApp(unittest.TestCase):
     def test_app_spocs_production_valid(self, mock_geo, mock_adzerk):
         resp = self.create_client_no_geo_locs().post('/spocs', json=self.get_request_body())
         self.assertEqual(resp.status_code, 200)
+
+    @patch('provider.geo_provider.GeolocationProvider.__init__', return_value=None)
+    @patch('adzerk.api.Api.get_decisions', return_value=mock_collection_placement_map)
+    def test_app_spocs_collection_v1(self, mock_geo, mock_adzerk):
+        """
+        API version 1 returns the collection as an array for backwards compatibility.
+        """
+        request_body = self.get_request_body(placements=mock_collection_placements)
+        resp = self.create_client_no_geo_locs().post('/spocs', json=request_body)
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.json['sponsored-collection'][0]['collection_title'], 'Best of the Web')
+
+    @patch('provider.geo_provider.GeolocationProvider.__init__', return_value=None)
+    @patch('adzerk.api.Api.get_decisions', return_value=mock_collection_placement_map)
+    def test_app_spocs_collection_v2(self, mock_geo, mock_adzerk):
+        """
+        API version 2 returns the collection as an object, with collection-level fields pulled up.
+        """
+        request_body = self.get_request_body(placements=mock_collection_placements, update={'version': '2'})
+        resp = self.create_client_no_geo_locs().post('/spocs', json=request_body)
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.json['spocs'][0]['title'], 'title 1000')
+
+        collection = resp.json['sponsored-collection']
+        self.assertEqual(collection['title'],     'Best of the Web')
+        self.assertEqual(collection['sponsor'],   'sponsor')
+        self.assertEqual(collection['flight_id'], 333)
+        self.assertEqual(collection['items'][0]['title'], 'title 900')
+        self.assertTrue('collection_title' not in collection['items'][0])
 
     @patch('provider.geo_provider.GeolocationProvider.__init__', return_value=None)
     @patch('adzerk.api.Api.get_decisions', return_value=mock_response_map)
