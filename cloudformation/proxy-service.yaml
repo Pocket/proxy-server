@@ -430,3 +430,4 @@ Resources:
           Value: !GetAtt EcsService.Name
       ComparisonOperator: LessThanThreshold
       MetricName: CPUUtilization
+
