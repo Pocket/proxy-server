@@ -400,7 +400,7 @@ Resources:
     Properties:
       EvaluationPeriods: !Ref ServiceScaleEvaluationPeriods
       Statistic: Average
-      TreatMissingData: notBreaching
+      TreatMissingData: breaching
       Threshold: !Ref ServiceCpuScaleUpThreshold
       AlarmDescription: Alarm to add capacity if CPU is high
       Period: 60
@@ -420,7 +420,7 @@ Resources:
     Properties:
       EvaluationPeriods: !Ref ServiceScaleEvaluationPeriods
       Statistic: Average
-      TreatMissingData: notBreaching
+      TreatMissingData: breaching
       Threshold: !Ref ServiceCpuScaleDownThreshold
       AlarmDescription: Alarm to reduce capacity if container CPU is low
       Period: 300
