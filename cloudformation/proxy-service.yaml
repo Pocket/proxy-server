@@ -35,6 +35,10 @@ Parameters:
     Type: String
     Default: 250
 
+  EcsServiceTaskMinCount:
+    Type: String
+    Default: 125
+
   EcsScaleTaskUpCount:
     Type: String
     Default: 10
@@ -353,7 +357,7 @@ Resources:
   ServiceScalingTarget:
     Type: "AWS::ApplicationAutoScaling::ScalableTarget"
     Properties:
-      MinCapacity: !Ref "EcsServiceTaskDesiredCount" 
+      MinCapacity: !Ref "EcsServiceTaskMinCount"
       MaxCapacity: !Ref "EcsServiceTaskMaxCount"
       ResourceId: !Sub
         - "service/${EcsClusterName}/${EcsServiceName}"
