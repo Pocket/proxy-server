@@ -402,7 +402,6 @@ production = development = {
         "clarizen.com": 1,
         "rowshare.com": 1,
         "projectmanager.com": 1,
-        "projectmanager.com": 1,
         "teodesk.com": 1,
         "support.office.com": 1,
         "www.forbes.com": 1,
