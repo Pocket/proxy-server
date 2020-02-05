@@ -41,11 +41,11 @@ Parameters:
 
   EcsScaleTaskUpCount:
     Type: String
-    Default: 10
+    Default: 12
 
   EcsScaleTaskDownCount:
     Type: String
-    Default: 3
+    Default: -6
 
   EcsScaleTaskUpCooldown:
     Type: String
