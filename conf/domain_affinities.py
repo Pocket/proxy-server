@@ -201,7 +201,12 @@ production = development = {
         "medminder.com": 1,
         "maxiaids.com": 1,
         "lifeline.philips.com": 1,
-        "amazon.com": 1
+        "amazon.com": 1,
+        "liviathome.com": 1,
+        "medacube.com": 1,
+        "healthline.com": 1,
+        "my.clevelandclinic.org": 1,
+        "cdc.gov": 1
     },
     "mailerlite": {
         "bookfunnel.com": 1,
@@ -309,5 +314,107 @@ production = development = {
         "freshservice.com": 1,
         "onpage.com": 1,
         "alertfind.com": 1
+    },
+    "innogamesnews": {
+        "msn.com": 1,
+        "foxnews.com": 1,
+        "abcnews.go.com": 1,
+        "nypost.com": 1,
+        "washingtonpost.com": 1,
+        "yahoo.com": 1,
+        "cnn.com": 1,
+        "bbc.com": 1,
+        "huffpost.com": 1
+    },
+    "innogamessport": {
+        "espn.com": 1,
+        "cbssports.com": 1,
+        "fantasy.nfl.com": 1,
+        "sports.yahoo.com": 1,
+        "nbcsports.com": 1,
+        "sportsillustrated.com": 1,
+        "bleacherreport.com": 1,
+        "nba.com": 1,
+        "mlb.com": 1,
+        "nfl.com": 1
+    },
+    "innogamesbusiness": {
+        "foxbusiness.com": 1,
+        "wsj.com": 1,
+        "cnbc.com": 1,
+        "bloomberg.com": 1,
+        "reuters.com": 1,
+        "msnbc.com": 1,
+        "bbc.com": 1
+    },
+    "abstract": {
+        "getbootstrap.com": 1,
+        "sitepoint.com": 1,
+        "densediscovery.com": 1,
+        "flawlessapp.io": 1,
+        "designernews.co": 1,
+        "utom.design": 1,
+        "cleverpodcast.com": 1,
+        "revisionpath.com": 1,
+        "layout.fm": 1,
+        "producthunt.com": 1,
+        "sketch.com": 1,
+        "adobe.com": 1,
+        "sketchtalk.io": 1,
+        "sketchapphub.com": 1,
+        "figma.com": 1,
+        "blog.sketchapp.com": 1,
+        "careerfoundry.com": 1,
+        "learnux.io": 1,
+        "prototypr.io": 1,
+        "udemy.com": 1,
+        "xdguru.com": 1,
+        "learnsketch.com": 1,
+        "dribbble.com": 1,
+        "uxtools.co": 1
+    },
+    "aircall": {
+        "ringcentral.com": 1,
+        "justcall.io": 1,
+        "toky.co": 1,
+        "dialpad.com": 1,
+        "8x8.com": 1,
+        "mightycall.com": 1,
+        "nectardesk.com": 1,
+        "callhippo.com": 1,
+        "salesforce.com": 1,
+        "hubspot.com": 1,
+        "salesloft.com": 1,
+        "outreach.io": 1,
+        "copper.com": 1
+    },
+    "innogameswomen": {
+        "cosmopolitan.com": 1,
+        "bustle.com": 1,
+        "pinterest.com": 1,
+        "elle.com": 1,
+        "womenshealthmag.com": 1,
+        "refinery29.com": 1,
+        "popsugar.com ": 1
+    },
+    "monday1": {
+        "producthunt.com": 1,
+        "clarizen.com": 1,
+        "rowshare.com": 1,
+        "projectmanager.com": 1,
+        "teodesk.com": 1,
+        "support.office.com": 1,
+        "www.forbes.com": 1,
+        "asana.com": 1
+    },
+    "monday2": {
+        "mindtools.com": 1,
+        "teamgantt.com": 1,
+        "capterra.com": 1,
+        "ganttpro.com": 1,
+        "workzone.com": 1,
+        "goodfirms.co": 1,
+        "learn.g2.com": 1,
+        "softwareadvice.com": 1
     }
 }
