@@ -59,6 +59,34 @@ def tracking_url_to_shim(url):
     return ','.join([path_id,e,s])
 
 
+def is_collection(spocs):
+    """
+    :param spocs: A list of spocs
+    :return: True if the list of spocs is a sponsored collection; spocs that should be featured together.
+    """
+    return all(spoc.get('collection_title') for spoc in spocs)
+
+
+def to_collection(spocs):
+    """
+    Transforms a list of spocs to a sponsored collection dictionary.
+    AdZerk does not support fields for a collection. We set them on all creatives and get them from an arbitrary one.
+    :param spocs: A list of spocs
+    :return: A dictionary with collection fields (title, flight_id, and sponsor) and a list of spocs.
+    """
+    collection = {
+        'title':     spocs[0]['collection_title'],
+        'flight_id': spocs[0]['flight_id'],
+        'sponsor':   spocs[0]['sponsor'],
+    }
+
+    for spoc in spocs:
+        del spoc['collection_title']
+
+    collection['items'] = spocs
+    return collection
+
+
 def __get_cdn_image(raw_image_url):
     escaped = parse.quote(raw_image_url)
     return 'https://img-getpocket.cdn.mozilla.net/direct?url={0}&resize=w618-h310'.format(escaped)
