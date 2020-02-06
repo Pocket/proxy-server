@@ -8,7 +8,7 @@ class Client:
 
     def __init__(self, version, consumer_key, pocket_id, ip, geolocation_provider,
                  site=None, placements=None):
-        self.version = version
+        self.version = int(version)
         self.consumer_key = consumer_key
         self.pocket_id = pocket_id
         self.ip = ip
@@ -55,6 +55,9 @@ class Client:
         for div, spocs in spocs_raw.items():
             if spocs:
                 transformed_spocs = [adzerk.transform.to_spoc(s) for s in spocs]
-                response[div] = transformed_spocs
+                if self.version >= 2 and adzerk.transform.is_collection(transformed_spocs):
+                    response[div] = adzerk.transform.to_collection(transformed_spocs)
+                else:
+                    response[div] = transformed_spocs
             else:
                 response[div] = []

@@ -40,3 +40,15 @@ mock_spoc_2 = {
 mock_spoc_3_cta = deepcopy(mock_spoc_2)
 mock_spoc_3_cta["id"] = 3
 mock_spoc_3_cta["cta"] = "Learn more"
+
+mock_collection_spoc_2 = deepcopy(mock_spoc_2)
+mock_collection_spoc_2["collection_title"] = "Best of the Web"
+mock_collection_spoc_3 = deepcopy(mock_spoc_3_cta)
+mock_collection_spoc_3["collection_title"] = "Best of the Web"
+
+mock_collection = {
+    "title": "Best of the Web",
+    "sponsor": "WallMarket",
+    "flight_id": 8525375,
+    "items": [deepcopy(mock_spoc_2), deepcopy(mock_spoc_3_cta)]
+}

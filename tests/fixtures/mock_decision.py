@@ -156,4 +156,6 @@ mock_decision_3_cta = deepcopy(mock_decision_2)
 mock_decision_3_cta['adId'] = 3
 mock_decision_3_cta['contents'][0]['data']['ctCta'] = "Learn more"
 
-
+mock_collection_response = deepcopy(mock_response_900)
+mock_collection_response['adId'] = 4
+mock_collection_response['contents'][0]['data']['ctCollectionTitle'] = "Best of the Web"

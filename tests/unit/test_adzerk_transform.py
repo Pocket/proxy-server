@@ -1,8 +1,8 @@
 from unittest import TestCase
 from unittest.mock import patch
 
-from adzerk.transform import to_spoc, tracking_url_to_shim
-from tests.fixtures.mock_spoc import mock_spoc_2, mock_spoc_3_cta
+from adzerk.transform import to_spoc, tracking_url_to_shim, is_collection, to_collection
+from tests.fixtures.mock_spoc import mock_spoc_2, mock_spoc_3_cta, mock_collection_spoc_2, mock_collection_spoc_3, mock_collection
 from tests.fixtures.mock_decision import mock_decision_2, mock_decision_3_cta
 
 
@@ -22,3 +22,12 @@ class TestAdZerkTransform(TestCase):
 
         with self.assertRaises(Exception):
             tracking_url_to_shim('https://e-10250.adzerk.net/x.gif?e=123&s=1')
+
+    def test_is_collection(self):
+        self.assertEqual(False, is_collection([mock_spoc_2]))
+        self.assertEqual(False, is_collection([mock_spoc_2, mock_collection_spoc_2]))
+        self.assertEqual(True, is_collection([mock_collection_spoc_2]))
+        self.assertEqual(True, is_collection([mock_collection_spoc_2, mock_collection_spoc_3]))
+
+    def test_to_collection(self):
+        self.assertEqual(mock_collection, to_collection([mock_collection_spoc_2, mock_collection_spoc_3]))
