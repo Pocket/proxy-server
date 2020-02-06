@@ -29,7 +29,7 @@ Parameters:
 
   EcsServiceTaskDesiredCount:
     Type: String
-    Default: 125
+    Default: 115
 
   EcsServiceTaskMaxCount:
     Type: String
@@ -37,11 +37,11 @@ Parameters:
 
   EcsServiceTaskMinCount:
     Type: String
-    Default: 125
+    Default: 50
 
   EcsScaleTaskUpCount:
     Type: String
-    Default: 12
+    Default: 9
 
   EcsScaleTaskDownCount:
     Type: String
