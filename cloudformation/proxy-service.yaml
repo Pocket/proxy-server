@@ -84,7 +84,7 @@ Parameters:
   ServiceCpuScaleDownThreshold:
     Type: Number
     Description: "Average CPU value to trigger auto scaling down"
-    Default: 35
+    Default: 40
     MinValue: 0
     MaxValue: 100
     ConstraintDescription: Value must be between 0 and 100
