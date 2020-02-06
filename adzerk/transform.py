@@ -33,9 +33,14 @@ def to_spoc(decision):
         'caps':              conf.spocs['caps'],
         'domain_affinities': __get_domain_affinities(custom_data.get('ctDomain_affinities')),
     }
-    
-    if 'ctCta' in custom_data and custom_data['ctCta']:
-        spoc['cta'] = custom_data['ctCta']
+
+    optional_fields = {
+        'ctCta':             'cta',
+        'ctCollectionTitle': 'collection_title',
+    }
+    for adzerk_key, spoc_key in optional_fields.items():
+        if adzerk_key in custom_data and custom_data[adzerk_key]:
+            spoc[spoc_key] = custom_data[adzerk_key]
 
     try:
         spoc['min_score']  = float(custom_data['ctMin_score'])
