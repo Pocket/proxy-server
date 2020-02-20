@@ -19,7 +19,6 @@ def to_spoc(decision):
         'url':               custom_data['ctUrl'],
         'domain':            custom_data['ctDomain'],
         'excerpt':           custom_data['ctExcerpt'],
-        'sponsor':           custom_data['ctSponsor'],
         'context':           __get_context(custom_data['ctSponsor']),
         'raw_image_src':     custom_data['ctFullimagepath'],
         'image_src':         __get_cdn_image(custom_data['ctFullimagepath']),
@@ -37,6 +36,7 @@ def to_spoc(decision):
     optional_fields = {
         'ctCta':             'cta',
         'ctCollectionTitle': 'collection_title',
+        'ctSponsor':         'sponsor',
     }
     for adzerk_key, spoc_key in optional_fields.items():
         if adzerk_key in custom_data and custom_data[adzerk_key]:
