@@ -159,3 +159,7 @@ mock_decision_3_cta['contents'][0]['data']['ctCta'] = "Learn more"
 mock_collection_response = deepcopy(mock_response_900)
 mock_collection_response['adId'] = 4
 mock_collection_response['contents'][0]['data']['ctCollectionTitle'] = "Best of the Web"
+
+mock_decision_5_topics = deepcopy(mock_decision_2)
+mock_decision_5_topics['adId'] = 5
+mock_decision_5_topics['contents'][0]['body'] = "{\"topic_arts_and_entertainment\":\"\",\"topic_autos_and_vehicles\":\"true\",\"topic_beauty_and_fitness\":\"true\"}"

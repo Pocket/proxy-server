@@ -1,4 +1,6 @@
 from urllib import parse
+import json
+import re
 import logging
 
 import conf
@@ -8,6 +10,9 @@ def to_spoc(decision):
     if not decision:
         return {}
     custom_data = decision['contents'][0]['data']
+    body = decision['contents'][0].get('body')
+    if body:
+        body = json.loads(body)
 
     events_map = {e["id"]: tracking_url_to_shim(e["url"]) for e in decision["events"]}
 
@@ -32,6 +37,7 @@ def to_spoc(decision):
         'parameter_set':     'default',
         'caps':              conf.spocs['caps'],
         'domain_affinities': __get_domain_affinities(custom_data.get('ctDomain_affinities')),
+        'topics':            get_topics(body),
     }
 
     optional_fields = {
@@ -90,6 +96,14 @@ def to_collection(spocs):
 
     collection['items'] = spocs
     return collection
+
+
+def get_topics(body):
+    if body is None:
+        return {}
+    else:
+        p = re.compile('^topic_')
+        return [p.sub('nb_model_', t) for t, v in body.items() if p.match(t) and v in ('true', True)]
 
 
 def __get_cdn_image(raw_image_url):
