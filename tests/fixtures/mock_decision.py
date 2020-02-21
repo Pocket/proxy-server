@@ -10,7 +10,6 @@ mock_response = {
   "contents": [
     {
       "type": "html",
-      "body": "Example",
       "template": "image",
       "data": {
         "imageUrl": "http://static.adzerk.net/cat.jpg",
@@ -67,7 +66,6 @@ mock_response_900 = {
   "contents": [
     {
       "type": "html",
-      "body": "Example",
       "template": "image",
       "data": {
         "imageUrl": "http://static.adzerk.net/cat.jpg",
