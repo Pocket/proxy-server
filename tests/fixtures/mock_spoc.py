@@ -33,7 +33,7 @@ mock_spoc_2 = {
     "domain_affinities": {
         "example.com": 1
     },
-    "topics": {},
+    "personalization_models": {},
     "min_score": 0.1,
     "item_score": 0.11,
 }
@@ -56,4 +56,4 @@ mock_collection = {
 
 mock_spoc_5_topics = deepcopy(mock_spoc_2)
 mock_spoc_5_topics["id"] = 5
-mock_spoc_5_topics["topics"] = ["nb_model_autos_and_vehicles", "nb_model_beauty_and_fitness"]
+mock_spoc_5_topics["personalization_models"] = ["nb_model_autos_and_vehicles", "nb_model_beauty_and_fitness"]
