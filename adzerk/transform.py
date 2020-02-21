@@ -17,27 +17,27 @@ def to_spoc(decision):
     events_map = {e["id"]: tracking_url_to_shim(e["url"]) for e in decision["events"]}
 
     spoc = {
-        'id':                decision['adId'],
-        'flight_id':         decision['flightId'],
-        'campaign_id':       decision['campaignId'],
-        'title':             custom_data['ctTitle'],
-        'url':               custom_data['ctUrl'],
-        'domain':            custom_data['ctDomain'],
-        'excerpt':           custom_data['ctExcerpt'],
-        'sponsor':           custom_data['ctSponsor'],
-        'context':           __get_context(custom_data['ctSponsor']),
-        'raw_image_src':     custom_data['ctFullimagepath'],
-        'image_src':         __get_cdn_image(custom_data['ctFullimagepath']),
-        'shim': {
-            'click':         tracking_url_to_shim(decision['clickUrl']),
-            'impression':    tracking_url_to_shim(decision['impressionUrl']),
-            'delete':        events_map[17],
-            'save':          events_map[20],
+        'id':                     decision['adId'],
+        'flight_id':              decision['flightId'],
+        'campaign_id':            decision['campaignId'],
+        'title':                  custom_data['ctTitle'],
+        'url':                    custom_data['ctUrl'],
+        'domain':                 custom_data['ctDomain'],
+        'excerpt':                custom_data['ctExcerpt'],
+        'sponsor':                custom_data['ctSponsor'],
+        'context':                __get_context(custom_data['ctSponsor']),
+        'raw_image_src':          custom_data['ctFullimagepath'],
+        'image_src':              __get_cdn_image(custom_data['ctFullimagepath']),
+        'shim':      {
+            'click':              tracking_url_to_shim(decision['clickUrl']),
+            'impression':         tracking_url_to_shim(decision['impressionUrl']),
+            'delete':             events_map[17],
+            'save':               events_map[20],
         },
-        'parameter_set':     'default',
-        'caps':              conf.spocs['caps'],
-        'domain_affinities': __get_domain_affinities(custom_data.get('ctDomain_affinities')),
-        'topics':            get_topics(body),
+        'parameter_set':          'default',
+        'caps':                   conf.spocs['caps'],
+        'domain_affinities':      __get_domain_affinities(custom_data.get('ctDomain_affinities')),
+        'personalization_models': get_personalization_models(body),
     }
 
     optional_fields = {
@@ -98,10 +98,11 @@ def to_collection(spocs):
     return collection
 
 
-def get_topics(body):
+def get_personalization_models(body):
     if body is None:
         return {}
     else:
+        # Topics in AdZerk prefixed with topic_ correspond with models in Firefox prefixed with nb_model_.
         p = re.compile('^topic_')
         return [p.sub('nb_model_', t) for t, v in body.items() if p.match(t) and v in ('true', True)]
 
