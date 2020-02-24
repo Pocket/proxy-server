@@ -24,7 +24,7 @@ def to_spoc(decision):
         'url':                    custom_data['ctUrl'],
         'domain':                 custom_data['ctDomain'],
         'excerpt':                custom_data['ctExcerpt'],
-        'context':                __get_context(custom_data['ctSponsor']),
+        'context':                __get_context(custom_data.get('ctSponsor')),
         'raw_image_src':          custom_data['ctFullimagepath'],
         'image_src':              __get_cdn_image(custom_data['ctFullimagepath']),
         'shim':      {
@@ -113,7 +113,7 @@ def __get_cdn_image(raw_image_url):
 
 
 def __get_context(sponsor):
-    return 'Sponsored by {0}'.format(sponsor)
+    return 'Sponsored by {0}'.format(sponsor) if sponsor else None
 
 
 def __get_domain_affinities(name):
