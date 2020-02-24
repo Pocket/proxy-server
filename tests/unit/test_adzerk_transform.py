@@ -1,9 +1,10 @@
 from unittest import TestCase
 from unittest.mock import patch
 
-from adzerk.transform import to_spoc, tracking_url_to_shim, is_collection, to_collection
-from tests.fixtures.mock_spoc import mock_spoc_2, mock_spoc_3_cta, mock_collection_spoc_2, mock_collection_spoc_3, mock_collection
-from tests.fixtures.mock_decision import mock_decision_2, mock_decision_3_cta
+from adzerk.transform import to_spoc, tracking_url_to_shim, is_collection, to_collection, get_personalization_models
+from tests.fixtures.mock_spoc import \
+    mock_spoc_2, mock_spoc_3_cta, mock_collection_spoc_2, mock_collection_spoc_3, mock_collection, mock_spoc_5_topics
+from tests.fixtures.mock_decision import mock_decision_2, mock_decision_3_cta, mock_decision_5_topics
 
 
 class TestAdZerkTransform(TestCase):
@@ -14,6 +15,10 @@ class TestAdZerkTransform(TestCase):
     @patch.dict('conf.domain_affinities', {"publishers": {'example.com': 1}})
     def test_to_spoc_cta(self):
         self.assertEqual(mock_spoc_3_cta, to_spoc(mock_decision_3_cta))
+
+    @patch.dict('conf.domain_affinities', {"publishers": {'example.com': 1}})
+    def test_to_spoc_topics(self):
+        self.assertEqual(mock_spoc_5_topics, to_spoc(mock_decision_5_topics))
 
     def test_tracking_url_to_shim(self):
         self.assertEqual('0,eyJ,Zz', tracking_url_to_shim('https://e-10250.adzerk.net/r?e=eyJ&s=Zz'))
@@ -31,3 +36,21 @@ class TestAdZerkTransform(TestCase):
 
     def test_to_collection(self):
         self.assertEqual(mock_collection, to_collection([mock_collection_spoc_2, mock_collection_spoc_3]))
+
+    def test_get_topics(self):
+        self.assertEqual(
+            ['nb_model_business', 'nb_model_technology'],
+            get_personalization_models({'topic_business': 'true', 'topic_technology': True}))
+
+        self.assertEqual(
+            [],
+            get_personalization_models({'topic_business': '', 'topic_technology': ''}))
+
+        self.assertEqual(
+            ['nb_model_business'],
+            get_personalization_models({'topic_business': 'true', 'topic_technology': 'false'}))
+
+        self.assertEqual(
+            ['nb_model_arts_and_entertainment'],
+            get_personalization_models({'other_property_business': 'true', 'topic_arts_and_entertainment': 'true'}))
+
