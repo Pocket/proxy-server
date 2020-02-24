@@ -25,6 +25,7 @@ default = {
                 "networkId": network_id,
                 "siteId": 1070098,
                 "adTypes": [2401, 3617],
+                "zoneIds": [217995],
                 "count": 20,
                 "eventIds": [17, 20],
             }]
