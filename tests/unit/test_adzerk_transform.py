@@ -3,8 +3,10 @@ from unittest.mock import patch
 
 from adzerk.transform import to_spoc, tracking_url_to_shim, is_collection, to_collection, get_personalization_models
 from tests.fixtures.mock_spoc import \
-    mock_spoc_2, mock_spoc_3_cta, mock_collection_spoc_2, mock_collection_spoc_3, mock_collection, mock_spoc_5_topics
-from tests.fixtures.mock_decision import mock_decision_2, mock_decision_3_cta, mock_decision_5_topics
+    mock_spoc_2, mock_spoc_3_cta, mock_collection_spoc_2, mock_collection_spoc_3, mock_collection, mock_spoc_5_topics,\
+    mock_spoc_6_no_sponsor
+from tests.fixtures.mock_decision import mock_decision_2, mock_decision_3_cta, mock_decision_5_topics,\
+    mock_decision_6_no_sponsor
 
 
 class TestAdZerkTransform(TestCase):
@@ -19,6 +21,10 @@ class TestAdZerkTransform(TestCase):
     @patch.dict('conf.domain_affinities', {"publishers": {'example.com': 1}})
     def test_to_spoc_topics(self):
         self.assertEqual(mock_spoc_5_topics, to_spoc(mock_decision_5_topics))
+
+    @patch.dict('conf.domain_affinities', {"publishers": {'example.com': 1}})
+    def test_to_spoc_no_sponsor(self):
+        self.assertEqual(mock_spoc_6_no_sponsor, to_spoc(mock_decision_6_no_sponsor))
 
     def test_tracking_url_to_shim(self):
         self.assertEqual('0,eyJ,Zz', tracking_url_to_shim('https://e-10250.adzerk.net/r?e=eyJ&s=Zz'))

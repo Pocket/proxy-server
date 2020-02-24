@@ -161,3 +161,7 @@ mock_collection_response['contents'][0]['data']['ctCollectionTitle'] = "Best of 
 mock_decision_5_topics = deepcopy(mock_decision_2)
 mock_decision_5_topics['adId'] = 5
 mock_decision_5_topics['contents'][0]['body'] = "{\"topic_arts_and_entertainment\":\"\",\"topic_autos_and_vehicles\":\"true\",\"topic_beauty_and_fitness\":\"true\"}"
+
+mock_decision_6_no_sponsor = deepcopy(mock_decision_2)
+mock_decision_6_no_sponsor['adId'] = 6
+del mock_decision_6_no_sponsor['contents'][0]['data']['ctSponsor']
