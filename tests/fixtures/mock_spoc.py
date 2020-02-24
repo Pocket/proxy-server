@@ -61,4 +61,4 @@ mock_spoc_5_topics["personalization_models"] = ["nb_model_autos_and_vehicles", "
 mock_spoc_6_no_sponsor = deepcopy(mock_spoc_2)
 mock_spoc_6_no_sponsor["id"] = 6
 del mock_spoc_6_no_sponsor["sponsor"]
-mock_spoc_6_no_sponsor["context"] = None
+mock_spoc_6_no_sponsor["context"] = ""

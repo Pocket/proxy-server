@@ -113,7 +113,7 @@ def __get_cdn_image(raw_image_url):
 
 
 def __get_context(sponsor):
-    return 'Sponsored by {0}'.format(sponsor) if sponsor else None
+    return 'Sponsored by {0}'.format(sponsor) if sponsor else ''
 
 
 def __get_domain_affinities(name):
