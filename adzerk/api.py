@@ -66,8 +66,10 @@ class Api:
             default_placement = body['placements'].pop(0)   # remove default
             for place in self.placements:
                 copy_place = deepcopy(default_placement)
-                copy_place['adTypes'] = place['ad_types'] if 'ad_types' in place else None
-                copy_place['zoneIds'] = place['zone_ids'] if 'zone_ids' in place else None
+                if 'ad_types' in place:
+                    copy_place['adTypes'] = place['ad_types']
+                if 'zone_ids' in place:
+                    copy_place['zoneIds'] = place['zone_ids']
                 copy_place['divName'] = place['name']
                 body['placements'].append(copy_place)
 

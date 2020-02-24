@@ -3,7 +3,7 @@ from unittest.mock import patch
 import responses
 
 from adzerk.api import Api
-from tests.fixtures.mock_placements import mock_placements
+from tests.fixtures.mock_placements import mock_placements, mock_spocs_placement
 
 
 class TestAdZerkApi(TestCase):
@@ -64,6 +64,14 @@ class TestAdZerkApi(TestCase):
             self.assertEqual(10250, p['networkId'])
             self.assertEqual(1070098, p['siteId'])
             self.assertEqual(20, p['count'])
+            self.assertEqual([5000], p['zoneIds'])
+
+    def test_default_zone(self):
+        api = Api(pocket_id="{123}", placements=mock_spocs_placement)
+        body = api.get_decision_body()
+        self.assertTrue(1, len(body['placements']))
+        for p in body['placements']:
+            self.assertEqual([217995], p['zoneIds'])
 
     @patch.dict('conf.adzerk', {"api_key": "DUMMY_123"})
     @responses.activate

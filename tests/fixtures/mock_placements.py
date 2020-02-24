@@ -1,3 +1,13 @@
+mock_spocs_placement = [
+    {
+        "name": "spocs",
+        "ad_types": [
+            2401,
+            3617
+        ]
+    }
+]
+
 mock_placements = [
     {
         "name": "top-sites",
@@ -9,7 +19,6 @@ mock_placements = [
         "ad_types": [99, 400],
         "zone_ids": [5000],
     }
-
 ]
 
 mock_collection_placements = [
@@ -29,6 +38,9 @@ mock_collection_placements = [
         "ad_types": [
             2401,
             3617
+        ],
+        "zone_ids": [
+            217995
         ],
         "count": 20
     }
