@@ -50,6 +50,7 @@ mock_collection_spoc_3["collection_title"] = "Best of the Web"
 mock_collection = {
     "title": "Best of the Web",
     "sponsor": "WallMarket",
+    "context": "Sponsored by WallMarket",
     "flight_id": 8525375,
     "items": [deepcopy(mock_spoc_2), deepcopy(mock_spoc_3_cta)]
 }
