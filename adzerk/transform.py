@@ -89,6 +89,7 @@ def to_collection(spocs):
         'title':     spocs[0]['collection_title'],
         'flight_id': spocs[0]['flight_id'],
         'sponsor':   spocs[0]['sponsor'],
+        'context':   __get_context(spocs[0]['sponsor']),
     }
 
     for spoc in spocs:
