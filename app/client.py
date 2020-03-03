@@ -37,10 +37,15 @@ class Client:
 
         try:
             geo = self.geolocation.get_city(self.ip)
-            targeting['country'] = self.country if self.country else self.geolocation.get_country(geo)
-            targeting['region'] = self.region if self.region else self.geolocation.get_region(geo)
+            targeting['country'] = self.geolocation.get_country(geo)
+            targeting['region'] = self.geolocation.get_region(geo)
         except Exception as e:
             logging.warning("Could not target based on geolocation. {0}".format(str(e)))
+
+        if self.country:
+            targeting['country'] = self.country
+        if self.region:
+            targeting['region'] = self.region
 
         if self.pocket_id:
             targeting['pocket_id'] = self.pocket_id
