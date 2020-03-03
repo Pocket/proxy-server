@@ -46,10 +46,10 @@ class TestAdZerkApi(TestCase):
         self.assertEqual('DUMMY_123', request.headers['X-Adzerk-ApiKey'])
 
     def test_keywords(self):
-        api = Api(pocket_id="{123}", country='USA', region='CA')
+        api = Api(pocket_id="{123}", country='US', region='CA')
         body = api.get_decision_body()
-        self.assertTrue('country-USA' in body['keywords'])
-        self.assertTrue('region-CA' in body['keywords'])
+        self.assertTrue('US' in body['keywords'])
+        self.assertTrue('US-CA' in body['keywords'])
 
     def test_keywords_empty(self):
         api = Api(pocket_id="{123}")
