@@ -20,7 +20,7 @@ def create_app():
     @app.route('/spocs', methods=['POST'])
     def get_spocs():
         required_params = set(['version', 'consumer_key', 'pocket_id'])
-        optional_params = set(['site', 'placements'])
+        optional_params = set(['site', 'placements', 'country', 'region'])
         req_params = __get_request_params()
         return call(req_params, required_params, optional_params=optional_params)
 
@@ -110,8 +110,8 @@ def create_app():
         for k, v in request.json.items():
             req_params.update({k: v})
         for k, v in request.args.items():
-            if k == 'site':
-                req_params.update({'site': v})
+            if k in ('site', 'country', 'region'):
+                req_params.update({k: v})
         if 'site' not in req_params:
             req_params.update({'site': None})
         if 'placements' not in req_params:

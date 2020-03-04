@@ -347,6 +347,25 @@ production = development = {
         "msnbc.com": 1,
         "bbc.com": 1
     },
+    "innogamesluxury": {
+        "rolex.com": 1,
+        "mercedes-benz.com": 1,
+        "ferrari.com": 1,
+        "callawaygolf.com": 1,
+        "titleist.com": 1,
+        "hugoboss.com": 1,
+        "tesla.com": 1,
+        "maserati.com": 1,
+        "porsche.com": 1
+    },
+    "innogamesfun": {
+        "9gag.com": 1,
+        "imgur.com": 1,
+        "buzzfeed.com": 1,
+        "cheezburger.com": 1,
+        "funnyordie.com": 1,
+        "reddit.com": 1
+    },
     "abstract": {
         "getbootstrap.com": 1,
         "sitepoint.com": 1,
@@ -395,7 +414,7 @@ production = development = {
         "elle.com": 1,
         "womenshealthmag.com": 1,
         "refinery29.com": 1,
-        "popsugar.com ": 1
+        "popsugar.com": 1
     },
     "monday1": {
         "producthunt.com": 1,
@@ -459,6 +478,14 @@ production = development = {
         "quora.com": 1,
         "shopify.com": 1,
         "wrike.com": 1
+    },
+    "monday7": {
+        "getflow.com": 1,
+        "asana.com": 1,
+        "wikijob.co.uk": 1,
+        "atlassian.com": 1,
+        "cleverism.com": 1,
+        "deviniti.com": 1
     },
     "monday8": {
         "entrepreneur.com": 1,
@@ -581,5 +608,26 @@ production = development = {
         "npmjs.com": 1,
         "packagist.org": 1,
         "twilio.com": 1
+    },
+    "thuma": {
+        "casper.com": 1,
+        "tuftandneedle.com": 1,
+        "leesa.com": 1,
+        "nectarsleep.com": 1,
+        "purple.com": 1,
+        "snowehome.com": 1,
+        "shop.lululemon.com": 1,
+        "patagonia.com": 1,
+        "outdoorvoices.com": 1,
+        "theartifox.com": 1,
+        "rimowa.com": 1,
+        "warbyparker.com": 1,
+        "awaytravel.com": 1,
+        "burrow.com": 1,
+        "campaignliving.com": 1,
+        "livefeather.com": 1,
+        "fernish.co": 1,
+        "interiordefine.com": 1,
+        "avocadogreenmattress.com": 1
     }
 }
