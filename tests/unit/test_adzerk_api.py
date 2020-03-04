@@ -51,6 +51,11 @@ class TestAdZerkApi(TestCase):
         self.assertTrue('US' in body['keywords'])
         self.assertTrue('US-CA' in body['keywords'])
 
+    def test_missing_region(self):
+        api = Api(pocket_id="{123}", country='US', region='')
+        body = api.get_decision_body()
+        self.assertEqual(['US'], body['keywords'])
+
     def test_keywords_empty(self):
         api = Api(pocket_id="{123}")
         body = api.get_decision_body()
@@ -76,11 +81,11 @@ class TestAdZerkApi(TestCase):
     @patch.dict('conf.adzerk', {"api_key": "DUMMY_123"})
     @responses.activate
     def test_site_is_not_stored_in_conf(self):
-        api = Api(pocket_id="{123}", country='USA', region='CA', site=1084367)
+        api = Api(pocket_id="{123}", country='US', region='CA', site=1084367)
         body = api.get_decision_body()
         self.assertEqual(1084367, body['placements'][0]['siteId'])
 
-        api = Api(pocket_id="{123}", country='USA', region='CA')
+        api = Api(pocket_id="{123}", country='US', region='CA')
         body = api.get_decision_body()
         self.assertEqual(1070098, body['placements'][0]['siteId'])
 
