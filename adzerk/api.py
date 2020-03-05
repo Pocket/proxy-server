@@ -48,10 +48,10 @@ class Api:
         if self.pocket_id is not None:
             body['user'] = {'key': self.pocket_id}
         keywords = []
-        if self.country is not None:
-            keywords.append('country-' + self.country)
-        if self.region is not None:
-            keywords.append('region-' + self.region)
+        if self.country:
+            keywords.append(self.country)
+            if self.region:
+                keywords.append(self.country + '-' + self.region)
         if keywords:
             body['keywords'] = keywords
 
