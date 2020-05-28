@@ -57,7 +57,7 @@ def to_spoc(decision):
         logging.warning(str(e))
 
     try:
-        spoc['is_video'] = distutils.util.strtobool(custom_data['ctIsVideo'].strip())
+        spoc['is_video'] = bool(distutils.util.strtobool(custom_data['ctIsVideo'].strip()))
     except (KeyError, ValueError):
         # Don't set is_video if ctIsVideo is not present or not a boolean (e.g. an empty string)
         pass
