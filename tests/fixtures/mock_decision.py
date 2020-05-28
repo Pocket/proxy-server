@@ -133,6 +133,7 @@ mock_decision_2 = {
         "ctExcerpt": "Get up to 50% off furniture, bedding, and more.",
         "ctFullimagepath": "https://cdn.net/25a.jpg",
         "ctSponsor": "WallMarket",
+        "ctIsVideo": "",
         "ctImage": "25a.jpg",
         "fileName": "25a.jpg"
       }
@@ -165,3 +166,7 @@ mock_decision_5_topics['contents'][0]['body'] = "{\"topic_arts_and_entertainment
 mock_decision_6_no_sponsor = deepcopy(mock_decision_2)
 mock_decision_6_no_sponsor['adId'] = 6
 del mock_decision_6_no_sponsor['contents'][0]['data']['ctSponsor']
+
+mock_decision_7_is_video = deepcopy(mock_decision_2)
+mock_decision_7_is_video['adId'] = 7
+mock_decision_7_is_video['contents'][0]['data']['ctIsVideo'] = " Yes  "

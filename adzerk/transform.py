@@ -2,6 +2,7 @@ from urllib import parse
 import json
 import re
 import logging
+import distutils.util
 
 import conf
 
@@ -54,6 +55,12 @@ def to_spoc(decision):
         spoc['item_score'] = float(custom_data['ctItem_score'])
     except (KeyError, ValueError) as e:
         logging.warning(str(e))
+
+    try:
+        spoc['is_video'] = distutils.util.strtobool(custom_data['ctIsVideo'].strip())
+    except (KeyError, ValueError):
+        # Don't set is_video if ctIsVideo is not present or not a boolean (e.g. an empty string)
+        pass
 
     return spoc
 
