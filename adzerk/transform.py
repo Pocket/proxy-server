@@ -40,9 +40,10 @@ def to_spoc(decision):
     }
 
     optional_fields = {
-        'ctCta':             'cta',
-        'ctCollectionTitle': 'collection_title',
-        'ctSponsor':         'sponsor',
+        'ctCta':                 'cta',
+        'ctCollectionTitle':     'collection_title',
+        'ctSponsor':             'sponsor',
+        'ctSponsoredByOverride': 'sponsored_by_override',
     }
     for adzerk_key, spoc_key in optional_fields.items():
         if adzerk_key in custom_data and custom_data[adzerk_key]:
