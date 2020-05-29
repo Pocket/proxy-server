@@ -428,7 +428,7 @@ production = development = {
         "projectmanager.com": 1,
         "teodesk.com": 1,
         "support.office.com": 1,
-        "www.forbes.com": 1,
+        "forbes.com": 1,
         "asana.com": 1
     },
     "monday2": {
@@ -680,5 +680,52 @@ production = development = {
         "us-mattress.com": 1,
         "serta.com": 1,
         "zomasleep.com": 1
+    },
+    "chirpeducation": {
+        "goodreads.com": 1,
+        "bookriot.com": 1,
+        "theskimm.com": 1,
+        "consumerreports.org": 1,
+        "aarp.org": 1,
+        "positiveparentingsolutions.com": 1,
+        "thedailybeast.com": 1,
+        "refinery29.com": 1,
+        "nytimes.com": 1
+    },
+    "chirpfoodandhome": {
+        "becomingminimalist.com": 1,
+        "thepaleosecret.com": 1,
+        "youngliving.com": 1,
+        "dailyom.com": 1,
+        "forksoverknives.com": 1,
+        "amazon.com": 1,
+        "traditionalmedicinals.com": 1,
+        "joann.com": 1,
+        "fitbit.com": 1,
+        "worldmarket.com": 1,
+        "birchlane.com": 1,
+        "bobsredmill.com": 1,
+        "sixsistersstuff.com": 1,
+        "mybluprint.com": 1,
+        "hungry-girl.com": 1,
+        "thrivemarket.com": 1,
+        "blueapron.com": 1,
+        "hellofresh.com": 1,
+        "kingarthurflour.com": 1,
+        "delish.com": 1,
+        "brit.co": 1
+    },
+    "chirpbudget": {
+        "budget101.com": 1,
+        "passionatepennypincher.com": 1,
+        "thredup.com": 1,
+        "livingwellspendingless.com": 1,
+        "odditymall.com": 1,
+        "thepennyhoarder.com": 1,
+        "coupons.com": 1,
+        "retailmenot.com": 1,
+        "coupons.today.com": 1,
+        "thekrazycouponlady.com": 1,
+        "rakuten.com": 1
     }
 }
