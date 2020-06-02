@@ -2,6 +2,7 @@ from urllib import parse
 import json
 import re
 import logging
+import distutils.util
 
 import conf
 
@@ -40,9 +41,10 @@ def to_spoc(decision):
     }
 
     optional_fields = {
-        'ctCta':             'cta',
-        'ctCollectionTitle': 'collection_title',
-        'ctSponsor':         'sponsor',
+        'ctCta':                 'cta',
+        'ctCollectionTitle':     'collection_title',
+        'ctSponsor':             'sponsor',
+        'ctSponsoredByOverride': 'sponsored_by_override',
     }
     for adzerk_key, spoc_key in optional_fields.items():
         if adzerk_key in custom_data and custom_data[adzerk_key]:
@@ -53,6 +55,12 @@ def to_spoc(decision):
         spoc['item_score'] = float(custom_data['ctItem_score'])
     except (KeyError, ValueError) as e:
         logging.warning(str(e))
+
+    try:
+        spoc['is_video'] = bool(distutils.util.strtobool(custom_data['ctIsVideo'].strip()))
+    except (KeyError, ValueError):
+        # Don't set is_video if ctIsVideo is not present or not a boolean (e.g. an empty string)
+        pass
 
     return spoc
 

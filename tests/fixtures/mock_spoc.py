@@ -63,3 +63,7 @@ mock_spoc_6_no_sponsor = deepcopy(mock_spoc_2)
 mock_spoc_6_no_sponsor["id"] = 6
 del mock_spoc_6_no_sponsor["sponsor"]
 mock_spoc_6_no_sponsor["context"] = ""
+
+mock_spoc_7_is_video = deepcopy(mock_spoc_2)
+mock_spoc_7_is_video["id"] = 7
+mock_spoc_7_is_video["is_video"] = True
