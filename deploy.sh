@@ -1,9 +1,8 @@
 #!/usr/bin/env bash
 
-usage="$(basename "$0") -p <aws profile> [-a <app ecr uri>] [-n <nginx ecr uri>]
+usage="$(basename "$0") [-a <app ecr uri>] [-n <nginx ecr uri>]
 
 where:
-    -p  is your AWS profile name in ~/.aws/config
     -a  uri of app ECR image
     -n  uri of nginx ECR image"
 
@@ -27,8 +26,6 @@ while getopts ':hp:a:n:' option; do
   case "$option" in
     h) echo "$usage"
        exit
-       ;;
-    p) PROFILE=$OPTARG
        ;;
     a) APP_URI=$OPTARG
        ;;
@@ -55,7 +52,7 @@ fi
 
 # Login to ECR
 Print "Logging in..."
-$(aws ecr get-login --no-include-email --region us-east-1 --profile `echo ${PROFILE}`)
+$(aws ecr get-login --no-include-email --region us-east-1)
 
 Deploy()
 {
