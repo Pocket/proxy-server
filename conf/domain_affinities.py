@@ -690,7 +690,20 @@ production = development = {
         "positiveparentingsolutions.com": 1,
         "thedailybeast.com": 1,
         "refinery29.com": 1,
-        "nytimes.com": 1
+        "nytimes.com": 1,
+        "coursera.org": 1,
+        "classcentral.com": 1,
+        "khanacademy.org": 1,
+        "udemy.com": 1,
+        "udacity.com": 1,
+        "linkedin.com": 1,
+        "lynda.com": 1,
+        "pluralsight.com": 1,
+        "skillshare.com": 1,
+        "codecademy.com": 1,
+        "edx.org": 1,
+        "ted.com": 1,
+        "bookofthemonth.com": 1
     },
     "chirpfoodandhome": {
         "becomingminimalist.com": 1,
@@ -713,7 +726,26 @@ production = development = {
         "hellofresh.com": 1,
         "kingarthurflour.com": 1,
         "delish.com": 1,
-        "brit.co": 1
+        "brit.co": 1,
+        "bonappetit.com": 1,
+        "apartmenttherapy.com": 1,
+        "foodandwine.com": 1,
+        "cooksillustrated.com": 1,
+        "thekitchn.com": 1,
+        "seriouseats.com": 1,
+        "potterybarn.com": 1,
+        "homechef.com": 1,
+        "plated.com": 1,
+        "splendidspoon.com": 1,
+        "sunbasket.com": 1,
+        "freshdirect.com": 1,
+        "daily-harvest.com": 1,
+        "buzzfeed.com": 1,
+        "wayfair.com": 1,
+        "overstock.com": 1,
+        "hgtv.com": 1,
+        "houzz.com": 1,
+        "popsugar.com": 1
     },
     "chirpbudget": {
         "budget101.com": 1,
@@ -726,6 +758,15 @@ production = development = {
         "retailmenot.com": 1,
         "coupons.today.com": 1,
         "thekrazycouponlady.com": 1,
-        "rakuten.com": 1
+        "rakuten.com": 1,
+        "money.usnews.com": 1,
+        "nerdwallet.com": 1,
+        "couponmom.com": 1,
+        "joinhoney.com": 1,
+        "ibotta.com": 1,
+        "swagbucks.com": 1,
+        "mint.com": 1,
+        "robinhood.com": 1,
+        "chime.com": 1
     }
 }
