@@ -2,7 +2,13 @@
 #
 # Check https://circleci.com/docs/2.0/language-python/ for more details
 #
-version: 2
+version: 2.1
+
+orbs:
+  aws-cli: circleci/aws-cli@0.1.13
+  aws-ecr: circleci/aws-ecr@6.9.0
+  assume-role: airswap/assume-role@0.2.0
+
 jobs:
   tests_unit:
     docker:
@@ -47,8 +53,148 @@ jobs:
       - store_artifacts:
           path: proxy-server-coverage
 
+
+  build_app:
+    docker:
+      - image: pocket/ops-cli:v0.0.5
+        environment:
+          MAIN_IMAGE_NAME: proxy-server-app
+    steps:
+      - checkout
+      - run:
+          name: Setup common environment variables
+          command: |
+            echo 'export AWS_ECR_ACCOUNT_PROD_URL="${ACCOUNT_ID_PROD}.dkr.ecr.us-east-1.amazonaws.com"' >> $BASH_ENV
+            echo 'export AWS_ECR_ACCOUNT_DEV_URL="${ACCOUNT_ID_DEV}.dkr.ecr.us-east-1.amazonaws.com"' >> $BASH_ENV
+            echo 'export AWS_ECR_ACCOUNT_URL="${AWS_ECR_ACCOUNT_PROD_URL}"' >> $BASH_ENV
+      - assume-role/assume-role:
+          account-id: $ACCOUNT_ID_PROD
+      - aws-ecr/build-and-push-image:
+          checkout: false
+          repo: $MAIN_IMAGE_NAME
+          setup-remote-docker: true
+          tag: $CIRCLE_SHA1,latest
+          extra-build-args: "--build-arg GIT_SHA1=$CIRCLE_SHA1 \
+            --build-arg GIT_BRANCH=$CIRCLE_BRANCH"
+          dockerfile: ./images/app/Dockerfile
+      - assume-role/assume-role:
+          account-id: $ACCOUNT_ID_DEV
+      - run:
+          name: Retag And Setup
+          command: |
+            echo 'export AWS_ECR_ACCOUNT_URL="${AWS_ECR_ACCOUNT_DEV_URL}"' >> $BASH_ENV
+            docker tag ${AWS_ECR_ACCOUNT_PROD_URL}/${MAIN_IMAGE_NAME}:$CIRCLE_SHA1 ${AWS_ECR_ACCOUNT_DEV_URL}/${MAIN_IMAGE_NAME}:$CIRCLE_SHA1
+            docker tag ${AWS_ECR_ACCOUNT_PROD_URL}/${MAIN_IMAGE_NAME}:latest ${AWS_ECR_ACCOUNT_DEV_URL}/${MAIN_IMAGE_NAME}:latest
+      - aws-ecr/ecr-login
+      - aws-ecr/push-image:
+          repo: $MAIN_IMAGE_NAME
+          tag: $CIRCLE_SHA1
+      - aws-ecr/push-image:
+          repo: $MAIN_IMAGE_NAME
+          tag: latest
+
+
+#  build_nginx:
+#    docker:
+#      - image: pocket/ops-cli:v0.0.5
+#        environment:
+#          MAIN_IMAGE_NAME: proxy-server-nginx
+#    steps:
+#      - checkout
+#      - run:
+#          name: Setup common environment variables
+#          command: |
+#            echo 'export AWS_ECR_ACCOUNT_PROD_URL="${ACCOUNT_ID_PROD}.dkr.ecr.us-east-1.amazonaws.com"' >> $BASH_ENV
+#            echo 'export AWS_ECR_ACCOUNT_DEV_URL="${ACCOUNT_ID_DEV}.dkr.ecr.us-east-1.amazonaws.com"' >> $BASH_ENV
+#            echo 'export AWS_ECR_ACCOUNT_URL="${AWS_ECR_ACCOUNT_PROD_URL}"' >> $BASH_ENV
+#      - assume-role/assume-role:
+#          account-id: $ACCOUNT_ID_PROD
+#      - aws-ecr/build-and-push-image:
+#          checkout: false
+#          repo: $MAIN_IMAGE_NAME
+#          setup-remote-docker: true
+#          tag: $CIRCLE_SHA1,latest
+#          extra-build-args: "--build-arg GIT_SHA1=$CIRCLE_SHA1 \
+#            --build-arg GIT_BRANCH=$CIRCLE_BRANCH"
+#          dockerfile: ./images/nginx/Dockerfile
+#          path: images/nginx/
+#      - assume-role/assume-role:
+#          account-id: $ACCOUNT_ID_DEV
+#      - run:
+#          name: Retag And Setup
+#          command: |
+#            echo 'export AWS_ECR_ACCOUNT_URL="${AWS_ECR_ACCOUNT_DEV_URL}"' >> $BASH_ENV
+#            docker tag ${AWS_ECR_ACCOUNT_PROD_URL}/${MAIN_IMAGE_NAME}:$CIRCLE_SHA1 ${AWS_ECR_ACCOUNT_DEV_URL}/${MAIN_IMAGE_NAME}:$CIRCLE_SHA1
+#            docker tag ${AWS_ECR_ACCOUNT_PROD_URL}/${MAIN_IMAGE_NAME}:latest ${AWS_ECR_ACCOUNT_DEV_URL}/${MAIN_IMAGE_NAME}:latest
+#      - aws-ecr/ecr-login
+#      - aws-ecr/push-image:
+#          repo: $MAIN_IMAGE_NAME
+#          tag: $CIRCLE_SHA1
+#      - aws-ecr/push-image:
+#          repo: $MAIN_IMAGE_NAME
+#          tag: latest
+
+
+  feature_deploy:
+    docker:
+      - image: pocket/ops-cli:v0.0.5
+        environment:
+          MAIN_IMAGE_NAME: proxy-server-app
+    steps:
+      - checkout
+      - run:
+          name: Setup common environment variables
+          command: |
+            echo 'export AWS_ECR_ACCOUNT_PROD_URL="${ACCOUNT_ID_PROD}.dkr.ecr.us-east-1.amazonaws.com"' >> $BASH_ENV
+            echo 'export AWS_ECR_ACCOUNT_DEV_URL="${ACCOUNT_ID_DEV}.dkr.ecr.us-east-1.amazonaws.com"' >> $BASH_ENV
+            echo 'export AWS_ECR_ACCOUNT_URL="${AWS_ECR_ACCOUNT_PROD_URL}"' >> $BASH_ENV
+      - assume-role/assume-role:
+          account-id: $ACCOUNT_ID_PROD
+      - run:
+          name: Deploy
+          command: |
+            ops-cli feature-deploy \
+            --param-file .aws/pfm_feature.json \
+            --template-file .aws/service.cfn.yaml \
+            --git-sha "$CIRCLE_SHA1" \
+            --branch-name "$CIRCLE_BRANCH" \
+            --image-name ${AWS_ECR_ACCOUNT_PROD_URL}/${MAIN_IMAGE_NAME}:${CIRCLE_SHA1}
+      - run:
+          name: Notify Deploy
+          command: |
+            ops-cli feature-deploy-notify \
+            --param-file .aws/pfm_feature.json \
+            --template-file .aws/service.cfn.yaml \
+            --git-sha "$CIRCLE_SHA1" \
+            --branch-name "$CIRCLE_BRANCH" \
+            --github-username "$CIRCLE_USERNAME" \
+            --github-compare-url "https://github.com/Pocket/${MAIN_IMAGE_NAME}/compare/master...$CIRCLE_SHA1" \
+            --slack-webhook "$SLACK_WEBHOOK" \
+            --github-token $GITHUB_TOKEN \
+            --github-owner Pocket \
+            --github-repo ${MAIN_IMAGE_NAME}
+
+# Workflow shortcuts
+not_master: &not_master
+  filters:
+    branches:
+      ignore:
+        - master
+
+only_master: &only_master
+  filters:
+    branches:
+      only:
+        - master
+
 workflows:
   version: 2
-  build_and_test:
+  all:
     jobs:
       - tests_unit
+      - build_app
+      - feature_deploy:
+          <<: *not_master
+          requires:
+            - test
+            - build
