@@ -10,7 +10,7 @@ orbs:
   assume-role: airswap/assume-role@0.2.0
 
 jobs:
-  tests_unit:
+  test:
     docker:
       - image: circleci/python:3.7.4
 
@@ -191,10 +191,10 @@ workflows:
   version: 2
   all:
     jobs:
-      - tests_unit
+      - test
       - build_app
       - feature_deploy:
           <<: *not_master
           requires:
             - test
-            - build
+            - build_app
