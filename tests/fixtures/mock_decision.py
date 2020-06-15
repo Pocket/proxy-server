@@ -170,3 +170,11 @@ del mock_decision_6_no_sponsor['contents'][0]['data']['ctSponsor']
 mock_decision_7_is_video = deepcopy(mock_decision_2)
 mock_decision_7_is_video['adId'] = 7
 mock_decision_7_is_video['contents'][0]['data']['ctIsVideo'] = " Yes  "
+
+mock_decision_8_blank_sponsored_by_override = deepcopy(mock_decision_2)
+mock_decision_8_blank_sponsored_by_override['adId'] = 8
+mock_decision_8_blank_sponsored_by_override['contents'][0]['data']['ctSponsoredByOverride'] = "BLANK "
+
+mock_decision_9_blank_sponsored_by_override = deepcopy(mock_decision_2)
+mock_decision_9_blank_sponsored_by_override['adId'] = 9
+mock_decision_9_blank_sponsored_by_override['contents'][0]['data']['ctSponsoredByOverride'] = "Brought by blank"
