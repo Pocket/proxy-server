@@ -100,8 +100,12 @@ def to_collection(spocs):
         'context':   __get_context(spocs[0]['sponsor']),
     }
 
+    if 'sponsored_by_override' in spocs[0]:
+        collection['sponsored_by_override'] = spocs[0]['sponsored_by_override']
+
     for spoc in spocs:
         del spoc['collection_title']
+        spoc.pop('sponsored_by_override', None)
 
     collection['items'] = spocs
     return collection

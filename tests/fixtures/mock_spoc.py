@@ -44,12 +44,15 @@ mock_spoc_3_cta["cta"] = "Learn more"
 
 mock_collection_spoc_2 = deepcopy(mock_spoc_2)
 mock_collection_spoc_2["collection_title"] = "Best of the Web"
+mock_collection_spoc_2["sponsored_by_override"] = "Brought to you by WallMarket"
 mock_collection_spoc_3 = deepcopy(mock_spoc_3_cta)
 mock_collection_spoc_3["collection_title"] = "Best of the Web"
+mock_collection_spoc_3["sponsored_by_override"] = "Brought to you by WallMarket"
 
 mock_collection = {
     "title": "Best of the Web",
     "sponsor": "WallMarket",
+    "sponsored_by_override": "Brought to you by WallMarket",
     "context": "Sponsored by WallMarket",
     "flight_id": 8525375,
     "items": [deepcopy(mock_spoc_2), deepcopy(mock_spoc_3_cta)]
