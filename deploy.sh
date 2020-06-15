@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 
-usage="$(basename "$0") -p <aws profile> [-a <app ecr uri>] [-n <nginx ecr uri>]
+usage="$(basename "$0") -s <ecr server> [-a <app repository name>] [-n <nginx repository name>]
 
 where:
-    -p  is your AWS profile name in ~/.aws/config
-    -a  uri of app ECR image
-    -n  uri of nginx ECR image"
+    -s  ECR server uri, e.g. \"1234.dkr.ecr.us-east-1.amazonaws.com\"
+    -a  ECR app repository name (or omit to not push it)
+    -n  ECR nginx repository name (or omit to not push it)"
 
 PROFILE=""
 NGINX_URI=""
@@ -23,16 +23,16 @@ Error () {
     printf "${RED}${1}${NC}\n"
 }
 
-while getopts ':hp:a:n:' option; do
+while getopts ':hp:s:a:n:' option; do
   case "$option" in
     h) echo "$usage"
        exit
        ;;
-    p) PROFILE=$OPTARG
+    s) SERVER=$OPTARG
        ;;
-    a) APP_URI=$OPTARG
+    a) APP_REPO=$OPTARG
        ;;
-    n) NGINX_URI=$OPTARG
+    n) NGINX_REPO=$OPTARG
        ;;
     :) Error "missing argument for -${OPTARG}\n"
        echo "$usage"
@@ -46,38 +46,52 @@ while getopts ':hp:a:n:' option; do
 done
 shift $((OPTIND - 1))
 
-if [[ -z ${APP_URI} ]] && [[ -z ${NGINX_URI} ]]
+if [[ -z ${SERVER} ]]
 then
-    Error "app or nginx uri needs to be provided"
+    Error "server needs to be provided"
+    echo "$usage"
+    exit 1
+fi
+
+if [[ -z ${APP_REPO} ]] && [[ -z ${NGINX_REPO} ]]
+then
+    Error "app or nginx repo needs to be provided"
     echo "$usage"
     exit 1
 fi
 
 # Login to ECR
 Print "Logging in..."
-$(aws ecr get-login --no-include-email --region us-east-1 --profile `echo ${PROFILE}`)
+LOGIN=$(aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${SERVER})
+if [ $? -ne 0 ]
+then
+    Error "Failed to login to ECR"
+    exit 1
+fi
 
 Deploy()
 {
     DOCKER_FILE=$1
     CONTEXT=$2
     IMAGE=$3
-    URI=$4
+    SERVER=$4
+    REPO=$5
+    URI="${SERVER}/${REPO}"
 
-    if [[ ! -z ${URI} ]]
+    if [[ ! -z ${REPO} ]]
     then
         Print "Building ${DOCKER_FILE}..."
         TAG=`date +"%Y%m%d%H%M%S"` # tags uniquely with date, hour, minute and second
         docker build -f ${DOCKER_FILE} -t ${IMAGE}:${TAG} -t "${IMAGE}:latest" ${CONTEXT} &&
         docker tag ${IMAGE}:${TAG} ${URI}:${TAG} &&
         docker tag ${IMAGE}:${TAG} "${URI}:latest" &&   # move the 'latest' designation to the last timestamp
-        Print "Pushing ${URI}:${TAG}..."
-        docker push ${URI}:${TAG}
+        Print "Pushing ${URI}:${TAG}..." &&
+        docker push ${URI}:${TAG} &&
         docker push "${URI}:latest"
     fi
 }
 
-Deploy "images/nginx/Dockerfile" "images/nginx/" "proxy-server-nginx" ${NGINX_URI}
-Deploy "images/app/Dockerfile" "." "proxy-server-app" ${APP_URI}
+Deploy "images/nginx/Dockerfile" "images/nginx/" "proxy-server-nginx" ${SERVER} ${NGINX_REPO} &&
+Deploy "images/app/Dockerfile" "." "proxy-server-app" ${SERVER} ${APP_REPO} &&
 
 Print "Done."
