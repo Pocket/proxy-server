@@ -29,8 +29,9 @@ class TestAdZerkTransform(TestCase):
         self.assertEqual(mock_spoc_7_is_video, to_spoc(mock_decision_7_is_video))
 
     @patch.dict('conf.domain_affinities', {"publishers": {'example.com': 1}})
-    def test_to_spoc_is_video(self):
+    def test_to_spoc_sponsored_by_override(self):
         self.assertEqual(mock_spoc_8_blank_sponsored_by_override, to_spoc(mock_decision_8_blank_sponsored_by_override))
+        self.assertEqual(mock_spoc_9_sponsored_by_override, to_spoc(mock_decision_9_sponsored_by_override))
 
     def test_tracking_url_to_shim(self):
         self.assertEqual('0,eyJ,Zz', tracking_url_to_shim('https://e-10250.adzerk.net/r?e=eyJ&s=Zz'))

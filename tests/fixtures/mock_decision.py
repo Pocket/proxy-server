@@ -175,6 +175,6 @@ mock_decision_8_blank_sponsored_by_override = deepcopy(mock_decision_2)
 mock_decision_8_blank_sponsored_by_override['adId'] = 8
 mock_decision_8_blank_sponsored_by_override['contents'][0]['data']['ctSponsoredByOverride'] = "BLANK "
 
-mock_decision_9_blank_sponsored_by_override = deepcopy(mock_decision_2)
-mock_decision_9_blank_sponsored_by_override['adId'] = 9
-mock_decision_9_blank_sponsored_by_override['contents'][0]['data']['ctSponsoredByOverride'] = "Brought by blank"
+mock_decision_9_sponsored_by_override = deepcopy(mock_decision_2)
+mock_decision_9_sponsored_by_override['adId'] = 9
+mock_decision_9_sponsored_by_override['contents'][0]['data']['ctSponsoredByOverride'] = "Brought by blank"
