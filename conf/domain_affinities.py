@@ -768,5 +768,19 @@ production = development = {
         "mint.com": 1,
         "robinhood.com": 1,
         "chime.com": 1
+    },
+    "lovevery": {
+        "montikids.com": 1,
+        "kiwico.com": 1,
+        "babylist.com": 1,
+        "buybuybaby.com": 1,
+        "hellobello.com": 1,
+        "bluum.com": 1,
+        "cerebelly.com": 1,
+        "helloyumi.com": 1,
+        "tinyorganics.com": 1,
+        "chiccousa.com": 1,
+        "gracobaby.com": 1,
+        "littlespoon.com": 1
     }
 }
