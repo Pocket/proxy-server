@@ -50,6 +50,9 @@ def to_spoc(decision):
         if adzerk_key in custom_data and custom_data[adzerk_key]:
             spoc[spoc_key] = custom_data[adzerk_key]
 
+    if 'sponsored_by_override' in spoc:
+        spoc['sponsored_by_override'] = __clean_sponsored_by_override(spoc['sponsored_by_override'])
+
     try:
         spoc['min_score']  = float(custom_data['ctMin_score'])
         spoc['item_score'] = float(custom_data['ctItem_score'])
@@ -134,3 +137,11 @@ def __get_domain_affinities(name):
         return {}
     else:
         return conf.domain_affinities.get(str(name).lower(), dict())
+
+
+def __clean_sponsored_by_override(sponsored_by_override):
+    """
+    Return an empty string for 'sponsored_by_override' if the value in AdZerk is set to "blank" or "empty".
+    @type sponsored_by_override: str
+    """
+    return re.sub(r'^(blank|empty)$', '', sponsored_by_override.strip(), flags=re.IGNORECASE)
