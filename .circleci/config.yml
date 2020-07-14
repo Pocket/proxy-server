@@ -195,7 +195,7 @@ workflows:
       - build_app:
           requires:
             - test
-          context: pocket-dev
+          context: pocket-prod
       - feature_deploy:
           <<: *not_master
           requires:
