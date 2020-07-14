@@ -192,9 +192,11 @@ workflows:
   all:
     jobs:
       - test
-      - build_app
+      - build_app:
+          requires:
+            - test
+          context: pocket-dev
       - feature_deploy:
           <<: *not_master
           requires:
-            - test
             - build_app
