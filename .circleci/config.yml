@@ -53,6 +53,26 @@ jobs:
       - store_artifacts:
           path: proxy-server-coverage
 
+  test_aws:
+    docker:
+      - image: pocket/ops-cli:v0.0.5
+        environment:
+          MAIN_IMAGE_NAME: proxy-server-app
+    steps:
+      - checkout
+      - run:
+          name: Setup common environment variables
+          command: |
+            echo 'export AWS_ECR_ACCOUNT_PROD_URL="${ACCOUNT_ID_PROD}.dkr.ecr.us-east-1.amazonaws.com"' >> $BASH_ENV
+            echo 'export AWS_ECR_ACCOUNT_DEV_URL="${ACCOUNT_ID_DEV}.dkr.ecr.us-east-1.amazonaws.com"' >> $BASH_ENV
+            echo 'export AWS_ECR_ACCOUNT_URL="${AWS_ECR_ACCOUNT_PROD_URL}"' >> $BASH_ENV
+      - assume-role/assume-role:
+          account-id: $ACCOUNT_ID_PROD
+      - run:
+          name: Test AWS cli
+          command:
+            aws sts get-caller-identity
+
 
   build_app:
     docker:
@@ -82,7 +102,6 @@ jobs:
       - run:
           name: Retag And Setup
           command: |
-            aws sts get-caller-identity
             echo 'export AWS_ECR_ACCOUNT_URL="${AWS_ECR_ACCOUNT_DEV_URL}"' >> $BASH_ENV
             docker tag ${AWS_ECR_ACCOUNT_PROD_URL}/${MAIN_IMAGE_NAME}:$CIRCLE_SHA1 ${AWS_ECR_ACCOUNT_DEV_URL}/${MAIN_IMAGE_NAME}:$CIRCLE_SHA1
             docker tag ${AWS_ECR_ACCOUNT_PROD_URL}/${MAIN_IMAGE_NAME}:latest ${AWS_ECR_ACCOUNT_DEV_URL}/${MAIN_IMAGE_NAME}:latest
@@ -193,6 +212,7 @@ workflows:
   all:
     jobs:
       - test
+      - test_aws
       - build_app:
           requires:
             - test
