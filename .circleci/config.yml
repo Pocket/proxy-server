@@ -212,7 +212,8 @@ workflows:
   all:
     jobs:
       - test
-      - test_aws
+      - test_aws:
+          context: pocket-prod
       - build_app:
           requires:
             - test
