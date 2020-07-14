@@ -67,3 +67,11 @@ mock_spoc_6_no_sponsor["context"] = ""
 mock_spoc_7_is_video = deepcopy(mock_spoc_2)
 mock_spoc_7_is_video["id"] = 7
 mock_spoc_7_is_video["is_video"] = True
+
+mock_spoc_8_blank_sponsored_by_override = deepcopy(mock_spoc_2)
+mock_spoc_8_blank_sponsored_by_override["id"] = 8
+mock_spoc_8_blank_sponsored_by_override["sponsored_by_override"] = ""
+
+mock_spoc_9_sponsored_by_override = deepcopy(mock_spoc_2)
+mock_spoc_9_sponsored_by_override["id"] = 9
+mock_spoc_9_sponsored_by_override["sponsored_by_override"] = "Brought by blank"
