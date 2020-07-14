@@ -82,6 +82,7 @@ jobs:
       - run:
           name: Retag And Setup
           command: |
+            aws sts get-caller-identity
             echo 'export AWS_ECR_ACCOUNT_URL="${AWS_ECR_ACCOUNT_DEV_URL}"' >> $BASH_ENV
             docker tag ${AWS_ECR_ACCOUNT_PROD_URL}/${MAIN_IMAGE_NAME}:$CIRCLE_SHA1 ${AWS_ECR_ACCOUNT_DEV_URL}/${MAIN_IMAGE_NAME}:$CIRCLE_SHA1
             docker tag ${AWS_ECR_ACCOUNT_PROD_URL}/${MAIN_IMAGE_NAME}:latest ${AWS_ECR_ACCOUNT_DEV_URL}/${MAIN_IMAGE_NAME}:latest
