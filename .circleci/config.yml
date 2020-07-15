@@ -5,7 +5,7 @@
 version: 2.1
 
 orbs:
-  aws-cli: circleci/aws-cli@0.1.13
+  aws-cli: circleci/aws-cli@1.2.1
   aws-ecr: circleci/aws-ecr@6.10.0
   assume-role: airswap/assume-role@0.2.0
 
@@ -53,26 +53,6 @@ jobs:
       - store_artifacts:
           path: proxy-server-coverage
 
-  test_aws:
-    docker:
-      - image: pocket/ops-cli:v0.0.5
-        environment:
-          MAIN_IMAGE_NAME: proxy-server-app
-    steps:
-      - checkout
-      - run:
-          name: Setup common environment variables
-          command: |
-            echo 'export AWS_ECR_ACCOUNT_PROD_URL="${ACCOUNT_ID_PROD}.dkr.ecr.us-east-1.amazonaws.com"' >> $BASH_ENV
-            echo 'export AWS_ECR_ACCOUNT_DEV_URL="${ACCOUNT_ID_DEV}.dkr.ecr.us-east-1.amazonaws.com"' >> $BASH_ENV
-            echo 'export AWS_ECR_ACCOUNT_URL="${AWS_ECR_ACCOUNT_PROD_URL}"' >> $BASH_ENV
-      - assume-role/assume-role:
-          account-id: $ACCOUNT_ID_PROD
-      - run:
-          name: Test AWS cli
-          command:
-            aws sts get-caller-identity
-
 
   build_app:
     docker:
@@ -89,6 +69,8 @@ jobs:
             echo 'export AWS_ECR_ACCOUNT_URL="${AWS_ECR_ACCOUNT_PROD_URL}"' >> $BASH_ENV
       - assume-role/assume-role:
           account-id: $ACCOUNT_ID_PROD
+      - aws-cli/install:
+          version: 1
       - aws-ecr/build-and-push-image:
           checkout: false
           repo: $MAIN_IMAGE_NAME
