@@ -70,7 +70,7 @@ jobs:
       - assume-role/assume-role:
           account-id: $ACCOUNT_ID_PROD
       - aws-cli/install:
-          version: 1
+          version: "1"
       - aws-ecr/build-and-push-image:
           checkout: false
           repo: $MAIN_IMAGE_NAME
