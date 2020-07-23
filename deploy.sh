@@ -62,7 +62,7 @@ fi
 
 # Login to ECR
 Print "Logging in..."
-LOGIN=$(aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${SERVER})
+LOGIN=$(aws ecr get-login --no-include-email --region us-east-1)
 if [ $? -ne 0 ]
 then
     Error "Failed to login to ECR"
