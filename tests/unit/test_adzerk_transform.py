@@ -52,7 +52,7 @@ class TestAdZerkTransform(TestCase):
 
     def test_get_topics(self):
         self.assertEqual(
-            ['nb_model_business', 'nb_model_technology'],
+            ['business', 'technology'],
             get_personalization_models({'topic_business': 'true', 'topic_technology': True}))
 
         self.assertEqual(
@@ -60,9 +60,9 @@ class TestAdZerkTransform(TestCase):
             get_personalization_models({'topic_business': '', 'topic_technology': ''}))
 
         self.assertEqual(
-            ['nb_model_business'],
+            ['business'],
             get_personalization_models({'topic_business': 'true', 'topic_technology': 'false'}))
 
         self.assertEqual(
-            ['nb_model_arts_and_entertainment'],
+            ['arts_and_entertainment'],
             get_personalization_models({'other_property_business': 'true', 'topic_arts_and_entertainment': 'true'}))
