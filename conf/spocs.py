@@ -12,7 +12,7 @@ production = development = {
     },
     'settings': {
         "feature_flags": {
-            "spoc_v2": True,
+            "spoc_v2": False,
         },
         "spocsPerNewTabs": 1,
         "domainAffinityParameterSets": {
