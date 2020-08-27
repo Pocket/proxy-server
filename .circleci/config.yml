@@ -88,7 +88,7 @@ jobs:
                 name: Setup common environment variables
                 command: |
                   echo "building for prod...main image name is $MAIN_IMAGE_NAME"
-                  echo 'export AWS_ECR_ACCOUNT_PROXY_URL="${ACCOUNT_ID_PROXY}.dkr.ecr.us-east-1.amazonaws.com"' >> $BASH_ENV
+                  echo 'export AWS_ECR_ACCOUNT_PROD_URL="${ACCOUNT_ID_PROXY}.dkr.ecr.us-east-1.amazonaws.com"' >> $BASH_ENV
                   echo 'export AWS_ECR_ACCOUNT_URL="${AWS_ECR_ACCOUNT_PROD_URL}"' >> $BASH_ENV
             - assume-role/assume-role:
                 account-id: $ACCOUNT_ID_PROXY
