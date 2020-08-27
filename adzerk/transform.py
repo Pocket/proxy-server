@@ -120,7 +120,8 @@ def get_personalization_models(body):
     else:
         # Topics in AdZerk prefixed with topic_ correspond with models in Firefox prefixed with nb_model_.
         p = re.compile('^topic_')
-        return [p.sub('nb_model_', t) for t, v in body.items() if p.match(t) and v in ('true', True)]
+        return {k: 1 for k in [p.sub('', t) for t, v in body.items() if p.match(t) and v in ('true', True)]}
+
 
 
 def __get_cdn_image(raw_image_url):

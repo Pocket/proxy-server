@@ -60,7 +60,7 @@ mock_collection = {
 
 mock_spoc_5_topics = deepcopy(mock_spoc_2)
 mock_spoc_5_topics["id"] = 5
-mock_spoc_5_topics["personalization_models"] = ["nb_model_autos_and_vehicles", "nb_model_beauty_and_fitness"]
+mock_spoc_5_topics["personalization_models"] = {"autos_and_vehicles":1, "beauty_and_fitness": 1}
 
 mock_spoc_6_no_sponsor = deepcopy(mock_spoc_2)
 mock_spoc_6_no_sponsor["id"] = 6
