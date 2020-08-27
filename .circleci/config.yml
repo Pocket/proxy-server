@@ -58,10 +58,14 @@ jobs:
         type: enum
         enum: ["dev", "prod", "staging"]
         default: dev
+      main_image_name:
+        description: Main Docker image name
+        type: string
+        default: proxy
     docker:
       - image: pocket/ops-cli:v0.0.5
         environment:
-          MAIN_IMAGE_NAME: proxy-server-dev
+          MAIN_IMAGE_NAME: << parameters.main_image_name >>
     steps:
       - checkout
       - when:
@@ -80,10 +84,6 @@ jobs:
           condition:
             equal: ["prod", << parameters.env >>]
           steps:
-            - run:
-                name: Change main image name for prod
-                command: |
-                  export MAIN_IMAGE_NAME="proxy"
             - run:
                 name: Setup common environment variables
                 command: |
@@ -123,6 +123,7 @@ workflows:
       - build:
           <<: *not_master
           env: dev
+          main_image_name: proxy-server-dev
           context: pocket-proxy
           requires:
             - tests_unit
