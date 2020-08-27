@@ -36,22 +36,23 @@ The first time the service is deployed, follow the steps in the [CloudFormation 
 
 ### Deploy EMR images
 Run `./deploy.sh` with the following arguments:
-- `-p` AWS profile name from `~/.aws/config`
-- `-a` ECR URI for the app container
-- `-n` ECR URI for the nginx container
+- `-s` ECR server URI
+- `-a` ECR repository for the app container
+- `-n` ECR repository for the nginx container
 
-For example:
+It's recommended to use `aws-vault` to access AWS with the right credentials. For example:
 ```bash
-./deploy.sh -p pocket-proxy-rw \
--a "12345.dkr.ecr.us-east-1.amazonaws.com/proxy-server-dev:latest" \
--n "12345.dkr.ecr.us-east-1.amazonaws.com/proxy-server-nginx-dev:latest"
+aws-vault exec pocket-dev-rw -- ./deploy.sh -p pocket-proxy-rw \
+-s 12345.dkr.ecr.us-east-1.amazonaws.com \
+-a proxy-server-dev \
+-n proxy-server-nginx-dev
 ```
 
 ### Deploy Fargate
 Open Fargate in the AWS console and update the service, forcing a new deployment.
 
 # Telemetry Function
-The [Telemtry Handler](telemetry/handler.py) is triggered by telemetry from the Firefox discovery stream. It anonymously pings AdZerk to keep track of events related to sponsored content, such as clicks and impressions in a privacy-preserving way. The event code (or "shim") does not contain any personally identifiable data; we never share personal data with AdZerk.
+The [Telemtry Handler](telemetry/handler.py) is triggered by telemetry from the Firefox discovery stream. It anonymously pings AdZerk to keep track of events related to sponsored content, such as clicks and impressions, in a privacy-preserving way. The event code (or "shim") does not contain any personally identifiable data; we never share personal data with AdZerk.
 
 ## Deployment
  

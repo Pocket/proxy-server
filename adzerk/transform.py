@@ -2,6 +2,7 @@ from urllib import parse
 import json
 import re
 import logging
+import distutils.util
 
 import conf
 
@@ -40,19 +41,29 @@ def to_spoc(decision):
     }
 
     optional_fields = {
-        'ctCta':             'cta',
-        'ctCollectionTitle': 'collection_title',
-        'ctSponsor':         'sponsor',
+        'ctCta':                 'cta',
+        'ctCollectionTitle':     'collection_title',
+        'ctSponsor':             'sponsor',
+        'ctSponsoredByOverride': 'sponsored_by_override',
     }
     for adzerk_key, spoc_key in optional_fields.items():
         if adzerk_key in custom_data and custom_data[adzerk_key]:
             spoc[spoc_key] = custom_data[adzerk_key]
+
+    if 'sponsored_by_override' in spoc:
+        spoc['sponsored_by_override'] = __clean_sponsored_by_override(spoc['sponsored_by_override'])
 
     try:
         spoc['min_score']  = float(custom_data['ctMin_score'])
         spoc['item_score'] = float(custom_data['ctItem_score'])
     except (KeyError, ValueError) as e:
         logging.warning(str(e))
+
+    try:
+        spoc['is_video'] = bool(distutils.util.strtobool(custom_data['ctIsVideo'].strip()))
+    except (KeyError, ValueError):
+        # Don't set is_video if ctIsVideo is not present or not a boolean (e.g. an empty string)
+        pass
 
     return spoc
 
@@ -105,7 +116,8 @@ def get_personalization_models(body):
     else:
         # Topics in AdZerk prefixed with topic_ correspond with models in Firefox prefixed with nb_model_.
         p = re.compile('^topic_')
-        return [p.sub('nb_model_', t) for t, v in body.items() if p.match(t) and v in ('true', True)]
+        return {k: 1 for k in [p.sub('', t) for t, v in body.items() if p.match(t) and v in ('true', True)]}
+
 
 
 def __get_cdn_image(raw_image_url):
@@ -122,3 +134,11 @@ def __get_domain_affinities(name):
         return {}
     else:
         return conf.domain_affinities.get(str(name).lower(), dict())
+
+
+def __clean_sponsored_by_override(sponsored_by_override):
+    """
+    Return an empty string for 'sponsored_by_override' if the value in AdZerk is set to "blank" or "empty".
+    @type sponsored_by_override: str
+    """
+    return re.sub(r'^(blank|empty)$', '', sponsored_by_override.strip(), flags=re.IGNORECASE)
