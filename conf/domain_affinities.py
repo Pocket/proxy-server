@@ -856,5 +856,25 @@ production = development = {
         "nature.com": 1,
         "sciencemag.org": 1,
         "arstechnica.com": 1
+    },
+    "georgetown": {
+        "foreignaffairs.com": 1,
+        "foreignpolicy.com": 1,
+        "springer.com": 1,
+        "homelandsecurityreview.com": 1,
+        "thecyberwire.com": 1,
+        "afcea.org": 1,
+        "homelandsecuritynewsire.com": 1,
+        "homelandprepnews.com": 1,
+        "officer.com": 1,
+        "americansecuritytoday.com": 1,
+        "clearedconnections.com": 1,
+        "fopconnect.com": 1,
+        "ecommercetimes.com": 1,
+        "dice.com": 1,
+        "cyberscoop.com": 1,
+        "infosecurity-magazine.com": 1,
+        "threatpost.com": 1,
+        "darkreading.com": 1
     }
 }
