@@ -875,6 +875,19 @@ production = development = {
         "cyberscoop.com": 1,
         "infosecurity-magazine.com": 1,
         "threatpost.com": 1,
-        "darkreading.com": 1
+        "darkreading.com": 1,
+        "scmagazine.com": 1,
+        "securityintelligence.com": 1,
+        "fcw.com": 1,
+        "techrepublic.com": 1,
+        "federalnewsnetwork.com": 1,
+        "fedscoop.com": 1,
+        "nextgov.com": 1,
+        "federaltimes.com": 1,
+        "thehackernews.com": 1,
+        "welivesecurity.com": 1,
+        "bankinfosecurity.com": 1,
+        "csoonline.com": 1,
+        "krebsonsecurity.com": 1
     }
 }
