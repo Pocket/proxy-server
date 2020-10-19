@@ -914,5 +914,26 @@ production = development = {
         "wired.com": 1,
         "akamai.com": 1,
         "erratasec.com": 1
+    },
+    "route": {
+        "route.com": 1,
+        "shopify.com": 1,
+        "bigcommerce.com": 1,
+        "woocommerce.com": 1,
+        "magento.com": 1,
+        "wix.com": 1,
+        "klarna.com": 1,
+        "privy.com": 1,
+        "squarespace.com": 1,
+        "wordpress.com": 1,
+        "shipstation.com": 1,
+        "afterpay.com": 1,
+        "affirm.com": 1,
+        "bolt.com": 1,
+        "ecommercetimes.com": 1,
+        "digitalcommerce360.com": 1,
+        "ecommercenext.org": 1,
+        "wpbeginner.com": 1,
+        "boldcommerce.com": 1
     }
 }
