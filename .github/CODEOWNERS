@@ -1,5 +1,2 @@
 #All Files
-*                         @pocket/DataLearning
-.circleci/                @pocket/Backend
-images/                   @pocket/Backend
-docker-compose.yml        @pocket/Backend
+*                @pocket/Backend
