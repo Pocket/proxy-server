@@ -117,7 +117,7 @@ mock_decision_2 = {
   "creativeId": 9142593,
   "flightId": 8525375,
   "campaignId": 887195,
-  "priorityId": 155142,
+  "priorityId": 147517,
   "clickUrl": "https://e-10250.adzerk.net/r?e=jq&s=s2",
   "impressionUrl": "https://e-10250.adzerk.net/i.gif?e=ke1&s=s3",
   "contents": [
@@ -178,3 +178,7 @@ mock_decision_8_blank_sponsored_by_override['contents'][0]['data']['ctSponsoredB
 mock_decision_9_sponsored_by_override = deepcopy(mock_decision_2)
 mock_decision_9_sponsored_by_override['adId'] = 9
 mock_decision_9_sponsored_by_override['contents'][0]['data']['ctSponsoredByOverride'] = "Brought by blank"
+
+mock_decision_10_missing_priority = deepcopy(mock_decision_2)
+mock_decision_10_missing_priority['adId'] = 10
+mock_decision_10_missing_priority['priorityId'] = 147520

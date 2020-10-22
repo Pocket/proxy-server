@@ -5,6 +5,7 @@ from adzerk.transform import \
     to_spoc, tracking_url_to_shim, is_collection, to_collection, get_personalization_models
 from tests.fixtures.mock_spoc import *
 from tests.fixtures.mock_decision import *
+import conf
 
 
 class TestAdZerkTransform(TestCase):
@@ -32,6 +33,10 @@ class TestAdZerkTransform(TestCase):
     def test_to_spoc_sponsored_by_override(self):
         self.assertEqual(mock_spoc_8_blank_sponsored_by_override, to_spoc(mock_decision_8_blank_sponsored_by_override))
         self.assertEqual(mock_spoc_9_sponsored_by_override, to_spoc(mock_decision_9_sponsored_by_override))
+
+    @patch.dict('conf.domain_affinities', {"publishers": {'example.com': 1}})
+    def test_to_collection(self):
+        self.assertEqual(mock_spoc_10_missing_priority, to_spoc(mock_decision_10_missing_priority))
 
     def test_tracking_url_to_shim(self):
         self.assertEqual('0,eyJ,Zz', tracking_url_to_shim('https://e-10250.adzerk.net/r?e=eyJ&s=Zz'))
@@ -66,3 +71,11 @@ class TestAdZerkTransform(TestCase):
         self.assertEqual(
             {'arts_and_entertainment':1},
             get_personalization_models({'other_property_business': 'true', 'topic_arts_and_entertainment': 'true'}))
+
+    def test_priority_to_weight(self):
+        priority_id_to_weight = conf.adzerk['priority_id_to_weight']
+        self.assertEqual(1, priority_id_to_weight[147517])
+        self.assertEqual(3, priority_id_to_weight[147518])
+        self.assertEqual(10, priority_id_to_weight[147520])
+        self.assertEqual(9, priority_id_to_weight[160722])
+        self.assertEqual(2, priority_id_to_weight[180843])

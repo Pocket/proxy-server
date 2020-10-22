@@ -7,6 +7,9 @@ import distutils.util
 import conf
 
 
+DEFAULT_PRIORITY = 100
+
+
 def to_spoc(decision):
     if not decision:
         return {}
@@ -25,6 +28,7 @@ def to_spoc(decision):
         'url':                    custom_data['ctUrl'],
         'domain':                 custom_data['ctDomain'],
         'excerpt':                custom_data['ctExcerpt'],
+        'priority':               conf.adzerk['priority_id_to_weight'].get(decision.get('priorityId'), DEFAULT_PRIORITY),
         'context':                __get_context(custom_data.get('ctSponsor')),
         'raw_image_src':          custom_data['ctFullimagepath'],
         'image_src':              __get_cdn_image(custom_data['ctFullimagepath']),
