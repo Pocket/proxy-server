@@ -13,6 +13,9 @@ jobs:
   tests_unit:
     docker:
       - image: circleci/python:3.7.4
+        auth:
+          username: $DOCKERHUB_USERNAME
+          password: $DOCKERHUB_PASSWORD
     working_directory: ~/proxy-server
     steps:
       - checkout
@@ -64,6 +67,9 @@ jobs:
         default: proxy
     docker:
       - image: pocket/ops-cli:v0.0.5
+        auth:
+          username: $DOCKERHUB_USERNAME
+          password: $DOCKERHUB_PASSWORD
         environment:
           MAIN_IMAGE_NAME: << parameters.main_image_name >>
     steps:
