@@ -139,8 +139,9 @@ class TestAdZerkApi(TestCase):
         url = 'https://api.adzerk.net/v1/priority'
         responses.add(responses.GET, url, status=200, body='{"items": [{"Id": 123, "Weight": 9}]}')
 
+        api = Api(pocket_id=None)
+
         for i in range(20):
-            api = Api(pocket_id=None)
             result = api.get_cached_priorty_id_to_weights()
             self.assertEqual({123: 9}, result)
 
