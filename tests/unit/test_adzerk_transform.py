@@ -9,6 +9,13 @@ import conf
 
 
 class TestAdZerkTransform(TestCase):
+    def setUp(self):
+        self.patcher = patch('adzerk.api.Api.get_cached_priorty_id_to_weights', return_value={147517: 1})
+        self.mock_object = self.patcher.start()
+
+    def tearDown(self):
+        self.patcher.stop()
+
     @patch.dict('conf.domain_affinities', {"publishers": {'example.com': 1}})
     def test_to_spoc(self):
         self.assertEqual(mock_spoc_2, to_spoc(mock_decision_2))
@@ -72,7 +79,8 @@ class TestAdZerkTransform(TestCase):
             {'arts_and_entertainment':1},
             get_personalization_models({'other_property_business': 'true', 'topic_arts_and_entertainment': 'true'}))
 
-    def test_priority_to_weight(self):
+    def test_fallback_priority_to_weight(self):
+        # Test that AdZerk priorities are set in conf, without having to fetch them from AdZerk.
         priority_id_to_weight = conf.adzerk['priority_id_to_weight']
         self.assertEqual(1, priority_id_to_weight[147517])
         self.assertEqual(3, priority_id_to_weight[147518])
