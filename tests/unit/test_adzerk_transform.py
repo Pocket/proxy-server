@@ -78,12 +78,3 @@ class TestAdZerkTransform(TestCase):
         self.assertEqual(
             {'arts_and_entertainment':1},
             get_personalization_models({'other_property_business': 'true', 'topic_arts_and_entertainment': 'true'}))
-
-    def test_fallback_priority_to_weight(self):
-        # Test that AdZerk priorities are set in conf, without having to fetch them from AdZerk.
-        priority_id_to_weight = conf.adzerk['priority_id_to_weight']
-        self.assertEqual(1, priority_id_to_weight[147517])
-        self.assertEqual(3, priority_id_to_weight[147518])
-        self.assertEqual(10, priority_id_to_weight[147520])
-        self.assertEqual(9, priority_id_to_weight[160722])
-        self.assertEqual(2, priority_id_to_weight[180843])

@@ -33,15 +33,6 @@ default = {
             }]
         }
     },
-    # These are hardcoded and not expected to change.
-    # If they do end up changing, we should fetch them from https://api.adzerk.net/v1/priority.
-    "priority_id_to_weight": {
-        147517: 1,
-        180843: 2,
-        147518: 3,
-        160722: 9,
-        147520: 10,
-    }
 }
 
 production = deepcopy(default)
