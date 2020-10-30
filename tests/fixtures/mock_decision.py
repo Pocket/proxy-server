@@ -181,4 +181,4 @@ mock_decision_9_sponsored_by_override['contents'][0]['data']['ctSponsoredByOverr
 
 mock_decision_10_missing_priority = deepcopy(mock_decision_2)
 mock_decision_10_missing_priority['adId'] = 10
-mock_decision_10_missing_priority['priorityId'] = 147520
+del mock_decision_10_missing_priority['priorityId']

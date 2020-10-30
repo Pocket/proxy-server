@@ -42,7 +42,7 @@ class TestAdZerkTransform(TestCase):
         self.assertEqual(mock_spoc_9_sponsored_by_override, to_spoc(mock_decision_9_sponsored_by_override))
 
     @patch.dict('conf.domain_affinities', {"publishers": {'example.com': 1}})
-    def test_to_collection(self):
+    def test_missing_priority_id(self):
         self.assertEqual(mock_spoc_10_missing_priority, to_spoc(mock_decision_10_missing_priority))
 
     def test_tracking_url_to_shim(self):

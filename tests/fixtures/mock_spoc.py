@@ -79,4 +79,4 @@ mock_spoc_9_sponsored_by_override["sponsored_by_override"] = "Brought by blank"
 
 mock_spoc_10_missing_priority = deepcopy(mock_spoc_2)
 mock_spoc_10_missing_priority["id"] = 10
-mock_spoc_10_missing_priority["priority"] = 10
+mock_spoc_10_missing_priority["priority"] = 100
