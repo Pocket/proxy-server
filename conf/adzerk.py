@@ -33,6 +33,14 @@ default = {
             }]
         }
     },
+    # Default priory_id to weight mapping, used during task startup before they are fetched from AdZerk.
+    "priority_id_to_weight": {
+        147517: 1,
+        180843: 2,
+        147518: 3,
+        160722: 9,
+        147520: 10,
+    }
 }
 
 production = deepcopy(default)

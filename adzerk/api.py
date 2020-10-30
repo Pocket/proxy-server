@@ -6,6 +6,7 @@ from copy import deepcopy
 import conf
 import adzerk.validation
 import adzerk.secret
+import random
 import time
 
 
@@ -16,7 +17,7 @@ class AdZerkException(Exception):
 class Api:
     # Cache AdZerk priorities for this many seconds
     PRIORITY_CACHE_DURATION = 3600
-    priority_cache_expires_at = None
+    priority_cache_expires_at = time.time() + random.uniform(0, PRIORITY_CACHE_DURATION)
 
     def __init__(self, pocket_id, country=None, region=None, site=None, placements=None):
         self.pocket_id = pocket_id
