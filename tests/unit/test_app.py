@@ -67,8 +67,7 @@ class TestApp(unittest.TestCase):
 
     @patch('provider.geo_provider.GeolocationProvider.__init__', return_value=None)
     @patch('adzerk.api.Api.get_decisions', return_value=mock_response_map)
-    @responses.activate
-    def test_app_spocs_production_valid(self, mock_geo, mock_adzerk):
+    def test_app_spocs_production_valid_with_country_region(self, mock_geo, mock_adzerk):
         country_region = {
             'country': 'CA',
             'region': 'ON',
