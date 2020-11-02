@@ -1,6 +1,7 @@
 import unittest
 from unittest.mock import patch
 from copy import deepcopy
+import responses
 
 from app.main import create_app
 from tests.fixtures.mock_decision import mock_response, mock_response_900, mock_collection_response
@@ -15,6 +16,13 @@ class TestApp(unittest.TestCase):
     mock_response_map = {'default': [mock_response]}
     mock_placement_map = {'top-sites': [mock_response], 'text-promo': [mock_response_900]}
     mock_collection_placement_map = {'sponsored-collection': [mock_collection_response], 'spocs': [mock_response]}
+
+    def setUp(self):
+        self.patcher = patch('adzerk.api.Api.get_cached_priorty_id_to_weights', return_value={147517: 1})
+        self.mock_object = self.patcher.start()
+
+    def tearDown(self):
+        self.patcher.stop()
 
     @classmethod
     def create_client_no_geo_locs(cls):
@@ -59,7 +67,7 @@ class TestApp(unittest.TestCase):
 
     @patch('provider.geo_provider.GeolocationProvider.__init__', return_value=None)
     @patch('adzerk.api.Api.get_decisions', return_value=mock_response_map)
-    def test_app_spocs_production_valid(self, mock_geo, mock_adzerk):
+    def test_app_spocs_production_valid_with_country_region(self, mock_geo, mock_adzerk):
         country_region = {
             'country': 'CA',
             'region': 'ON',

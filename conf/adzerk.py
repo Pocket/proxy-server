@@ -6,6 +6,7 @@ from copy import deepcopy
 
 from telemetry.handler import TELEMETRY_PATH_IDS
 import adzerk.secret
+import adzerk.api
 from conf import env
 
 network_id = 10250
@@ -17,6 +18,7 @@ default = {
     "div_name": div_name,
     "telemetry_endpoint_ids": TELEMETRY_PATH_IDS,
     "forget_endpoint": "{0}/udb/{1}/".format(domain, str(network_id)),
+    "get_priority_endpoint": "https://api.adzerk.net/v1/priority",
     "decision": {
         "url": "{0}/api/v2".format(domain),
         "body": {
@@ -30,6 +32,14 @@ default = {
                 "eventIds": [17, 20],
             }]
         }
+    },
+    # Default priory_id to weight mapping, used during task startup before they are fetched from AdZerk.
+    "priority_id_to_weight": {
+        147517: 1,
+        180843: 2,
+        147518: 3,
+        160722: 9,
+        147520: 10,
     }
 }
 

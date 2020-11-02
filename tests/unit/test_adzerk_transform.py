@@ -5,9 +5,17 @@ from adzerk.transform import \
     to_spoc, tracking_url_to_shim, is_collection, to_collection, get_personalization_models
 from tests.fixtures.mock_spoc import *
 from tests.fixtures.mock_decision import *
+import conf
 
 
 class TestAdZerkTransform(TestCase):
+    def setUp(self):
+        self.patcher = patch('adzerk.api.Api.get_cached_priorty_id_to_weights', return_value={147517: 1})
+        self.mock_object = self.patcher.start()
+
+    def tearDown(self):
+        self.patcher.stop()
+
     @patch.dict('conf.domain_affinities', {"publishers": {'example.com': 1}})
     def test_to_spoc(self):
         self.assertEqual(mock_spoc_2, to_spoc(mock_decision_2))
@@ -32,6 +40,10 @@ class TestAdZerkTransform(TestCase):
     def test_to_spoc_sponsored_by_override(self):
         self.assertEqual(mock_spoc_8_blank_sponsored_by_override, to_spoc(mock_decision_8_blank_sponsored_by_override))
         self.assertEqual(mock_spoc_9_sponsored_by_override, to_spoc(mock_decision_9_sponsored_by_override))
+
+    @patch.dict('conf.domain_affinities', {"publishers": {'example.com': 1}})
+    def test_missing_priority_id(self):
+        self.assertEqual(mock_spoc_10_missing_priority, to_spoc(mock_decision_10_missing_priority))
 
     def test_tracking_url_to_shim(self):
         self.assertEqual('0,eyJ,Zz', tracking_url_to_shim('https://e-10250.adzerk.net/r?e=eyJ&s=Zz'))

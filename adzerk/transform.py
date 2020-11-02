@@ -5,6 +5,9 @@ import logging
 import distutils.util
 
 import conf
+from adzerk.api import Api
+
+DEFAULT_PRIORITY = 100
 
 
 def to_spoc(decision):
@@ -16,6 +19,8 @@ def to_spoc(decision):
         body = json.loads(body)
 
     events_map = {e["id"]: tracking_url_to_shim(e["url"]) for e in decision["events"]}
+    adzerk_api = Api(pocket_id=None)
+    priority_map = adzerk_api.get_cached_priorty_id_to_weights()
 
     spoc = {
         'id':                     decision['adId'],
@@ -25,6 +30,7 @@ def to_spoc(decision):
         'url':                    custom_data['ctUrl'],
         'domain':                 custom_data['ctDomain'],
         'excerpt':                custom_data['ctExcerpt'],
+        'priority':               priority_map.get(decision.get('priorityId'), DEFAULT_PRIORITY),
         'context':                __get_context(custom_data.get('ctSponsor')),
         'raw_image_src':          custom_data['ctFullimagepath'],
         'image_src':              __get_cdn_image(custom_data['ctFullimagepath']),

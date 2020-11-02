@@ -8,6 +8,7 @@ mock_spoc_2 = {
     "url": "https://example.com/?key=foobar",
     "domain": "wallmarket.com",
     "excerpt": "Get up to 50% off furniture, bedding, and more.",
+    "priority": 1,
     "context": "Sponsored by WallMarket",
     "sponsor": "WallMarket",
     "raw_image_src": "https://cdn.net/25a.jpg",
@@ -75,3 +76,7 @@ mock_spoc_8_blank_sponsored_by_override["sponsored_by_override"] = ""
 mock_spoc_9_sponsored_by_override = deepcopy(mock_spoc_2)
 mock_spoc_9_sponsored_by_override["id"] = 9
 mock_spoc_9_sponsored_by_override["sponsored_by_override"] = "Brought by blank"
+
+mock_spoc_10_missing_priority = deepcopy(mock_spoc_2)
+mock_spoc_10_missing_priority["id"] = 10
+mock_spoc_10_missing_priority["priority"] = 100
