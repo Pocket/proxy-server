@@ -7,3 +7,4 @@ gunicorn
 Flask
 geoip2
 gevent
+sentry-sdk[flask]

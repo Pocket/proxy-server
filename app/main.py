@@ -1,5 +1,9 @@
+from os import environ
+
 from flask import Flask, request, jsonify
 from werkzeug.middleware.proxy_fix import ProxyFix
+import sentry_sdk
+from sentry_sdk.integrations.flask import FlaskIntegration
 
 from adzerk.api import Api as AdZerk
 from app.client import Client
@@ -8,9 +12,16 @@ from app.exceptions.invalid_content_type import InvalidContentType
 from app.exceptions.invalid_param import InvalidParam
 from app.validation import is_valid_pocket_id
 from provider.geo_provider import GeolocationProvider
+import sentry.secret
 
 
 def create_app():
+    if environ.get('APP_ENV') != 'development':
+        sentry_sdk.init(
+            dsn=sentry.secret.get_sentry_dsn(),
+            integrations=[FlaskIntegration()],
+            environment=environ.get('APP_ENV')
+        )
 
     app = Flask(__name__)
     # Indicate that we have two proxy servers in front of the App (Docker gateway and load balancer).

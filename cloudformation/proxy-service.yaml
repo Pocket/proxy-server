@@ -67,6 +67,10 @@ Parameters:
     Type: String
     Default: prod/adzerk
 
+  EcsAppSentryDsnSecretName:
+    Type: String
+    Default: prod/sentry_dsn
+
   ServiceScaleEvaluationPeriods:
     Description: "The number of periods over which data is compared to the specified threshold"
     Type: Number
@@ -214,6 +218,8 @@ Resources:
               Value: !Ref EcsAppGeoipS3Bucket
             - Name: ADZERK_SECRET_NAME
               Value: !Ref EcsAppAdzerkSecretName
+            - Name: SENTRY_DSN_SECRET_NAME
+              Value: !Ref EcsAppSentryDsnSecretName
           PortMappings:
             - Protocol: tcp
               ContainerPort: 8000
