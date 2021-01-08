@@ -8,7 +8,7 @@ development = {
     },
 }
 
-production = {
+staging = production = {
     'session': {},
     'client': {},
 }
