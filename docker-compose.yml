@@ -18,6 +18,7 @@ services:
     environment:
       - APP_ENV=development
       - GEOIP_S3_BUCKET=pocket-geoip
+      - SENTRY_DSN=${SENTRY_DSN}
     ports:
       - "8000:8000"
     volumes:

@@ -13,15 +13,23 @@ from app.exceptions.invalid_param import InvalidParam
 from app.validation import is_valid_pocket_id
 from provider.geo_provider import GeolocationProvider
 import sentry.secret
+import logging
 
 
 def create_app():
-    if environ.get('APP_ENV') != 'development':
+    try:
+        sentry_dsn = sentry.secret.get_sentry_dsn()
         sentry_sdk.init(
-            dsn=sentry.secret.get_sentry_dsn(),
+            dsn=sentry_dsn,
             integrations=[FlaskIntegration()],
             environment=environ.get('APP_ENV')
         )
+    except sentry.secret.ApplicationSecretException as e:
+        # Only require Sentry to load on production and staging. Log an error otherwise.
+        if environ.get('APP_ENV') in ['production', 'staging']:
+            raise e
+        else:
+            logging.warning(f"Failed to initialize Sentry with {e}")
 
     app = Flask(__name__)
     # Indicate that we have two proxy servers in front of the App (Docker gateway and load balancer).

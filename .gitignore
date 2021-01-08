@@ -115,3 +115,6 @@ tmp/
 /tests/load/*.js
 /tests/load/*.json
 /tests/load/node_modules
+
+# Environment variables
+.env
