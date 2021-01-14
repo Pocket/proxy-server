@@ -17,13 +17,6 @@ class TestApp(unittest.TestCase):
     mock_placement_map = {'top-sites': [mock_response], 'text-promo': [mock_response_900]}
     mock_collection_placement_map = {'sponsored-collection': [mock_collection_response], 'spocs': [mock_response]}
 
-    def setUp(self):
-        self.patcher = patch('adzerk.api.Api.get_cached_priorty_id_to_weights', return_value={147517: 1})
-        self.mock_object = self.patcher.start()
-
-    def tearDown(self):
-        self.patcher.stop()
-
     @classmethod
     def create_client_no_geo_locs(cls):
         app = create_app()
