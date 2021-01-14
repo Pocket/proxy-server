@@ -6,8 +6,7 @@ network_id = 10250
 div_name = "spocs"
 domain = "https://e-{0}.adzerk.net".format(str(network_id))
 
-production = staging = development = {
-    "api_key": adzerk.secret.get_api_key(),
+production = staging = development = test = {
     "network_id": network_id,
     "div_name": div_name,
     "telemetry_endpoint_ids": TELEMETRY_PATH_IDS,

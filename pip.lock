@@ -2,7 +2,8 @@
 
 boto3==1.13.19
 botocore==1.16.19
-certifi>=2020.4.5.1
+cachetools==4.2.0
+certifi>=2020.12.5
 chardet==3.0.4
 Click==7.0
 docutils==0.14

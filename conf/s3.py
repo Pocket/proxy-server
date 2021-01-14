@@ -1,4 +1,4 @@
-development = {
+development = test = {
     'session': {},
     'client': {
         'endpoint_url': 'http://localhost:4569',

@@ -1,4 +1,4 @@
-production = staging = development = {
+production = staging = development = test = {
     'caps': {
         'lifetime': 50,
         'campaign': {

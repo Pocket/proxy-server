@@ -82,11 +82,14 @@ class Api:
                 copy_place['divName'] = place['name']
                 body['placements'].append(copy_place)
 
-    def delete_user(self):
+    def delete_user(self, retry_count=1):
         response = self.__request_delete_user()
         if response.status_code == 401:
-            self.__update_api_key()
-            response = self.delete_user()
+            if retry_count > 0:
+                adzerk.secret.clear_api_key_cache()
+                response = self.delete_user(retry_count - 1)
+            else:
+                logging.error("Permission denied while trying to delete a user and out of retry attempts.")
         if response.status_code != 200:
             logging.error("{0} delete_user: {1}".format(str(response.status_code), response.text))
 
@@ -105,7 +108,7 @@ class Api:
     def get_priority_id_to_weights(self):
         response = self.__get_priorities()
         if response.status_code == 401:
-            self.__update_api_key()
+            adzerk.secret.clear_api_key_cache()
             response = self.__get_priorities()
 
         if response.status_code != 200:
@@ -118,16 +121,13 @@ class Api:
         return requests.delete(
             url=conf.adzerk['forget_endpoint'],
             params={'userKey': self.pocket_id},
-            headers={'X-Adzerk-ApiKey': conf.adzerk['api_key']},
+            headers={'X-Adzerk-ApiKey': adzerk.secret.get_api_key()},
             timeout=30
         )
 
     def __get_priorities(self):
         return requests.get(
             url=conf.adzerk['get_priority_endpoint'],
-            headers={'X-Adzerk-ApiKey': conf.adzerk['api_key']},
+            headers={'X-Adzerk-ApiKey': adzerk.secret.get_api_key()},
             timeout=30
         )
-
-    def __update_api_key(self):
-        conf.adzerk['api_key'] = adzerk.secret.get_api_key()

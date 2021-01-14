@@ -1,3 +1,5 @@
+import os
+
 from unittest import TestCase
 from unittest.mock import patch
 import responses
@@ -13,7 +15,7 @@ class TestAdZerkApi(TestCase):
         # Reset cache expiration time
         Api.priority_cache_expires_at = None
 
-    @patch.dict('conf.adzerk', {"api_key": "DUMMY_123"})
+    @patch.dict(os.environ, {"ADZERK_API_KEY": "DUMMY_123"})
     @responses.activate
     def test_delete_user(self):
 
@@ -29,16 +31,19 @@ class TestAdZerkApi(TestCase):
         self.assertEqual(url, request.url)
         self.assertEqual('DUMMY_123', request.headers['X-Adzerk-ApiKey'])
 
-    @patch.dict('conf.adzerk', {"api_key": "OUT_OF_DATE_456"})
-    @patch('adzerk.secret.get_api_key', return_value="DUMMY_123")
+    @patch('adzerk.secret.get_api_key')
     @responses.activate
     def test_update_api_key(self, mock_get_api_key):
         url = 'https://e-10250.adzerk.net/udb/10250/?userKey=%7B123%7D'
         responses.add(responses.DELETE, url, status=401)
         responses.add(responses.DELETE, url, status=200)
+        call_values = [, "DUMMY_123"]
+        return_values = ["OUT_OF_DATE_456", "DUMMY_123"]
+        mock_get_api_key.return_value = lambda: return_values.pop()
+        mock_get_api_key.side_effect = lambda: call_values.pop()
 
         api = Api(pocket_id="{123}")
-        api.delete_user()
+        api.delete_user(retry_count=10) # Arbitrarily high number of retry attempts. It's expected to only retry once.
 
         self.assertEqual(2, len(responses.calls))
 
@@ -83,7 +88,7 @@ class TestAdZerkApi(TestCase):
         for p in body['placements']:
             self.assertEqual([217995], p['zoneIds'])
 
-    @patch.dict('conf.adzerk', {"api_key": "DUMMY_123"})
+    @patch.dict(os.environ, {"ADZERK_API_KEY": "DUMMY_123"})
     @responses.activate
     def test_site_is_not_stored_in_conf(self):
         api = Api(pocket_id="{123}", country='US', region='CA', site=1084367)
@@ -94,7 +99,6 @@ class TestAdZerkApi(TestCase):
         body = api.get_decision_body()
         self.assertEqual(1070098, body['placements'][0]['siteId'])
 
-    @patch.dict('conf.adzerk', {"api_key": "DUMMY_123"})
     @patch('adzerk.secret.get_api_key', return_value="DUMMY_123")
     @responses.activate
     def test_get_priorities(self, mock_get_api_key):
@@ -118,7 +122,6 @@ class TestAdZerkApi(TestCase):
         self.assertEqual(url, request.url)
         self.assertEqual('DUMMY_123', request.headers['X-Adzerk-ApiKey'])
 
-    @patch.dict('conf.adzerk', {"api_key": "DUMMY_123"})
     @patch('adzerk.secret.get_api_key', return_value="DUMMY_123")
     @responses.activate
     def test_get_priorities_retries_on_401(self, mock_get_api_key):
@@ -132,7 +135,6 @@ class TestAdZerkApi(TestCase):
         self.assertEqual({123: 9}, result)
         self.assertEqual(2, len(responses.calls))
 
-    @patch.dict('conf.adzerk', {"api_key": "DUMMY_123"})
     @patch('adzerk.secret.get_api_key', return_value="DUMMY_123")
     @responses.activate
     def test_get_priorities_cache(self, mock_get_api_key):
