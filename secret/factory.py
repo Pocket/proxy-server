@@ -20,7 +20,7 @@ class SecretProvider:
     def get_value(self) -> str:
         """
         Get the secret value
-        @return: str: api
+        @return: str: secret value
         """
         try:
             session = boto3.session.Session()
@@ -33,7 +33,7 @@ class SecretProvider:
             secret = json.loads(response['SecretString'])
             return secret[self.key]
         except BotoCoreError:
-            # Fall back to an environment variable. This is intended only for development.
+            # Fall back to an environment variable. This is intended only for local development.
             secret = os.environ.get(self.key)
             if secret is not None:
                 return secret
