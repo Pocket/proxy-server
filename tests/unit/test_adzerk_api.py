@@ -37,10 +37,9 @@ class TestAdZerkApi(TestCase):
         url = 'https://e-10250.adzerk.net/udb/10250/?userKey=%7B123%7D'
         responses.add(responses.DELETE, url, status=401)
         responses.add(responses.DELETE, url, status=200)
-        call_values = [, "DUMMY_123"]
-        return_values = ["OUT_OF_DATE_456", "DUMMY_123"]
-        mock_get_api_key.return_value = lambda: return_values.pop()
-        mock_get_api_key.side_effect = lambda: call_values.pop()
+
+        call_values = ["OUT_OF_DATE_456", "DUMMY_123"]
+        mock_get_api_key.side_effect = lambda: call_values.pop(0)
 
         api = Api(pocket_id="{123}")
         api.delete_user(retry_count=10) # Arbitrarily high number of retry attempts. It's expected to only retry once.
