@@ -17,6 +17,12 @@ jobs:
           username: $DOCKERHUB_USERNAME
           password: $DOCKERHUB_PASSWORD
     working_directory: ~/proxy-server
+    parameters:
+      pipenv_path:
+        default: "./"
+        type: string
+    environment:
+      WORKON_HOME: '~/.venv'
     steps:
       - checkout
 
