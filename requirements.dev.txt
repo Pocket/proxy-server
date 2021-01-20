@@ -1,5 +1,0 @@
-# Libraries only used for development/testing.
-
-responses
-pytest
-pytest-cov

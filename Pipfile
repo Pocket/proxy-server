@@ -1,0 +1,26 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+certifi = ">=2020.4.5.1"
+boto3 = "1.13.19"
+requests = "2.22.0"
+geoip2 = "3.0.0"
+
+# we need to install gunicorn, uvicorn, uvloop, httptools, and fastapi
+# so it starts in the virtualenv instead of the one in the docker image
+gunicorn = "*"
+uvicorn = "*"
+fastapi = "*"
+uvloop = "*"
+httptools = "*"
+
+[dev-packages]
+responses = "*"
+pytest = "*"
+pytest-cov = "*"
+
+[requires]
+python_version = "3.7"

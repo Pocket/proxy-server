@@ -21,31 +21,23 @@ jobs:
       - checkout
 
       - restore_cache:
-          keys:
-            - v1-dependencies-{{ checksum "pip.lock" }}
-            # fallback to using the latest cache if no exact match is found
-            - v1-dependencies-
-
+          key: deps-test-{{ checksum "<<parameters.pipenv_path>>Pipfile.lock" }}
       - run:
-          name: install dependencies
+          name: Build environment and install requirements
           command: |
-            python3 -m venv venv
-            . venv/bin/activate
-            pip install -r pip.lock
-            pip install -r requirements.dev.txt
-
+            pip install pipenv
+            pipenv install --dev
       - save_cache:
+          key: deps-test-{{ checksum "<<parameters.pipenv_path>>Pipfile.lock" }}
           paths:
-            - ./venv
-          key: v1-dependencies-{{ checksum "pip.lock" }}
+            - "~/.venv"
 
       - run:
           name: Run tests
           command: |
-            . venv/bin/activate
             mkdir test-reports/
-            pytest tests/unit/ --cov=. --cov-config=.proxy_coveragerc --junitxml=test-reports/junit.xml
-            coverage html --rcfile=.proxy_coveragerc
+            pipenv run pytest tests/unit/ --cov=. --cov-config=.proxy_coveragerc --junitxml=test-reports/junit.xml
+            pipenv run coverage html --rcfile=.proxy_coveragerc
 
       # test reporting and pylint are still WIP
       - store_test_results:

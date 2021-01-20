@@ -1,9 +1,0 @@
-# Libraries are locked in pip.lock. Edit this file and then generate pip.lock using pip freeze
-
-certifi
-boto3
-requests
-gunicorn
-Flask
-geoip2
-gevent
