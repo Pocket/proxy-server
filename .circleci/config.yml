@@ -103,6 +103,7 @@ jobs:
           setup-remote-docker: true
           tag: $CIRCLE_SHA1,latest
           dockerfile: ./images/app/Dockerfile
+          extra-build-args: --build-arg GIT_SHA=${CIRCLE_SHA1}
 
 
 # Workflow shortcuts
