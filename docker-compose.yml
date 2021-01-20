@@ -9,7 +9,6 @@ services:
       - "80:80"
     depends_on:
       - app
-    network_mode: host
 
   app:
     build:
@@ -22,7 +21,6 @@ services:
       - "8000:8000"
     volumes:
       - "./:/app"
-    network_mode: host
     depends_on:
       - s3
 
@@ -30,7 +28,6 @@ services:
     image: pocket/fake-s3:20190604
     ports:
     - "4569:4569"
-    network_mode: host
     volumes:
       - "fake_s3_vol:/fakes3/data"
 
