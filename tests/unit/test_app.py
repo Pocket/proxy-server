@@ -17,6 +17,16 @@ class TestApp(unittest.TestCase):
     mock_placement_map = {'top-sites': [mock_response], 'text-promo': [mock_response_900]}
     mock_collection_placement_map = {'sponsored-collection': [mock_collection_response], 'spocs': [mock_response]}
 
+    def setUp(self):
+        patchers = []
+        patchers.append(patch('adzerk.secret.get_api_key', return_value='DUMMY_123'))
+        patchers.append(patch('sentry.secret.get_sentry_dsn', return_value='http://dummy:sentry'))
+        patchers.append(patch('sentry_sdk.init'))
+
+        for p in patchers:
+            self.addCleanup(p.stop)
+            p.start()
+
     @classmethod
     def create_client_no_geo_locs(cls):
         app = create_app()

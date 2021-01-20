@@ -3,7 +3,6 @@ import os
 from unittest import TestCase
 from unittest.mock import patch
 import responses
-import time
 
 from adzerk.api import Api
 from tests.fixtures.mock_placements import mock_placements, mock_spocs_placement
@@ -15,9 +14,9 @@ class TestAdZerkApi(TestCase):
         # Reset cache expiration time
         Api.priority_cache_expires_at = None
 
-    @patch.dict(os.environ, {"ADZERK_API_KEY": "DUMMY_123"})
+    @patch('adzerk.secret.get_api_key', return_value='DUMMY_123')
     @responses.activate
-    def test_delete_user(self):
+    def test_delete_user(self, mock_get_api_key):
 
         url = 'https://e-10250.adzerk.net/udb/10250/?userKey=%7B123%7D'
         responses.add(responses.DELETE, url, status=200)

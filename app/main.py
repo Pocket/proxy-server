@@ -25,11 +25,11 @@ def create_app():
             environment=environ.get('APP_ENV')
         )
     except sentry.secret.ApplicationSecretException as e:
-        # Only require Sentry to load on production and staging. Log an error otherwise.
-        if environ.get('APP_ENV') in ['production', 'staging']:
-            raise e
-        else:
+        # For local development you can optionally enable Sentry using the SENTRY_DSN environment variable.
+        if environ.get('APP_ENV') == 'development':
             logging.warning(f"Failed to initialize Sentry with {e}")
+        else:
+            raise e
 
     app = Flask(__name__)
     # Indicate that we have two proxy servers in front of the App (Docker gateway and load balancer).
