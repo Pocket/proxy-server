@@ -1,12 +1,9 @@
 import unittest
 from unittest.mock import patch
 from copy import deepcopy
-import responses
-
-from app.main import create_app
+from fastapi.testclient import TestClient
 from tests.fixtures.mock_decision import mock_response, mock_response_900, mock_collection_response
 from tests.fixtures.mock_placements import mock_placements, mock_collection_placements
-
 
 class TestApp(unittest.TestCase):
     """
@@ -18,10 +15,9 @@ class TestApp(unittest.TestCase):
     mock_collection_placement_map = {'sponsored-collection': [mock_collection_response], 'spocs': [mock_response]}
 
     @classmethod
-    def create_client_no_geo_locs(cls):
-        app = create_app()
-        app.config['TESTING'] = True
-        return app.test_client()
+    def create_client_no_geo_locs(cls) -> TestClient:
+        from app.main import app
+        return TestClient(app=app)
 
     @classmethod
     def get_request_body(cls, without=None, placements=None, update=None):
@@ -46,7 +42,7 @@ class TestApp(unittest.TestCase):
     @patch('provider.geo_provider.GeolocationProvider.__init__', return_value=None)
     def test_app_pulse(self, mock_geo):
         resp = self.create_client_no_geo_locs().get('/pulse')
-        self.assertEqual(resp.json, {"pulse" : "ok"})
+        self.assertEqual(resp.json(), {"pulse" : "ok"})
 
     """
     Tests: spocs
@@ -77,7 +73,7 @@ class TestApp(unittest.TestCase):
         request_body = self.get_request_body(placements=mock_collection_placements)
         resp = self.create_client_no_geo_locs().post('/spocs', json=request_body)
         self.assertEqual(resp.status_code, 200)
-        self.assertEqual(resp.json['sponsored-collection'][0]['collection_title'], 'Best of the Web')
+        self.assertEqual(resp.json()['sponsored-collection'][0]['collection_title'], 'Best of the Web')
 
     @patch('provider.geo_provider.GeolocationProvider.__init__', return_value=None)
     @patch('adzerk.api.Api.get_decisions', return_value=mock_collection_placement_map)
@@ -88,9 +84,9 @@ class TestApp(unittest.TestCase):
         request_body = self.get_request_body(placements=mock_collection_placements, update={'version': '2'})
         resp = self.create_client_no_geo_locs().post('/spocs', json=request_body)
         self.assertEqual(resp.status_code, 200)
-        self.assertEqual(resp.json['spocs'][0]['title'], 'title 1000')
+        self.assertEqual(resp.json()['spocs'][0]['title'], 'title 1000')
 
-        collection = resp.json['sponsored-collection']
+        collection = resp.json()['sponsored-collection']
         self.assertEqual(collection['title'],     'Best of the Web')
         self.assertEqual(collection['sponsor'],   'sponsor')
         self.assertEqual(collection['flight_id'], 333)
@@ -179,7 +175,7 @@ class TestApp(unittest.TestCase):
         bad_placements = deepcopy(mock_placements)
         resp = self.create_client_no_geo_locs().post('/spocs', json=self.get_request_body(placements=bad_placements))
         self.assertEqual(200, resp.status_code)
-        result = resp.json
+        result = resp.json()
         self.assertTrue('top-sites' in result)
         self.assertEqual(1000, result['top-sites'][0]['campaign_id'])
         self.assertEqual('title 1000', result['top-sites'][0]['title'])
