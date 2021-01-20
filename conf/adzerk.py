@@ -11,7 +11,6 @@ production = staging = development = test = {
     "div_name": div_name,
     "telemetry_endpoint_ids": TELEMETRY_PATH_IDS,
     "forget_endpoint": "{0}/udb/{1}/".format(domain, str(network_id)),
-    "get_priority_endpoint": "https://api.adzerk.net/v1/priority",
     "decision": {
         "url": "{0}/api/v2".format(domain),
         "body": {

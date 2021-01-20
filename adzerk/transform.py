@@ -19,8 +19,7 @@ def to_spoc(decision):
         body = json.loads(body)
 
     events_map = {e["id"]: tracking_url_to_shim(e["url"]) for e in decision["events"]}
-    adzerk_api = Api(pocket_id=None)
-    priority_map = adzerk_api.get_cached_priorty_id_to_weights()
+    priority_map = conf.adzerk['priority_id_to_weight']
 
     spoc = {
         'id':                     decision['adId'],

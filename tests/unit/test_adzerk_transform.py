@@ -9,12 +9,6 @@ import conf
 
 
 class TestAdZerkTransform(TestCase):
-    def setUp(self):
-        self.patcher = patch('adzerk.api.Api.get_cached_priorty_id_to_weights', return_value={147517: 1})
-        self.mock_object = self.patcher.start()
-
-    def tearDown(self):
-        self.patcher.stop()
 
     @patch.dict('conf.domain_affinities', {"publishers": {'example.com': 1}})
     def test_to_spoc(self):

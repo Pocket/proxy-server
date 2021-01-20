@@ -6,8 +6,6 @@ from copy import deepcopy
 import conf
 import adzerk.validation
 import adzerk.secret
-import random
-import time
 
 
 class AdZerkException(Exception):
@@ -15,9 +13,6 @@ class AdZerkException(Exception):
 
 
 class Api:
-    # Cache AdZerk priorities for this many seconds
-    PRIORITY_CACHE_DURATION = 3600
-    priority_cache_expires_at = time.time() + random.uniform(0, PRIORITY_CACHE_DURATION)
 
     def __init__(self, pocket_id, country=None, region=None, site=None, placements=None):
         self.pocket_id = pocket_id
@@ -95,39 +90,10 @@ class Api:
 
         return response
 
-    def get_cached_priorty_id_to_weights(self):
-        if Api.priority_cache_expires_at is None or Api.priority_cache_expires_at <= time.time():
-            try:
-                conf.adzerk['priority_id_to_weight'] = self.get_priority_id_to_weights()
-                Api.priority_cache_expires_at = time.time() + Api.PRIORITY_CACHE_DURATION
-            except AdZerkException as e:
-                logging.error(f"Failed to refresh AdZerk priorities: {e}")
-
-        return conf.adzerk['priority_id_to_weight']
-
-    def get_priority_id_to_weights(self):
-        response = self.__get_priorities()
-        if response.status_code == 401:
-            adzerk.secret.clear_api_key_cache()
-            response = self.__get_priorities()
-
-        if response.status_code != 200:
-            raise AdZerkException(f"{response.status_code} get_priorities: {response.text}")
-        else:
-            data = response.json()
-            return {priority['Id']: priority['Weight'] for priority in data['items']}
-
     def __request_delete_user(self):
         return requests.delete(
             url=conf.adzerk['forget_endpoint'],
             params={'userKey': self.pocket_id},
-            headers={'X-Adzerk-ApiKey': adzerk.secret.get_api_key()},
-            timeout=30
-        )
-
-    def __get_priorities(self):
-        return requests.get(
-            url=conf.adzerk['get_priority_endpoint'],
             headers={'X-Adzerk-ApiKey': adzerk.secret.get_api_key()},
             timeout=30
         )
