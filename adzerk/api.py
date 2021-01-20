@@ -1,11 +1,12 @@
 import requests
 import logging
+from typing import Optional
 from copy import deepcopy
 
 
 import conf
 import adzerk.validation
-import adzerk.secret
+from secret.factory import SecretProvider
 
 
 class AdZerkException(Exception):
@@ -14,12 +15,14 @@ class AdZerkException(Exception):
 
 class Api:
 
-    def __init__(self, pocket_id, country=None, region=None, site=None, placements=None):
+    def __init__(self, pocket_id, country=None, region=None, site=None, placements=None,
+                 api_key_provider: Optional[SecretProvider] = None):
         self.pocket_id = pocket_id
         self.country = country
         self.region = region
         self.site = site
         self.placements = placements
+        self.api_key_provider = api_key_provider
 
     def get_decisions(self):
         """
@@ -35,7 +38,7 @@ class Api:
         decisions = response['decisions']
         if not decisions or len(decisions) == 0:
             return dict()
-        for _,dec in decisions.items():
+        for _, dec in decisions.items():
             if dec:
                 map(adzerk.validation.validate_decision, dec)
         return decisions
@@ -81,7 +84,7 @@ class Api:
         response = self.__request_delete_user()
         if response.status_code == 401:
             if retry_count > 0:
-                adzerk.secret.clear_api_key_cache()
+                self.api_key_provider.clear_cache()
                 response = self.delete_user(retry_count - 1)
             else:
                 logging.error("Permission denied while trying to delete a user and out of retry attempts.")
@@ -94,6 +97,6 @@ class Api:
         return requests.delete(
             url=conf.adzerk['forget_endpoint'],
             params={'userKey': self.pocket_id},
-            headers={'X-Adzerk-ApiKey': adzerk.secret.get_api_key()},
+            headers={'X-Adzerk-ApiKey': self.api_key_provider.get_value()},
             timeout=30
         )

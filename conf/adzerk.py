@@ -1,6 +1,4 @@
 from telemetry.handler import TELEMETRY_PATH_IDS
-import adzerk.secret
-import adzerk.api
 
 network_id = 10250
 div_name = "spocs"

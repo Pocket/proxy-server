@@ -1,7 +1,7 @@
-from os import environ
+import os
 import logging
 
-env = environ.get('APP_ENV') or 'development'
+env = os.environ.get('APP_ENV') or 'development'
 logging.info("APP_ENV = " + env)
 
 from conf import s3, geolocation, spocs, adzerk, domain_affinities

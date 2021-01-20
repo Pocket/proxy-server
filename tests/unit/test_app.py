@@ -19,8 +19,7 @@ class TestApp(unittest.TestCase):
 
     def setUp(self):
         patchers = []
-        patchers.append(patch('adzerk.secret.get_api_key', return_value='DUMMY_123'))
-        patchers.append(patch('sentry.secret.get_sentry_dsn', return_value='http://dummy:sentry'))
+        patchers.append(patch('secret.factory.SecretProvider.get_value', return_value='DUMMY_123'))
         patchers.append(patch('sentry_sdk.init'))
 
         for p in patchers:

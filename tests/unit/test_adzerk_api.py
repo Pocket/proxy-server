@@ -1,10 +1,11 @@
 import os
 
 from unittest import TestCase
-from unittest.mock import patch
+from unittest.mock import patch, Mock
 import responses
 
 from adzerk.api import Api
+from secret.factory import SecretProvider
 from tests.fixtures.mock_placements import mock_placements, mock_spocs_placement
 
 
@@ -14,14 +15,15 @@ class TestAdZerkApi(TestCase):
         # Reset cache expiration time
         Api.priority_cache_expires_at = None
 
-    @patch('adzerk.secret.get_api_key', return_value='DUMMY_123')
     @responses.activate
-    def test_delete_user(self, mock_get_api_key):
+    def test_delete_user(self):
+        mock_secret_provider = SecretProvider('FOO', 'BAR')
+        mock_secret_provider.get_value = Mock(return_value="DUMMY_123")
 
         url = 'https://e-10250.adzerk.net/udb/10250/?userKey=%7B123%7D'
         responses.add(responses.DELETE, url, status=200)
 
-        api = Api(pocket_id="{123}")
+        api = Api(pocket_id="{123}", api_key_provider=mock_secret_provider)
         api.delete_user()
 
         self.assertEqual(1, len(responses.calls))
@@ -30,17 +32,16 @@ class TestAdZerkApi(TestCase):
         self.assertEqual(url, request.url)
         self.assertEqual('DUMMY_123', request.headers['X-Adzerk-ApiKey'])
 
-    @patch('adzerk.secret.get_api_key')
     @responses.activate
-    def test_update_api_key(self, mock_get_api_key):
+    def test_update_api_key(self):
+        mock_secret_provider = SecretProvider('FOO', 'BAR')
+        mock_secret_provider.get_value = Mock(side_effect=["OUT_OF_DATE_456", "DUMMY_123"])
+
         url = 'https://e-10250.adzerk.net/udb/10250/?userKey=%7B123%7D'
         responses.add(responses.DELETE, url, status=401)
         responses.add(responses.DELETE, url, status=200)
 
-        call_values = ["OUT_OF_DATE_456", "DUMMY_123"]
-        mock_get_api_key.side_effect = lambda: call_values.pop(0)
-
-        api = Api(pocket_id="{123}")
+        api = Api(pocket_id="{123}", api_key_provider=mock_secret_provider)
         api.delete_user(retry_count=10) # Arbitrarily high number of retry attempts. It's expected to only retry once.
 
         self.assertEqual(2, len(responses.calls))
@@ -86,7 +87,6 @@ class TestAdZerkApi(TestCase):
         for p in body['placements']:
             self.assertEqual([217995], p['zoneIds'])
 
-    @patch.dict(os.environ, {"ADZERK_API_KEY": "DUMMY_123"})
     @responses.activate
     def test_site_is_not_stored_in_conf(self):
         api = Api(pocket_id="{123}", country='US', region='CA', site=1084367)

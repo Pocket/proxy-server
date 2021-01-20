@@ -11,20 +11,21 @@ from app.exceptions.missing_param import MissingParam
 from app.exceptions.invalid_content_type import InvalidContentType
 from app.exceptions.invalid_param import InvalidParam
 from app.validation import is_valid_pocket_id
+import conf
 from provider.geo_provider import GeolocationProvider
-import sentry.secret
+from secret.factory import SecretProvider, SecretProviderException
 import logging
 
 
 def create_app():
     try:
-        sentry_dsn = sentry.secret.get_sentry_dsn()
+        dsn_provider = SecretProvider(name=environ.get('SENTRY_DSN_SECRET_NAME'), key='SENTRY_DSN')
         sentry_sdk.init(
-            dsn=sentry_dsn,
+            dsn=dsn_provider.get_value(),
             integrations=[FlaskIntegration()],
-            environment=environ.get('APP_ENV')
+            environment=conf.env
         )
-    except sentry.secret.ApplicationSecretException as e:
+    except SecretProviderException as e:
         # For local development you can optionally enable Sentry using the SENTRY_DSN environment variable.
         if environ.get('APP_ENV') == 'development':
             logging.warning(f"Failed to initialize Sentry with {e}")
@@ -35,6 +36,7 @@ def create_app():
     # Indicate that we have two proxy servers in front of the App (Docker gateway and load balancer).
     app.wsgi_app = ProxyFix(app.wsgi_app, x_for=2)
     provider = GeolocationProvider()
+    adzerk_api_key_provider = SecretProvider(name=environ.get('ADZERK_SECRET_NAME'), key='ADZERK_API_KEY')
 
     @app.route('/spocs', methods=['POST'])
     def get_spocs():
@@ -46,7 +48,7 @@ def create_app():
     @app.route('/user', methods=['DELETE'])
     def delete_user():
         pocket_id = request.json['pocket_id']
-        adzerk_api = AdZerk(pocket_id=pocket_id)
+        adzerk_api = AdZerk(pocket_id=pocket_id, api_key_provider=adzerk_api_key_provider)
         response = adzerk_api.delete_user()
 
         return jsonify({'status': int(response.status_code == 200)}), response.status_code
