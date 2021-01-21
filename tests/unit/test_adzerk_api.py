@@ -1,9 +1,8 @@
 from unittest import TestCase
 from unittest.mock import patch
 import responses
-import time
 
-from adzerk.api import Api
+from app.adzerk.api import Api
 from tests.fixtures.mock_placements import mock_placements, mock_spocs_placement
 
 
@@ -13,7 +12,7 @@ class TestAdZerkApi(TestCase):
         # Reset cache expiration time
         Api.priority_cache_expires_at = None
 
-    @patch.dict('conf.adzerk', {"api_key": "DUMMY_123"})
+    @patch.dict('app.conf.adzerk', {"api_key": "DUMMY_123"})
     @responses.activate
     def test_delete_user(self):
 
@@ -29,8 +28,8 @@ class TestAdZerkApi(TestCase):
         self.assertEqual(url, request.url)
         self.assertEqual('DUMMY_123', request.headers['X-Adzerk-ApiKey'])
 
-    @patch.dict('conf.adzerk', {"api_key": "OUT_OF_DATE_456"})
-    @patch('adzerk.secret.get_api_key', return_value="DUMMY_123")
+    @patch.dict('app.conf.adzerk', {"api_key": "OUT_OF_DATE_456"})
+    @patch('app.adzerk.secret.get_api_key', return_value="DUMMY_123")
     @responses.activate
     def test_update_api_key(self, mock_get_api_key):
         url = 'https://e-10250.adzerk.net/udb/10250/?userKey=%7B123%7D'
@@ -83,7 +82,7 @@ class TestAdZerkApi(TestCase):
         for p in body['placements']:
             self.assertEqual([217995], p['zoneIds'])
 
-    @patch.dict('conf.adzerk', {"api_key": "DUMMY_123"})
+    @patch.dict('app.conf.adzerk', {"api_key": "DUMMY_123"})
     @responses.activate
     def test_site_is_not_stored_in_conf(self):
         api = Api(pocket_id="{123}", country='US', region='CA', site=1084367)

@@ -2,12 +2,8 @@ import requests
 import logging
 from copy import deepcopy
 
-
-import conf
-import adzerk.validation
-import adzerk.secret
-import random
-import time
+from app.adzerk import validation, secret
+from app import conf
 
 
 class AdZerkException(Exception):
@@ -37,9 +33,9 @@ class Api:
         decisions = response['decisions']
         if not decisions or len(decisions) == 0:
             return dict()
-        for _,dec in decisions.items():
+        for _, dec in decisions.items():
             if dec:
-                map(adzerk.validation.validate_decision, dec)
+                map(validation.validate_decision, dec)
         return decisions
 
     def get_decision_body(self):
@@ -69,7 +65,7 @@ class Api:
     def __add_placements(self, body):
         # if placement exists, we need to replace default values with placements from client
         if self.placements and len(self.placements) > 0:
-            default_placement = body['placements'].pop(0)   # remove default
+            default_placement = body['placements'].pop(0)  # remove default
             for place in self.placements:
                 copy_place = deepcopy(default_placement)
                 if 'ad_types' in place:
@@ -98,4 +94,4 @@ class Api:
         )
 
     def __update_api_key(self):
-        conf.adzerk['api_key'] = adzerk.secret.get_api_key()
+        conf.adzerk['api_key'] = secret.get_api_key()

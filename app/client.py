@@ -1,6 +1,6 @@
-import conf
-from adzerk.api import Api as AdZerk
-import adzerk.transform
+from app import conf
+from app.adzerk.api import Api as AdZerk
+import app.adzerk.transform
 import logging
 
 
@@ -58,7 +58,7 @@ class Client:
         decisions = adzerk_api.get_decisions()
 
         response = {
-            'settings': conf.spocs['settings'],
+            'settings': app.conf.spocs['settings'],
         }
         self.__transform_spocs(response, decisions)
 
@@ -72,9 +72,9 @@ class Client:
         # so we add its elements to final response directly
         for div, spocs in spocs_raw.items():
             if spocs:
-                transformed_spocs = [adzerk.transform.to_spoc(s) for s in spocs]
-                if self.version >= 2 and adzerk.transform.is_collection(transformed_spocs):
-                    response[div] = adzerk.transform.to_collection(transformed_spocs)
+                transformed_spocs = [app.adzerk.transform.to_spoc(s) for s in spocs]
+                if self.version >= 2 and app.adzerk.transform.is_collection(transformed_spocs):
+                    response[div] = app.adzerk.transform.to_collection(transformed_spocs)
                 else:
                     response[div] = transformed_spocs
             else:

@@ -5,9 +5,8 @@ from copy import deepcopy
 
 
 from telemetry.handler import TELEMETRY_PATH_IDS
-import adzerk.secret
-import adzerk.api
-from conf import env
+import app.adzerk.secret
+from app.conf import env
 
 network_id = 10250
 div_name = "spocs"
@@ -46,7 +45,7 @@ production = deepcopy(default)
 development = deepcopy(default)
 
 try:
-    api_key = adzerk.secret.get_api_key()
+    api_key = app.adzerk.secret.get_api_key()
     development["api_key"] = production["api_key"] = api_key
 except BotoCoreError as e:
     if env == 'development':

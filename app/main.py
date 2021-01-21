@@ -4,14 +4,14 @@ import uvicorn
 from starlette.responses import JSONResponse
 from werkzeug.middleware.proxy_fix import ProxyFix
 from fastapi import FastAPI, Request
-from adzerk.api import Api as AdZerk
+from app.adzerk.api import Api as AdZerk
 from app.client import Client
 from app.exceptions.base_exception import BaseException
 from app.exceptions.missing_param import MissingParam
 from app.exceptions.invalid_content_type import InvalidContentType
 from app.exceptions.invalid_param import InvalidParam
 from app.validation import is_valid_pocket_id
-from provider.geo_provider import GeolocationProvider
+from app.provider.geo_provider import GeolocationProvider
 from typing import Dict
 
 app = FastAPI()  # Indicate that we have two proxy servers in front of the App (Docker gateway and load balancer).
