@@ -16,7 +16,7 @@ from app.middleware.proxy_headers import ProxyHeadersMiddleware
 
 app = FastAPI()
 
-#Trust the X-Forwarded-For using
+# Trust the X-Forwarded-For using a middleware. See the middle ware for more info.
 app.add_middleware(ProxyHeadersMiddleware, trusted_hosts="*")
 
 provider = GeolocationProvider()
