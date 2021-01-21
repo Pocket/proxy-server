@@ -35,4 +35,4 @@ ENV GIT_SHA=$GIT_SHA
 
 # Install application into container
 WORKDIR /
-COPY ./ /app
+COPY ./app /app

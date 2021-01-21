@@ -21,8 +21,8 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - "./:/app:ro"
-      - "./:/opt/project/src:ro" # PyCharm overrides app to /opt/project/src
+      - "./app:/app:ro"
+      - "./app:/opt/project/src:ro" # PyCharm overrides app to /opt/project/src
     depends_on:
       - s3
 
