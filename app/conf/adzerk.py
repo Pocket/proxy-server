@@ -43,10 +43,11 @@ default = {
 
 production = deepcopy(default)
 development = deepcopy(default)
+staging = deepcopy(default)
 
 try:
     api_key = app.adzerk.secret.get_api_key()
-    development["api_key"] = production["api_key"] = api_key
+    development["api_key"] = production["api_key"] = staging["api_key"] = api_key
 except BotoCoreError as e:
     if env == 'development':
         logging.info('Failed to load api_key from Secret Manager.')

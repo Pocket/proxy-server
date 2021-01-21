@@ -1,4 +1,4 @@
-production = development = {
+production = development = staging = {
     "thepointsguy": {
         "americanexpress.com": 1,
         "chase.com": 1,
