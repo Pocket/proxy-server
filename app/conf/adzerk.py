@@ -4,7 +4,7 @@ from botocore.exceptions import BotoCoreError
 from copy import deepcopy
 
 
-from telemetry.handler import TELEMETRY_PATH_IDS
+from app.telemetry.handler import TELEMETRY_PATH_IDS
 import app.adzerk.secret
 from app.conf import env
 

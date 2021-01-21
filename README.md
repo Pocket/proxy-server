@@ -52,7 +52,7 @@ aws-vault exec pocket-dev-rw -- ./deploy.sh -p pocket-proxy-rw \
 Open Fargate in the AWS console and update the service, forcing a new deployment.
 
 # Telemetry Function
-The [Telemtry Handler](telemetry/handler.py) is triggered by telemetry from the Firefox discovery stream. It anonymously pings AdZerk to keep track of events related to sponsored content, such as clicks and impressions, in a privacy-preserving way. The event code (or "shim") does not contain any personally identifiable data; we never share personal data with AdZerk.
+The [Telemtry Handler](app/telemetry/handler.py) is triggered by telemetry from the Firefox discovery stream. It anonymously pings AdZerk to keep track of events related to sponsored content, such as clicks and impressions, in a privacy-preserving way. The event code (or "shim") does not contain any personally identifiable data; we never share personal data with AdZerk.
 
 ## Deployment
  

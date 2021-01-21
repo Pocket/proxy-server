@@ -4,11 +4,11 @@ import json
 
 from unittest import TestCase
 from unittest.mock import patch, call
-from telemetry.handler import handle_message, ping_adzerk
+from app.telemetry.handler import handle_message, ping_adzerk
 
 
 class TestTelemetryHandler(TestCase):
-    @patch('telemetry.handler.ping_adzerk')
+    @patch('app.telemetry.handler.ping_adzerk')
     def test_handle_message(self, mock_ping_adzerk):
         telemetry = {'tiles': [{'shim': '0,foo,bar'}, {'shim': '1,1,2'}, {'shim': '2,a,b'}]}
         data = base64.b64encode(gzip.compress(json.dumps(telemetry).encode('utf-8')))
