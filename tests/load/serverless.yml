@@ -13,7 +13,7 @@
 
 # If the following value is changed, your service may be duplicated (this value is used to build the CloudFormation
 # Template script's name)
-service: serverless-artillery-dev
+service: serverless-artillery-proxy
 
 provider:
   name: aws

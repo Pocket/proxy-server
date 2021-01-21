@@ -5,13 +5,13 @@
 # https://artillery.io/docs/
 config:
   # this hostname will be used as a prefix for each URI in the flow unless a complete URI is specified
-  target: "https://spocs.getpocket.com"
+  target: "https://spocs.getpocket.dev"
   phases:
-    - duration: 3600
+    - duration: 1800
       arrivalRate: 10
       rampTo: 7000
       name: "Warm up AdZerk"
-    - duration: 10800
+    - duration: 1800
       arrivalRate: 7000
       name: "Sustained 100% of max load"
   plugins:
