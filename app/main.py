@@ -2,7 +2,6 @@ from json.decoder import JSONDecodeError
 
 import uvicorn
 from starlette.responses import JSONResponse
-from werkzeug.middleware.proxy_fix import ProxyFix
 from fastapi import FastAPI, Request
 from app.adzerk.api import Api as AdZerk
 from app.client import Client
@@ -13,9 +12,13 @@ from app.exceptions.invalid_param import InvalidParam
 from app.validation import is_valid_pocket_id
 from app.provider.geo_provider import GeolocationProvider
 from typing import Dict
+from app.middleware.proxy_headers import ProxyHeadersMiddleware
 
-app = FastAPI()  # Indicate that we have two proxy servers in front of the App (Docker gateway and load balancer).
-ProxyFix(app, x_for=2)
+app = FastAPI()
+
+#Trust the X-Forwarded-For using
+app.add_middleware(ProxyHeadersMiddleware, trusted_hosts="*")
+
 provider = GeolocationProvider()
 
 
