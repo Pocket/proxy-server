@@ -15,8 +15,7 @@ class AdZerkException(Exception):
 
 class Api:
 
-    def __init__(self, pocket_id, country=None, region=None, site=None, placements=None,
-                 api_key_provider: Optional[SecretProvider] = None):
+    def __init__(self, pocket_id, country=None, region=None, site=None, placements=None, api_key: str = None):
         self.pocket_id = pocket_id
         self.country = country
         self.region = region

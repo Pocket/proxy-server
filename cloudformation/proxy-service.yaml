@@ -228,6 +228,12 @@ Resources:
               SoftLimit: 16384
               HardLimit: 16384
 
+          Secrets:
+            - Name: SENTRY_DSN
+              ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${EcsAppSentryDsnSecretName}:SENTRY_DSN"
+            - Name: ADZERK_API_KEY
+              ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${EcsAppAdzerkSecretName}:ADZERK_API_KEY"
+
       Cpu: !Ref EcsTaskCpu
       Memory: !Ref EcsTaskMemory
       NetworkMode: awsvpc
