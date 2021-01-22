@@ -1,5 +1,7 @@
-import requests
 import logging
+
+import requests
+import aiohttp
 from copy import deepcopy
 
 from app.adzerk import validation, secret
@@ -19,16 +21,16 @@ class Api:
         self.site = site
         self.placements = placements
 
-    def get_decisions(self):
+    async def get_decisions(self):
         """
         Calls Adzerk API with request body
         :return: A map of decisions, previously
         a list of decisions for one div/placement.
         """
-        # changelog decisions now returns a *map* response of placement -> decisions
-        r = requests.post(conf.adzerk['decision']['url'], json=self.get_decision_body(),
-                          timeout=0.5)
-        response = r.json()
+        timeout = aiohttp.ClientTimeout(total=0.5)
+        async with aiohttp.ClientSession(timeout=timeout) as session:
+            async with session.post(conf.adzerk['decision']['url'], json=self.get_decision_body()) as r:
+                response = await r.json()
 
         decisions = response['decisions']
         if not decisions or len(decisions) == 0:

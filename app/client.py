@@ -32,7 +32,7 @@ class Client:
         self.site = site
         self.placements = placements
 
-    def get_spocs(self):
+    async def get_spocs(self):
         targeting = {"site": self.site}     # setting site here by default so it's picked up by API
 
         try:
@@ -55,7 +55,7 @@ class Client:
         targeting['placements'] = self.placements
 
         adzerk_api = AdZerk(**targeting)
-        decisions = adzerk_api.get_decisions()
+        decisions = await adzerk_api.get_decisions()
 
         response = {
             'settings': app.conf.spocs['settings'],

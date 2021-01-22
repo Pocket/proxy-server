@@ -74,7 +74,7 @@ async def call(client_ip, req_params, required_params, optional_params=None):
 
     client = Client(ip=client_ip, geolocation_provider=provider, **params)
 
-    return client.get_spocs()
+    return await client.get_spocs()
 
 
 def __validate_required_params(required, params):

@@ -15,6 +15,7 @@ uvicorn = "*"
 fastapi = "*"
 uvloop = "*"
 httptools = "*"
+aiohttp = {extras = ["speedups"], version = "*"}
 
 [dev-packages]
 responses = "*"
