@@ -50,39 +50,39 @@ class TestApp(unittest.TestCase):
 
     @patch('app.provider.geo_provider.GeolocationProvider.__init__', return_value=None)
     @patch('app.adzerk.api.Api.get_decisions', return_value=mock_response_map)
-    def test_app_spocs_production_valid(self, mock_geo, mock_adzerk):
-        resp = self.create_client_no_geo_locs().post('/spocs', json=self.get_request_body())
+    async def test_app_spocs_production_valid(self, mock_geo, mock_adzerk):
+        resp = await self.create_client_no_geo_locs().post('/spocs', json=self.get_request_body())
         self.assertEqual(resp.status_code, 200)
 
     @patch('app.provider.geo_provider.GeolocationProvider.__init__', return_value=None)
     @patch('app.adzerk.api.Api.get_decisions', return_value=mock_response_map)
-    def test_app_spocs_production_valid_with_country_region(self, mock_geo, mock_adzerk):
+    async def test_app_spocs_production_valid_with_country_region(self, mock_geo, mock_adzerk):
         country_region = {
             'country': 'CA',
             'region': 'ON',
         }
-        resp = self.create_client_no_geo_locs().post('/spocs', json=self.get_request_body(update=country_region))
+        resp = await self.create_client_no_geo_locs().post('/spocs', json=self.get_request_body(update=country_region))
         self.assertEqual(resp.status_code, 200)
 
     @patch('app.provider.geo_provider.GeolocationProvider.__init__', return_value=None)
     @patch('app.adzerk.api.Api.get_decisions', return_value=mock_collection_placement_map)
-    def test_app_spocs_collection_v1(self, mock_geo, mock_adzerk):
+    async def test_app_spocs_collection_v1(self, mock_geo, mock_adzerk):
         """
         API version 1 returns the collection as an array for backwards compatibility.
         """
         request_body = self.get_request_body(placements=mock_collection_placements)
-        resp = self.create_client_no_geo_locs().post('/spocs', json=request_body)
+        resp = await self.create_client_no_geo_locs().post('/spocs', json=request_body)
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.json()['sponsored-collection'][0]['collection_title'], 'Best of the Web')
 
     @patch('app.provider.geo_provider.GeolocationProvider.__init__', return_value=None)
     @patch('app.adzerk.api.Api.get_decisions', return_value=mock_collection_placement_map)
-    def test_app_spocs_collection_v2(self, mock_geo, mock_adzerk):
+    async def test_app_spocs_collection_v2(self, mock_geo, mock_adzerk):
         """
         API version 2 returns the collection as an object, with collection-level fields pulled up.
         """
         request_body = self.get_request_body(placements=mock_collection_placements, update={'version': '2'})
-        resp = self.create_client_no_geo_locs().post('/spocs', json=request_body)
+        resp = await self.create_client_no_geo_locs().post('/spocs', json=request_body)
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.json()['spocs'][0]['title'], 'title 1000')
 
@@ -139,7 +139,7 @@ class TestApp(unittest.TestCase):
 
     @patch('app.provider.geo_provider.GeolocationProvider.__init__', return_value=None)
     @patch('app.adzerk.api.Api.get_decisions', return_value=mock_response_map)
-    def test_app_spocs_staging_production_valid(self, mock_geo, mock_adzerk):
+    async def test_app_spocs_staging_production_valid(self, mock_geo, mock_adzerk):
         """
         This test would be more useful if we checked that we got different responses based on the site.
         But currently not sure how to return a mocked response based on site, or even to test
@@ -147,7 +147,7 @@ class TestApp(unittest.TestCase):
         :param mock_adzerk:
         :return:
         """
-        resp = self.create_client_no_geo_locs().post('/spocs?site=12345', json=self.get_request_body())
+        resp = await self.create_client_no_geo_locs().post('/spocs?site=12345', json=self.get_request_body())
         self.assertEqual(resp.status_code, 200)
 
     @patch('app.provider.geo_provider.GeolocationProvider.__init__', return_value=None)
@@ -171,9 +171,9 @@ class TestApp(unittest.TestCase):
 
     @patch('app.provider.geo_provider.GeolocationProvider.__init__', return_value=None)
     @patch('app.adzerk.api.Api.get_decisions', return_value=mock_placement_map)
-    def test_app_spocs_production_valid_placements_call(self, mock_geo, mock_dec):
+    async def test_app_spocs_production_valid_placements_call(self, mock_geo, mock_dec):
         bad_placements = deepcopy(mock_placements)
-        resp = self.create_client_no_geo_locs().post('/spocs', json=self.get_request_body(placements=bad_placements))
+        resp = await self.create_client_no_geo_locs().post('/spocs', json=self.get_request_body(placements=bad_placements))
         self.assertEqual(200, resp.status_code)
         result = resp.json()
         self.assertTrue('top-sites' in result)
