@@ -216,6 +216,8 @@ Resources:
               Value: !Ref EcsAppEnv
             - Name: GEOIP_S3_BUCKET
               Value: !Ref EcsAppGeoipS3Bucket
+            - Name: ADZERK_SECRET_NAME
+              Value: !Ref EcsAppAdzerkSecretName
           PortMappings:
             - Protocol: tcp
               ContainerPort: 8000
@@ -315,8 +317,13 @@ Resources:
                 Resource:
                   - !Sub "arn:aws:s3:::${EcsAppGeoipS3Bucket}"
                   - !Sub "arn:aws:s3:::${EcsAppGeoipS3Bucket}/*"
-
-  EcsSecurityGroup:
+              - Effect: Allow
+                Action:
+                  - secretsmanager:GetSecretValue
+                Resource:
+                  - !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${EcsAppAdzerkSecretName}-??????"
+ 
+ EcsSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: !Sub "${AWS::StackName} ecs security group"
