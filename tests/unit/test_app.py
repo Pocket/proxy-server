@@ -1,7 +1,6 @@
 import unittest
 from unittest.mock import patch
 from copy import deepcopy
-import responses
 
 from app.main import create_app
 from tests.fixtures.mock_decision import mock_response, mock_response_900, mock_collection_response
@@ -18,13 +17,9 @@ class TestApp(unittest.TestCase):
     mock_collection_placement_map = {'sponsored-collection': [mock_collection_response], 'spocs': [mock_response]}
 
     def setUp(self):
-        patchers = []
-        patchers.append(patch('secret.factory.SecretProvider.get_value', return_value='DUMMY_123'))
-        patchers.append(patch('sentry_sdk.init'))
-
-        for p in patchers:
-            self.addCleanup(p.stop)
-            p.start()
+        sentry_patcher = patch('sentry_sdk.init')
+        sentry_patcher.start()
+        self.addCleanup(sentry_patcher.stop)
 
     @classmethod
     def create_client_no_geo_locs(cls):

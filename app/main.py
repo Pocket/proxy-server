@@ -13,8 +13,6 @@ from app.exceptions.invalid_param import InvalidParam
 from app.validation import is_valid_pocket_id
 import conf
 from provider.geo_provider import GeolocationProvider
-from secret.factory import SecretProvider, SecretProviderException
-import logging
 
 
 def create_app():
@@ -23,12 +21,6 @@ def create_app():
         integrations=[FlaskIntegration()],
         environment=conf.env
     )
-    # except SecretProviderException as e:
-    #     # For local development you can optionally enable Sentry using the SENTRY_DSN environment variable.
-    #     if environ.get('APP_ENV') == 'development':
-    #         logging.warning(f"Failed to initialize Sentry with {e}")
-    #     else:
-    #         raise e
 
     app = Flask(__name__)
     # Indicate that we have two proxy servers in front of the App (Docker gateway and load balancer).
