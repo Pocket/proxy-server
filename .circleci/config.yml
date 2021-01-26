@@ -41,6 +41,8 @@ jobs:
 
       - run:
           name: Run tests
+          environment:
+            APP_ENV: test
           command: |
             . venv/bin/activate
             mkdir test-reports/

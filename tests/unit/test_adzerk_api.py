@@ -1,7 +1,9 @@
+import os
+
 from unittest import TestCase
-from unittest.mock import patch
+from unittest.mock import patch, Mock
 import responses
-import time
+import requests.exceptions
 
 from adzerk.api import Api
 from tests.fixtures.mock_placements import mock_placements, mock_spocs_placement
@@ -13,14 +15,12 @@ class TestAdZerkApi(TestCase):
         # Reset cache expiration time
         Api.priority_cache_expires_at = None
 
-    @patch.dict('conf.adzerk', {"api_key": "DUMMY_123"})
     @responses.activate
     def test_delete_user(self):
-
         url = 'https://e-10250.adzerk.net/udb/10250/?userKey=%7B123%7D'
         responses.add(responses.DELETE, url, status=200)
 
-        api = Api(pocket_id="{123}")
+        api = Api(pocket_id="{123}", api_key="DUMMY_123")
         api.delete_user()
 
         self.assertEqual(1, len(responses.calls))
@@ -29,26 +29,17 @@ class TestAdZerkApi(TestCase):
         self.assertEqual(url, request.url)
         self.assertEqual('DUMMY_123', request.headers['X-Adzerk-ApiKey'])
 
-    @patch.dict('conf.adzerk', {"api_key": "OUT_OF_DATE_456"})
-    @patch('adzerk.secret.get_api_key', return_value="DUMMY_123")
     @responses.activate
-    def test_update_api_key(self, mock_get_api_key):
+    def test_update_api_key(self):
         url = 'https://e-10250.adzerk.net/udb/10250/?userKey=%7B123%7D'
         responses.add(responses.DELETE, url, status=401)
-        responses.add(responses.DELETE, url, status=200)
 
-        api = Api(pocket_id="{123}")
-        api.delete_user()
+        api = Api(pocket_id="{123}", api_key="OUT_OF_DATE_123")
+        # Exception is raised when AdZerk responds with a bad status code.
+        with self.assertRaises(requests.exceptions.HTTPError):
+            api.delete_user()
 
-        self.assertEqual(2, len(responses.calls))
-
-        request = responses.calls[0].request
-        self.assertEqual(url, request.url)
-        self.assertEqual('OUT_OF_DATE_456', request.headers['X-Adzerk-ApiKey'])
-
-        request = responses.calls[1].request
-        self.assertEqual(url, request.url)
-        self.assertEqual('DUMMY_123', request.headers['X-Adzerk-ApiKey'])
+        self.assertEqual(1, len(responses.calls))
 
     def test_keywords(self):
         api = Api(pocket_id="{123}", country='US', region='CA')
@@ -83,7 +74,6 @@ class TestAdZerkApi(TestCase):
         for p in body['placements']:
             self.assertEqual([217995], p['zoneIds'])
 
-    @patch.dict('conf.adzerk', {"api_key": "DUMMY_123"})
     @responses.activate
     def test_site_is_not_stored_in_conf(self):
         api = Api(pocket_id="{123}", country='US', region='CA', site=1084367)

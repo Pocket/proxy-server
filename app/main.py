@@ -1,5 +1,9 @@
+from os import environ
+
 from flask import Flask, request, jsonify
 from werkzeug.middleware.proxy_fix import ProxyFix
+import sentry_sdk
+from sentry_sdk.integrations.flask import FlaskIntegration
 
 from adzerk.api import Api as AdZerk
 from app.client import Client
@@ -7,10 +11,16 @@ from app.exceptions.missing_param import MissingParam
 from app.exceptions.invalid_content_type import InvalidContentType
 from app.exceptions.invalid_param import InvalidParam
 from app.validation import is_valid_pocket_id
+import conf
 from provider.geo_provider import GeolocationProvider
 
 
 def create_app():
+    sentry_sdk.init(
+        dsn=environ.get('SENTRY_DSN'),
+        integrations=[FlaskIntegration()],
+        environment=conf.env
+    )
 
     app = Flask(__name__)
     # Indicate that we have two proxy servers in front of the App (Docker gateway and load balancer).
@@ -27,7 +37,7 @@ def create_app():
     @app.route('/user', methods=['DELETE'])
     def delete_user():
         pocket_id = request.json['pocket_id']
-        adzerk_api = AdZerk(pocket_id=pocket_id)
+        adzerk_api = AdZerk(pocket_id=pocket_id, api_key=environ.get('ADZERK_API_KEY'))
         response = adzerk_api.delete_user()
 
         return jsonify({'status': int(response.status_code == 200)}), response.status_code

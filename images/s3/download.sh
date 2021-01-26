@@ -32,8 +32,6 @@ while getopts ":p:b:" opt; do
   case $opt in
     b) SOURCE_BUCKET=$OPTARG
     ;;
-    p) AWS_PROFILE=$OPTARG
-    ;;
     \?) Warn "Invalid option -$OPTARG"
     ;;
   esac
@@ -41,7 +39,7 @@ done
 
 TMPDIR=$(mktemp -d)
 Print "Downloading $SOURCE_BUCKET to $TMPDIR"
-aws --profile $AWS_PROFILE s3 cp s3://$SOURCE_BUCKET $TMPDIR --recursive
+aws s3 cp s3://$SOURCE_BUCKET $TMPDIR --recursive
 
 Print "Creating fake_s3 aws profile"
 aws configure set aws_access_key_id 'foobar' --profile 'fake_s3'
