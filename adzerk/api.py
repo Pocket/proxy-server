@@ -1,12 +1,10 @@
 import requests
 import logging
-from typing import Optional
 from copy import deepcopy
 
 
 import conf
 import adzerk.validation
-from secret.factory import SecretProvider
 
 
 class AdZerkException(Exception):
@@ -21,7 +19,7 @@ class Api:
         self.region = region
         self.site = site
         self.placements = placements
-        self.api_key_provider = api_key_provider
+        self.api_key = api_key
 
     def get_decisions(self):
         """
@@ -79,23 +77,12 @@ class Api:
                 copy_place['divName'] = place['name']
                 body['placements'].append(copy_place)
 
-    def delete_user(self, retry_count=1):
-        response = self.__request_delete_user()
-        if response.status_code == 401:
-            if retry_count > 0:
-                self.api_key_provider.clear_cache()
-                response = self.delete_user(retry_count - 1)
-            else:
-                logging.error("Permission denied while trying to delete a user and out of retry attempts.")
-        if response.status_code != 200:
-            logging.error("{0} delete_user: {1}".format(str(response.status_code), response.text))
-
-        return response
-
-    def __request_delete_user(self):
-        return requests.delete(
+    def delete_user(self):
+        response = requests.delete(
             url=conf.adzerk['forget_endpoint'],
             params={'userKey': self.pocket_id},
-            headers={'X-Adzerk-ApiKey': self.api_key_provider.get_value()},
+            headers={'X-Adzerk-ApiKey': self.api_key},
             timeout=30
         )
+        response.raise_for_status()
+        return response

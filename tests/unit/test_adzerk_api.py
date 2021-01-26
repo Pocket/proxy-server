@@ -3,9 +3,9 @@ import os
 from unittest import TestCase
 from unittest.mock import patch, Mock
 import responses
+import requests.exceptions
 
 from adzerk.api import Api
-from secret.factory import SecretProvider
 from tests.fixtures.mock_placements import mock_placements, mock_spocs_placement
 
 
@@ -17,13 +17,10 @@ class TestAdZerkApi(TestCase):
 
     @responses.activate
     def test_delete_user(self):
-        mock_secret_provider = SecretProvider('FOO', 'BAR')
-        mock_secret_provider.get_value = Mock(return_value="DUMMY_123")
-
         url = 'https://e-10250.adzerk.net/udb/10250/?userKey=%7B123%7D'
         responses.add(responses.DELETE, url, status=200)
 
-        api = Api(pocket_id="{123}", api_key_provider=mock_secret_provider)
+        api = Api(pocket_id="{123}", api_key="DUMMY_123")
         api.delete_user()
 
         self.assertEqual(1, len(responses.calls))
@@ -34,25 +31,15 @@ class TestAdZerkApi(TestCase):
 
     @responses.activate
     def test_update_api_key(self):
-        mock_secret_provider = SecretProvider('FOO', 'BAR')
-        mock_secret_provider.get_value = Mock(side_effect=["OUT_OF_DATE_456", "DUMMY_123"])
-
         url = 'https://e-10250.adzerk.net/udb/10250/?userKey=%7B123%7D'
         responses.add(responses.DELETE, url, status=401)
-        responses.add(responses.DELETE, url, status=200)
 
-        api = Api(pocket_id="{123}", api_key_provider=mock_secret_provider)
-        api.delete_user(retry_count=10) # Arbitrarily high number of retry attempts. It's expected to only retry once.
+        api = Api(pocket_id="{123}", api_key="OUT_OF_DATE_123")
+        # Exception is raised when AdZerk responds with a bad status code.
+        with self.assertRaises(requests.exceptions.HTTPError):
+            api.delete_user()
 
-        self.assertEqual(2, len(responses.calls))
-
-        request = responses.calls[0].request
-        self.assertEqual(url, request.url)
-        self.assertEqual('OUT_OF_DATE_456', request.headers['X-Adzerk-ApiKey'])
-
-        request = responses.calls[1].request
-        self.assertEqual(url, request.url)
-        self.assertEqual('DUMMY_123', request.headers['X-Adzerk-ApiKey'])
+        self.assertEqual(1, len(responses.calls))
 
     def test_keywords(self):
         api = Api(pocket_id="{123}", country='US', region='CA')

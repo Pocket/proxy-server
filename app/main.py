@@ -18,25 +18,22 @@ import logging
 
 
 def create_app():
-    try:
-        dsn_provider = SecretProvider(name=environ.get('SENTRY_DSN_SECRET_NAME'), key='SENTRY_DSN')
-        sentry_sdk.init(
-            dsn=dsn_provider.get_value(),
-            integrations=[FlaskIntegration()],
-            environment=conf.env
-        )
-    except SecretProviderException as e:
-        # For local development you can optionally enable Sentry using the SENTRY_DSN environment variable.
-        if environ.get('APP_ENV') == 'development':
-            logging.warning(f"Failed to initialize Sentry with {e}")
-        else:
-            raise e
+    sentry_sdk.init(
+        dsn=environ.get('SENTRY_DSN'),
+        integrations=[FlaskIntegration()],
+        environment=conf.env
+    )
+    # except SecretProviderException as e:
+    #     # For local development you can optionally enable Sentry using the SENTRY_DSN environment variable.
+    #     if environ.get('APP_ENV') == 'development':
+    #         logging.warning(f"Failed to initialize Sentry with {e}")
+    #     else:
+    #         raise e
 
     app = Flask(__name__)
     # Indicate that we have two proxy servers in front of the App (Docker gateway and load balancer).
     app.wsgi_app = ProxyFix(app.wsgi_app, x_for=2)
     provider = GeolocationProvider()
-    adzerk_api_key_provider = SecretProvider(name=environ.get('ADZERK_SECRET_NAME'), key='ADZERK_API_KEY')
 
     @app.route('/spocs', methods=['POST'])
     def get_spocs():
@@ -48,7 +45,7 @@ def create_app():
     @app.route('/user', methods=['DELETE'])
     def delete_user():
         pocket_id = request.json['pocket_id']
-        adzerk_api = AdZerk(pocket_id=pocket_id, api_key_provider=adzerk_api_key_provider)
+        adzerk_api = AdZerk(pocket_id=pocket_id, api_key=environ.get('ADZERK_API_KEY'))
         response = adzerk_api.delete_user()
 
         return jsonify({'status': int(response.status_code == 200)}), response.status_code
