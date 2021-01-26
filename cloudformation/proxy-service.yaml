@@ -216,10 +216,6 @@ Resources:
               Value: !Ref EcsAppEnv
             - Name: GEOIP_S3_BUCKET
               Value: !Ref EcsAppGeoipS3Bucket
-            - Name: ADZERK_SECRET_NAME
-              Value: !Ref EcsAppAdzerkSecretName
-            - Name: SENTRY_DSN_SECRET_NAME
-              Value: !Ref EcsAppSentryDsnSecretName
           PortMappings:
             - Protocol: tcp
               ContainerPort: 8000
@@ -230,9 +226,9 @@ Resources:
 
           Secrets:
             - Name: SENTRY_DSN
-              ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${EcsAppSentryDsnSecretName}:SENTRY_DSN"
+              ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${EcsAppSentryDsnSecretName}:SENTRY_DSN::"
             - Name: ADZERK_API_KEY
-              ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${EcsAppAdzerkSecretName}:ADZERK_API_KEY"
+              ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${EcsAppAdzerkSecretName}:ADZERK_API_KEY::"
 
       Cpu: !Ref EcsTaskCpu
       Memory: !Ref EcsTaskMemory
