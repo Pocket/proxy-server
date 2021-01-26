@@ -4,7 +4,7 @@ import requests
 import aiohttp
 from copy import deepcopy
 
-from app.adzerk import validation, secret
+from app.adzerk import validation
 from app import conf
 
 

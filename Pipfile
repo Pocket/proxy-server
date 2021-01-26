@@ -16,6 +16,7 @@ fastapi = "*"
 uvloop = "*"
 httptools = "*"
 aiohttp = {extras = ["speedups"], version = "*"}
+sentry-sdk = "*"
 
 [dev-packages]
 responses = "*"
