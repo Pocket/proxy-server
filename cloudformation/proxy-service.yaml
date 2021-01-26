@@ -67,6 +67,10 @@ Parameters:
     Type: String
     Default: prod/adzerk
 
+  EcsAppSentryDsnSecretName:
+    Type: String
+    Default: prod/sentry_dsn
+
   ServiceScaleEvaluationPeriods:
     Description: "The number of periods over which data is compared to the specified threshold"
     Type: Number
@@ -222,6 +226,12 @@ Resources:
               SoftLimit: 16384
               HardLimit: 16384
 
+          Secrets:
+            - Name: SENTRY_DSN
+              ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${EcsAppSentryDsnSecretName}:SENTRY_DSN::"
+            - Name: ADZERK_API_KEY
+              ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${EcsAppAdzerkSecretName}:ADZERK_API_KEY::"
+
       Cpu: !Ref EcsTaskCpu
       Memory: !Ref EcsTaskMemory
       NetworkMode: awsvpc
@@ -272,6 +282,17 @@ Resources:
             Action: sts:AssumeRole
       ManagedPolicyArns:
       - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+      Policies:
+        - PolicyName: !Sub "${AWS::StackName}ExecutionPolicy"
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - secretsmanager:GetSecretValue
+                Resource:
+                  - !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${EcsAppAdzerkSecretName}-??????"
+                  - !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${EcsAppSentryDsnSecretName}-??????"
 
   EcsTaskRole:
     Type: AWS::IAM::Role
@@ -301,7 +322,7 @@ Resources:
                   - secretsmanager:GetSecretValue
                 Resource:
                   - !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${EcsAppAdzerkSecretName}-??????"
-
+ 
   EcsSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:

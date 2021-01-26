@@ -1,10 +1,12 @@
 from json.decoder import JSONDecodeError
-
+from os import environ
+import sentry_sdk
 import uvicorn
 from starlette.responses import JSONResponse
 from fastapi import FastAPI, Request
 from app.adzerk.api import Api as AdZerk
 from app.client import Client
+import app.conf
 from app.exceptions.base_exception import BaseException
 from app.exceptions.missing_param import MissingParam
 from app.exceptions.invalid_content_type import InvalidContentType
@@ -13,6 +15,12 @@ from app.validation import is_valid_pocket_id
 from app.provider.geo_provider import GeolocationProvider
 from typing import Dict
 from app.middleware.proxy_headers import ProxyHeadersMiddleware
+
+sentry_sdk.init(
+    dsn=environ.get('SENTRY_DSN'),
+    environment=app.conf.env,
+    release=app.conf.release
+)
 
 app = FastAPI()
 

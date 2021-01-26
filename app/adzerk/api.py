@@ -14,12 +14,13 @@ class AdZerkException(Exception):
 
 class Api:
 
-    def __init__(self, pocket_id, country=None, region=None, site=None, placements=None):
+    def __init__(self, pocket_id, country=None, region=None, site=None, placements=None, api_key: str = None):
         self.pocket_id = pocket_id
         self.country = country
         self.region = region
         self.site = site
         self.placements = placements
+        self.api_key = api_key
 
     async def get_decisions(self):
         """
@@ -78,22 +79,11 @@ class Api:
                 body['placements'].append(copy_place)
 
     def delete_user(self):
-        response = self.__request_delete_user()
-        if response.status_code == 401:
-            self.__update_api_key()
-            response = self.delete_user()
-        if response.status_code != 200:
-            logging.error("{0} delete_user: {1}".format(str(response.status_code), response.text))
-
-        return response
-
-    def __request_delete_user(self):
-        return requests.delete(
+        response = requests.delete(
             url=conf.adzerk['forget_endpoint'],
             params={'userKey': self.pocket_id},
-            headers={'X-Adzerk-ApiKey': conf.adzerk['api_key']},
+            headers={'X-Adzerk-ApiKey': self.api_key},
             timeout=30
         )
-
-    def __update_api_key(self):
-        conf.adzerk['api_key'] = secret.get_api_key()
+        response.raise_for_status()
+        return response

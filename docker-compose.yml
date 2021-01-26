@@ -17,6 +17,8 @@ services:
     environment:
       - APP_ENV=development
       - GEOIP_S3_BUCKET=pocket-geoip
+      - SENTRY_DSN=${SENTRY_DSN}
+      - ADZERK_API_KEY=${ADZERK_API_KEY}
     command: /start-reload.sh # Only for development. Reloads Gunicorn when source changes.
     ports:
       - "8000:8000"

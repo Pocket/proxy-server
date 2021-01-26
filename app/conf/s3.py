@@ -1,4 +1,4 @@
-development = {
+development = test = {
     'session': {},
     'client': {
         'endpoint_url': 'http://s3:4569',
@@ -8,7 +8,7 @@ development = {
     },
 }
 
-production = staging = {
+staging = production = {
     'session': {},
     'client': {},
 }

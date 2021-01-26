@@ -14,6 +14,11 @@ class TestApp(unittest.TestCase):
     mock_placement_map = {'top-sites': [mock_response], 'text-promo': [mock_response_900]}
     mock_collection_placement_map = {'sponsored-collection': [mock_collection_response], 'spocs': [mock_response]}
 
+    def setUp(self):
+        sentry_patcher = patch('sentry_sdk.init')
+        sentry_patcher.start()
+        self.addCleanup(sentry_patcher.stop)
+
     @classmethod
     def create_client_no_geo_locs(cls) -> TestClient:
         from app.main import app
