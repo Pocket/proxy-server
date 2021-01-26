@@ -284,6 +284,17 @@ Resources:
             Action: sts:AssumeRole
       ManagedPolicyArns:
       - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+      Policies:
+        - PolicyName: !Sub "${AWS::StackName}ExecutionPolicy"
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - secretsmanager:GetSecretValue
+                Resource:
+                  - !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${EcsAppAdzerkSecretName}-??????"
+                  - !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${EcsAppSentryDsnSecretName}-??????"
 
   EcsTaskRole:
     Type: AWS::IAM::Role
@@ -308,12 +319,6 @@ Resources:
                 Resource:
                   - !Sub "arn:aws:s3:::${EcsAppGeoipS3Bucket}"
                   - !Sub "arn:aws:s3:::${EcsAppGeoipS3Bucket}/*"
-              - Effect: Allow
-                Action:
-                  - secretsmanager:GetSecretValue
-                Resource:
-                  - !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${EcsAppAdzerkSecretName}-??????"
-                  - !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${EcsAppSentryDsnSecretName}-??????"
 
   EcsSecurityGroup:
     Type: AWS::EC2::SecurityGroup
