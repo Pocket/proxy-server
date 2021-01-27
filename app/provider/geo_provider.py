@@ -1,10 +1,10 @@
 import boto3
-import conf
-from geolocation.factory import Factory as GeolocationFactory
+from app.geolocation.factory import Factory as GeolocationFactory
+from app import conf
 import logging
 
 
-class GeolocationProvider():
+class GeolocationProvider:
 
     __PROVIDER_INSTANCE = None
 

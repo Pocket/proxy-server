@@ -1,10 +1,11 @@
-import requests
 import logging
+
+import requests
+import aiohttp
 from copy import deepcopy
 
-
-import conf
-import adzerk.validation
+from app.adzerk import validation
+from app import conf
 
 
 class AdZerkException(Exception):
@@ -21,23 +22,23 @@ class Api:
         self.placements = placements
         self.api_key = api_key
 
-    def get_decisions(self):
+    async def get_decisions(self):
         """
         Calls Adzerk API with request body
         :return: A map of decisions, previously
         a list of decisions for one div/placement.
         """
-        # changelog decisions now returns a *map* response of placement -> decisions
-        r = requests.post(conf.adzerk['decision']['url'], json=self.get_decision_body(),
-                          timeout=0.5)
-        response = r.json()
+        timeout = aiohttp.ClientTimeout(total=0.5)
+        async with aiohttp.ClientSession(timeout=timeout) as session:
+            async with session.post(conf.adzerk['decision']['url'], json=self.get_decision_body()) as r:
+                response = await r.json()
 
         decisions = response['decisions']
         if not decisions or len(decisions) == 0:
             return dict()
         for _, dec in decisions.items():
             if dec:
-                map(adzerk.validation.validate_decision, dec)
+                map(validation.validate_decision, dec)
         return decisions
 
     def get_decision_body(self):
@@ -67,7 +68,7 @@ class Api:
     def __add_placements(self, body):
         # if placement exists, we need to replace default values with placements from client
         if self.placements and len(self.placements) > 0:
-            default_placement = body['placements'].pop(0)   # remove default
+            default_placement = body['placements'].pop(0)  # remove default
             for place in self.placements:
                 copy_place = deepcopy(default_placement)
                 if 'ad_types' in place:

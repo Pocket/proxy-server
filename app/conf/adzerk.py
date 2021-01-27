@@ -1,4 +1,4 @@
-from telemetry.handler import TELEMETRY_PATH_IDS
+from app.telemetry.handler import TELEMETRY_PATH_IDS
 
 network_id = 10250
 div_name = "spocs"

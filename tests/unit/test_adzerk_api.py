@@ -1,11 +1,10 @@
 import os
-
 from unittest import TestCase
 from unittest.mock import patch, Mock
 import responses
 import requests.exceptions
 
-from adzerk.api import Api
+from app.adzerk.api import Api
 from tests.fixtures.mock_placements import mock_placements, mock_spocs_placement
 
 

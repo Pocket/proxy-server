@@ -3,9 +3,7 @@ import json
 import re
 import logging
 import distutils.util
-
-import conf
-from adzerk.api import Api
+from app import conf
 
 DEFAULT_PRIORITY = 100
 

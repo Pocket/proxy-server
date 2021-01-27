@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from adzerk.validation import validate_image_url
+from app.adzerk.validation import validate_image_url
 
 
 class TestAdZerkValidation(TestCase):

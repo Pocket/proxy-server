@@ -1,7 +1,8 @@
 import tempfile
-import conf
 
 import geoip2.database
+
+from app.conf import geolocation
 
 
 class Factory():
@@ -14,6 +15,6 @@ class Factory():
         :return: geoip2.database.Reader
         """
         with tempfile.TemporaryFile() as fp:
-            self.s3.download_fileobj(conf.geolocation['s3_bucket'], conf.geolocation['s3_key'], fp)
+            self.s3.download_fileobj(geolocation['s3_bucket'], geolocation['s3_key'], fp)
             fp.seek(0)
             return geoip2.database.Reader(fp, mode=geoip2.database.MODE_FD)
