@@ -41,7 +41,7 @@ async def get_spocs(request: Request):
 @app.delete('/user')
 async def delete_user(json_data: Dict):
     pocket_id = json_data['pocket_id']
-    adzerk_api = AdZerk(pocket_id=pocket_id)
+    adzerk_api = AdZerk(pocket_id=pocket_id, api_key=environ.get('ADZERK_API_KEY'))
     response = adzerk_api.delete_user()
 
     return {'status': int(response.status_code == 200)}, response.status_code
