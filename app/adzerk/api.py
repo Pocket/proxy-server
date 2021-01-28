@@ -29,7 +29,8 @@ class Api:
         a list of decisions for one div/placement.
         """
         timeout = aiohttp.ClientTimeout(total=30)
-        async with aiohttp.ClientSession(timeout=timeout) as session:
+        connector = aiohttp.TCPConnector(limit=None)
+        async with aiohttp.ClientSession(timeout=timeout, connector=connector) as session:
             async with session.post(conf.adzerk['decision']['url'], json=self.get_decision_body()) as r:
                 response = await r.json()
 
