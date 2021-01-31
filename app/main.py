@@ -1,6 +1,7 @@
 from json.decoder import JSONDecodeError
 from os import environ
 import sentry_sdk
+from sentry_sdk.integrations.asgi import SentryAsgiMiddleware
 import uvicorn
 from starlette.responses import JSONResponse
 from fastapi import FastAPI, Request
@@ -23,6 +24,7 @@ sentry_sdk.init(
 )
 
 app = FastAPI()
+app.add_middleware(SentryAsgiMiddleware)
 
 # Trust the X-Forwarded-For using a middleware. See the middle ware for more info.
 app.add_middleware(ProxyHeadersMiddleware, trusted_hosts="*")

@@ -32,6 +32,12 @@ class Api:
         connector = aiohttp.TCPConnector(limit=None)
         async with aiohttp.ClientSession(timeout=timeout, connector=connector) as session:
             async with session.post(conf.adzerk['decision']['url'], json=self.get_decision_body()) as r:
+                if r.status == 400:
+                    text = await r.text()
+                    # This occurs when there is no site with the requested id from adzerk.
+                    # So instead we send back no results but log an error
+                    logging.error(text)
+                    return dict()
                 response = await r.json()
 
         decisions = response['decisions']
