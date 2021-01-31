@@ -1,8 +1,9 @@
+ARG GIT_SHA=local
 FROM tiangolo/uvicorn-gunicorn-fastapi:python3.7 as base
 
 # Based on https://sourcery.ai/blog/python-docker/
 FROM base AS python-deps
-ARG GIT_SHA=local
+ARG GIT_SHA
 
 # Install pipenv
 RUN pip install pipenv
@@ -12,11 +13,11 @@ WORKDIR /
 COPY Pipfile .
 COPY Pipfile.lock .
 ENV PIPENV_VENV_IN_PROJECT=1
-RUN echo "GIT_SHA=${GIT_SHA}"
 RUN if [ "$GIT_SHA" = "local" ]; then pipenv install --dev; else pipenv install --deploy; fi
 
 
 FROM base AS runtime
+ARG GIT_SHA
 
 # Copy virtual env from python-deps stage
 COPY --from=python-deps /.venv /.venv
