@@ -32,13 +32,13 @@ When you have some code written, you can open up a Pull Request, get your code r
 
 ### Setting up your development environment
 
-Please review the [README](https://github.com/Pocket/proxy-server/blob/master/README.md) for instructions on setting up your development environment, installing dependencies and building the extensions.
+Please review the [README](https://github.com/Pocket/proxy-server/blob/main/README.md) for instructions on setting up your development environment, installing dependencies and building the extensions.
 
 ### Creating Pull Requests
 
 You have identified the bug, written code and now want to get it into the main repo using a [Pull Request](https://help.github.com/articles/about-pull-requests/).
 
-All code is added using a pull request against the master branch of our repo. Before submitting a PR, please go through this checklist:
+All code is added using a pull request against the main branch of our repo. Before submitting a PR, please go through this checklist:
 
 * All unit tests must pass (and if you haven't written a unit test, please do!)
 
@@ -46,7 +46,7 @@ All code is added using a pull request against the master branch of our repo. Be
 
 * Please add a PR / Needs Review tag to your PR (if you have permission). This starts the code review process. If you cannot add a tag, don't worry, we will add it during triage.
 
-* Make sure your PR will merge gracefully with master at the time you create the PR, and that your commit history is 'clean'
+* Make sure your PR will merge gracefully with main at the time you create the PR, and that your commit history is 'clean'
 
 ### Understanding Code Reviews
 
@@ -56,7 +56,7 @@ You have created a PR and submitted it to the repo, and now are waiting patientl
 
 * Give you a 👍 in the comments section, indicating the review is done and the code can be merged
 
-Typically, you will iterate on the PR, making changes and pushing your changes to new commits on the PR. When the reviewer is satisfied that your code is good-to-go, you will get the coveted R+ comment, and your code can be merged. If you have commit permission, you can go ahead and merge the code to master, otherwise, it will be done for you.
+Typically, you will iterate on the PR, making changes and pushing your changes to new commits on the PR. When the reviewer is satisfied that your code is good-to-go, you will get the coveted R+ comment, and your code can be merged. If you have commit permission, you can go ahead and merge the code to main, otherwise, it will be done for you.
 
 Our project prides itself on it's respectful, patient and positive attitude when it comes to reviewing contributor's code, and as such, we expect contributors to be respectful, patient and positive in their communications as well.
 
