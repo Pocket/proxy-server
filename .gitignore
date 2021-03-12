@@ -118,3 +118,8 @@ tmp/
 
 # Environment variables
 .env
+
+/.aws/node_modules/
+/.aws/cdktf.out/
+/.aws/.gen/
+/.aws/.terraform
