@@ -109,17 +109,17 @@ jobs:
 
 
 # Workflow shortcuts
-not_master: &not_master
+not_main: &not_main
   filters:
     branches:
       ignore:
-        - master
+        - main
 
-only_master: &only_master
+only_main: &only_main
   filters:
     branches:
       only:
-        - master
+        - main
 
 workflows:
   version: 2
@@ -128,14 +128,14 @@ workflows:
       - tests_unit:
           context: pocket-proxy
       - build:
-          <<: *not_master
+          <<: *not_main
           env: dev
           main_image_name: proxy-server-dev
           context: pocket-proxy
           requires:
             - tests_unit
       - build:
-          <<: *only_master
+          <<: *only_main
           env: prod
           context: pocket-proxy
           requires:
