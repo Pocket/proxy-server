@@ -18,7 +18,7 @@ production = staging = development = test = {
                 "siteId": 1070098,
                 "adTypes": [2401, 3617],
                 "zoneIds": [217995],
-                "count": 20,
+                "count": 10,
                 "eventIds": [17, 20],
             }]
         }
