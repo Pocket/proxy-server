@@ -63,7 +63,7 @@ class TestAdZerkApi(TestCase):
         for p in body['placements']:
             self.assertEqual(10250, p['networkId'])
             self.assertEqual(1070098, p['siteId'])
-            self.assertEqual(20, p['count'])
+            self.assertEqual(10, p['count'])
             self.assertEqual([5000], p['zoneIds'])
 
     def test_default_zone(self):
