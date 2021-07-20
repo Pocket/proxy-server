@@ -13,6 +13,7 @@ production = staging = development = test = {
     'settings': {
         "feature_flags": {
             "spoc_v2": True,
+            "collections": False,
         },
         "spocsPerNewTabs": 1,
         "domainAffinityParameterSets": {
