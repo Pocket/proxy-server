@@ -13,6 +13,10 @@ production = staging = development = test = {
     'settings': {
         "feature_flags": {
             "spoc_v2": True,
+            # 'Collections' are stories that are run together, currently only used occasionally in Firefox.
+            # If collections is True, the client can include a collection placement in the request.
+            # If collections is False, the client will not include a collection placement, to reduce ad decisions.
+            "collections": False,
         },
         "spocsPerNewTabs": 1,
         "domainAffinityParameterSets": {
