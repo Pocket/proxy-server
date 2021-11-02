@@ -56,11 +56,8 @@ def to_spoc(decision):
     if 'sponsored_by_override' in spoc:
         spoc['sponsored_by_override'] = __clean_sponsored_by_override(spoc['sponsored_by_override'])
 
-    try:
-        spoc['min_score']  = float(custom_data['ctMin_score'])
-        spoc['item_score'] = float(custom_data['ctItem_score'])
-    except (KeyError, ValueError) as e:
-        logging.warning(str(e))
+    spoc['min_score'] = float(custom_data.get('ctMin_score', 0.1))
+    spoc['item_score'] = float(custom_data.get('ctItem_score', 0.2))
 
     try:
         spoc['is_video'] = bool(distutils.util.strtobool(custom_data['ctIsVideo'].strip()))
