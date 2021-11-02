@@ -126,9 +126,7 @@ mock_decision_2 = {
       "data": {
         "ctUrl": "https://example.com/?key=foobar",
         "ctDomain_affinities": "publishers",
-        "ctMin_score": "0.1",
         "ctDomain": "wallmarket.com",
-        "ctItem_score": "0.11",
         "ctTitle": "Refresh Your Space for Spring",
         "ctExcerpt": "Get up to 50% off furniture, bedding, and more.",
         "ctFullimagepath": "https://cdn.net/25a.jpg",

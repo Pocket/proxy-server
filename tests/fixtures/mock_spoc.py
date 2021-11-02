@@ -36,7 +36,7 @@ mock_spoc_2 = {
     },
     "personalization_models": {},
     "min_score": 0.1,
-    "item_score": 0.11,
+    "item_score": 0.2,
 }
 
 mock_spoc_3_cta = deepcopy(mock_spoc_2)
