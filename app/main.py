@@ -54,6 +54,11 @@ async def pulse():
     return {'pulse': 'ok'}
 
 
+@app.get('/health')
+async def pulse():
+    return {'health': 'ok'}
+
+
 @app.exception_handler(MissingParam)
 @app.exception_handler(InvalidParam)
 @app.exception_handler(InvalidContentType)
