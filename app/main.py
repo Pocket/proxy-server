@@ -55,7 +55,7 @@ async def pulse():
 
 
 @app.get('/health')
-async def pulse():
+async def health():
     return {'health': 'ok'}
 
 
