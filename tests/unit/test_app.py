@@ -49,6 +49,17 @@ class TestApp(unittest.TestCase):
         resp = self.create_client_no_geo_locs().get('/pulse')
         self.assertEqual(resp.json(), {"pulse" : "ok"})
 
+
+    """
+    Tests: Health
+    """
+
+    @patch('app.provider.geo_provider.GeolocationProvider.__init__', return_value=None)
+    def test_app_health(self, mock_geo):
+        resp = self.create_client_no_geo_locs().get('/health')
+        self.assertEqual(resp.json(), {"health" : "ok"})
+
+
     """
     Tests: spocs
     """
