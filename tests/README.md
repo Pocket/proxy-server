@@ -25,8 +25,7 @@ python -m unittest tests.test_adzerk_transform.test_to_spoc
 
 ### Run test
 1. `cd tests/load`
-2. `aws-vault exec <aws profile> -- slsart deploy --stage <your-unique-stage-name>`
-3. `aws-vault exec <aws profile> -- slsart invoke --stage <your-unique-stage-name>`
+2. `slsart invoke --stage dev #for dev`
 
 ## Local speed test
 Locally run 500 requests in parallel. This is useful to:
