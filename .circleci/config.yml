@@ -65,6 +65,10 @@ jobs:
         description: Main Docker image name
         type: string
         default: proxy
+      nginx_image_name:
+        description: Nginx Docker image name
+        type: string
+        default: nginx
     docker:
       - image: pocket/ops-cli:v0.0.5
         auth:
@@ -72,6 +76,7 @@ jobs:
           password: $DOCKERHUB_PASSWORD
         environment:
           MAIN_IMAGE_NAME: << parameters.main_image_name >>
+          NGINX_IMAGE_NAME: << parameters.nginx_image_name >>
     steps:
       - checkout
       - when:
@@ -106,6 +111,15 @@ jobs:
           tag: $CIRCLE_SHA1,latest
           dockerfile: ./images/app/Dockerfile
           extra-build-args: --build-arg GIT_SHA=${CIRCLE_SHA1}
+      - aws-ecr/build-and-push-image:
+          checkout: false
+          repo: $NGINX_IMAGE_NAME
+          setup-remote-docker: false
+          tag: $CIRCLE_SHA1,latest
+          path: ./images/nginx/
+          dockerfile: ./images/nginx/Dockerfile
+          extra-build-args: --build-arg GIT_SHA=${CIRCLE_SHA1}
+
 
 
 # Workflow shortcuts
@@ -131,6 +145,7 @@ workflows:
           <<: *not_main
           env: dev
           main_image_name: proxy-server-dev
+          nginx_image_name: proxy-server-nginx-dev
           context: pocket-proxy
           requires:
             - tests_unit
