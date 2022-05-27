@@ -42,7 +42,9 @@ The first time the service is deployed, follow the steps in the [CloudFormation 
 For subsequent deployments:
 1. Merge a PR into the main branch.
 2. Wait for the new Docker image to be built and uploaded to ECR.
-3. Open Fargate in the AWS console and update the service, forcing a new deployment.
+3. Open Fargate in the AWS console and update the service, forcing a new deployment
+   Or, you can increase the number of tasks. Since the task is using the `latest` tag
+   they should pull in your changes without forcing an update to the task.
 
 # Telemetry Function
 The [Telemtry Handler](app/telemetry/handler.py) is triggered by telemetry from the Firefox discovery stream. It anonymously pings AdZerk to keep track of events related to sponsored content, such as clicks and impressions, in a privacy-preserving way. The event code (or "shim") does not contain any personally identifiable data; we never share personal data with AdZerk.
