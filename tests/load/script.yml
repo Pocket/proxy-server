@@ -7,12 +7,12 @@ config:
   # this hostname will be used as a prefix for each URI in the flow unless a complete URI is specified
   target: "https://spocs.getpocket.dev"
   phases:
-    - duration: 1800
+    - duration: 60
       arrivalRate: 10
-      rampTo: 7000
+      rampTo: 20
       name: "Warm up AdZerk"
-    - duration: 1800
-      arrivalRate: 7000
+    - duration: 60
+      arrivalRate: 30
       name: "Sustained 100% of max load"
   plugins:
     cloudwatch:
