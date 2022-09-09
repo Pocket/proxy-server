@@ -23,14 +23,14 @@ The following steps create a Docker development environment to run this service 
         ```
         aws --endpoint-url http://localhost:4569 s3 cp GeoLite2-City.mmdb s3://pocket-geoip/GeoIP2-City.mmdb
         ```
-4. Verify that GeoIP2 is available at [localhost:4569/pocket-geoip/GeoIP2-City.mmdb](http://localhost:4569/pocket-geoip/GeoIP2-City.mmdb).
-5. Create a `.env` file in the project root directory with the following content, replacing `<secret>` with the respective secret values:
+5. Verify that GeoIP2 is available at [localhost:4569/pocket-geoip/GeoIP2-City.mmdb](http://localhost:4569/pocket-geoip/GeoIP2-City.mmdb).
+6. Create a `.env` file in the project root directory with the following content, replacing `<secret>` with the respective secret values:
     ```
     SENTRY_DSN=<secret>
     ADZERK_API_KEY=<secret>
     ```
-6. Start the application containers: `docker-compose up`.
-7. Test that the application is running: http://localhost/pulse. It should return `{"pulse":"ok"}`.
+7. Start the application containers: `docker-compose up`.
+8. Test that the application is running: http://localhost/pulse. It should return `{"pulse":"ok"}`.
 
 ## Tests
 See the [Test README](tests/README.md).
@@ -47,7 +47,7 @@ For subsequent deployments:
    they should pull in your changes without forcing an update to the task.
 
 # Telemetry Function
-The [Telemtry Handler](app/telemetry/handler.py) is triggered by telemetry from the Firefox discovery stream. It anonymously pings AdZerk to keep track of events related to sponsored content, such as clicks and impressions, in a privacy-preserving way. The event code (or "shim") does not contain any personally identifiable data; we never share personal data with AdZerk.
+The [Telemetry Handler](app/telemetry/handler.py) is triggered by telemetry from the Firefox discovery stream. It anonymously pings AdZerk to keep track of events related to sponsored content, such as clicks and impressions, in a privacy-preserving way. The event code (or "shim") does not contain any personally identifiable data; we never share personal data with AdZerk.
 
 ## Deployment
  
