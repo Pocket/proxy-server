@@ -12,9 +12,10 @@ See [OpenAPI documentation](https://app.swaggerhub.com/apis-docs/PocketNewTab/Po
 The following steps create a Docker development environment to run this service locally.
 
 1. Install [Docker](https://docs.docker.com/install/) and [Docker Compose](https://docs.docker.com/compose/install/).
-2. In the project root run: `docker-compose build`.
-3. Start a mock s3 service: `docker-compose up s3`.
-4. Copy [MaxMind GeoIP2](https://dev.maxmind.com/geoip/geoip2/geolite2/) to `pocket-geoip/GeoIP2-City.mmdb` on the mock s3 container.
+2. In the project root run: `docker compose build`.
+3. Start a mock s3 service: `docker compose up s3`.
+4. Sign up for an account on the [MaxMind](https://dev.maxmind.com/geoip/geolite2-free-geolocation-data?lang=en#accessing-geolite2-free-geolocation-data) website.
+5. Navigate to the "Download Files" page in your account, download the GeoLite2 City database and copy it to `pocket-geoip/GeoIP2-City.mmdb` on the mock s3 container.
     1. If the database is stored on s3:
         ```
         images/s3/download.sh -b <s3 bucket>
@@ -29,7 +30,7 @@ The following steps create a Docker development environment to run this service 
     SENTRY_DSN=<secret>
     ADZERK_API_KEY=<secret>
     ```
-7. Start the application containers: `docker-compose up`.
+7. Start the application containers: `docker compose up`.
 8. Test that the application is running: http://localhost/pulse. It should return `{"pulse":"ok"}`.
 
 ## Tests
