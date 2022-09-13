@@ -27,7 +27,6 @@ The following steps create a Docker development environment to run this service 
 5. Verify that GeoIP2 is available at [localhost:4569/pocket-geoip/GeoIP2-City.mmdb](http://localhost:4569/pocket-geoip/GeoIP2-City.mmdb).
 6. Create a `.env` file in the project root directory with the following content, replacing `<secret>` with the respective secret values:
     ```
-    SENTRY_DSN=<secret>
     ADZERK_API_KEY=<secret>
     ```
 7. Start the application containers: `docker compose up`.
