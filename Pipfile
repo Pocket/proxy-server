@@ -16,7 +16,7 @@ fastapi = "*"
 uvloop = "*"
 httptools = "*"
 aiohttp = {extras = ["speedups"], version = "*"}
-# Note that this dependency  even though Sentry has been removed from the code.
+# Note that this dependency remains even though Sentry has been removed from the code.
 # Attempting to remove it updates many of the other packages that were last updated
 # in July 2020 and it's too much change to test/monitor for not much benefit.
 sentry-sdk = "*"
