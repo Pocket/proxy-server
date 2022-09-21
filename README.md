@@ -52,5 +52,5 @@ The [Telemetry Handler](app/telemetry/handler.py) is triggered by telemetry from
 ## Deployment
  
 1. Open telemetry-proxy in the [Google Cloud Console](https://console.cloud.google.com) 
-2. Click Edit and paste the new code
+2. Click Edit and paste the new code into the `main.py` file (*do not* be confused by the fact the contents of the function are stored in a file named `handler.py` in this repository and *do not* rename the file name on Google Cloud).
 3. Click Deploy
