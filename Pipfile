@@ -20,6 +20,7 @@ aiohttp = {extras = ["speedups"], version = "*"}
 # Attempting to remove it updates many of the other packages that were last updated
 # in July 2020 and it's too much change to test/monitor for not much benefit.
 sentry-sdk = "*"
+brotlipy = "==0.7.0"
 
 [dev-packages]
 responses = "*"
