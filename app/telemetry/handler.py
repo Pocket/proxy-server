@@ -24,6 +24,10 @@ def handle_message(event, context):
         for tile in telemetry["tiles"]:
             if "shim" in tile:
                 ping_adzerk(tile['shim'])
+    elif "metrics" in telemetry:
+        text_metrics = telemetry["metrics"].get("text", {})
+        if "pocket.spoc_shim" in text_metrics:
+            ping_adzerk(text_metrics["pocket.spoc_shim"])
 
 
 def ping_adzerk(shim):
