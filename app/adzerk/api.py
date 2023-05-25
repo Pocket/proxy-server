@@ -30,23 +30,29 @@ class Api:
         """
         timeout = aiohttp.ClientTimeout(total=30)
         connector = aiohttp.TCPConnector(limit=None)
-        async with aiohttp.ClientSession(timeout=timeout, connector=connector) as session:
-            async with session.post(conf.adzerk['decision']['url'], json=self.get_decision_body()) as r:
-                if r.status == 400:
-                    text = await r.text()
-                    # This occurs when there is no site with the requested id from adzerk.
-                    # So instead we send back no results but log an error
-                    logging.error(text)
-                    return dict()
-                response = await r.json()
+        # Wrap the request in a try/catch block to log timeout errors.
+        try:
+            async with aiohttp.ClientSession(timeout=timeout, connector=connector) as session:
+                async with session.post(conf.adzerk['decision']['url'], json=self.get_decision_body()) as r:
+                    if r.status == 400:
+                        text = await r.text()
+                        # This occurs when there is no site with the requested id from adzerk.
+                        # So instead we send back no results but log an error
+                        logging.error(text)
+                        return dict()
+                    response = await r.json()
 
-        decisions = response['decisions']
-        if not decisions or len(decisions) == 0:
+            decisions = response['decisions']
+            if not decisions or len(decisions) == 0:
+                return dict()
+            for _, dec in decisions.items():
+                if dec:
+                    map(validation.validate_decision, dec)
+            return decisions
+        except Exception as e:
+            # Log the exact parameters sent to Kevel
+            logging.error(repr(self.get_decision_body()))
             return dict()
-        for _, dec in decisions.items():
-            if dec:
-                map(validation.validate_decision, dec)
-        return decisions
 
     def get_decision_body(self):
         body = deepcopy(conf.adzerk['decision']['body'])
