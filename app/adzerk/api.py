@@ -1,7 +1,7 @@
 import logging
 
 import requests
-import aiohttp
+from aiohttp import ClientSession
 from copy import deepcopy
 
 from app.adzerk import validation
@@ -22,23 +22,20 @@ class Api:
         self.placements = placements
         self.api_key = api_key
 
-    async def get_decisions(self):
+    async def get_decisions(self, session: ClientSession):
         """
         Calls Adzerk API with request body
         :return: A map of decisions, previously
         a list of decisions for one div/placement.
         """
-        timeout = aiohttp.ClientTimeout(total=30)
-        connector = aiohttp.TCPConnector(limit=None)
-        async with aiohttp.ClientSession(timeout=timeout, connector=connector) as session:
-            async with session.post(conf.adzerk['decision']['url'], json=self.get_decision_body()) as r:
-                if r.status == 400:
-                    text = await r.text()
-                    # This occurs when there is no site with the requested id from adzerk.
-                    # So instead we send back no results but log an error
-                    logging.error(text)
-                    return dict()
-                response = await r.json()
+        async with session.post(conf.adzerk['decision']['url'], json=self.get_decision_body()) as r:
+            if r.status == 400:
+                text = await r.text()
+                # This occurs when there is no site with the requested id from adzerk.
+                # So instead we send back no results but log an error
+                logging.error(text)
+                return dict()
+            response = await r.json()
 
         decisions = response['decisions']
         if not decisions or len(decisions) == 0:

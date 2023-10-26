@@ -2,6 +2,7 @@ from app import conf
 from app.adzerk.api import Api as AdZerk
 import app.adzerk.transform
 import logging
+from aiohttp import ClientSession
 
 
 class Client:
@@ -32,7 +33,7 @@ class Client:
         self.site = site
         self.placements = placements
 
-    async def get_spocs(self):
+    async def get_spocs(self, session: ClientSession):
         targeting = {"site": self.site}     # setting site here by default so it's picked up by API
 
         try:
@@ -55,7 +56,7 @@ class Client:
         targeting['placements'] = self.placements
 
         adzerk_api = AdZerk(**targeting)
-        decisions = await adzerk_api.get_decisions()
+        decisions = await adzerk_api.get_decisions(session)
 
         response = {
             'settings': app.conf.spocs['settings'],
