@@ -41,7 +41,8 @@ class TestApp(unittest.TestCase):
 
     @patch('app.provider.geo_provider.GeolocationProvider.__init__', return_value=None)
     def test_app_pulse(self, mock_geo):
-        resp = self.create_client_no_geo_locs().get('/pulse')
+        with self.create_client_no_geo_locs() as client:
+            resp = client.get('/pulse')
         self.assertEqual(resp.json(), {"pulse" : "ok"})
 
 
@@ -51,7 +52,8 @@ class TestApp(unittest.TestCase):
 
     @patch('app.provider.geo_provider.GeolocationProvider.__init__', return_value=None)
     def test_app_health(self, mock_geo):
-        resp = self.create_client_no_geo_locs().get('/health')
+        with self.create_client_no_geo_locs() as client:
+            resp = client.get('/health')
         self.assertEqual(resp.json(), {"health" : "ok"})
 
 
@@ -62,7 +64,8 @@ class TestApp(unittest.TestCase):
     @patch('app.provider.geo_provider.GeolocationProvider.__init__', return_value=None)
     @patch('app.adzerk.api.Api.get_decisions', return_value=mock_response_map)
     async def test_app_spocs_production_valid(self, mock_geo, mock_adzerk):
-        resp = await self.create_client_no_geo_locs().post('/spocs', json=self.get_request_body())
+        with self.create_client_no_geo_locs() as client:
+            resp = await client.post('/spocs', json=self.get_request_body())
         self.assertEqual(resp.status_code, 200)
 
     @patch('app.provider.geo_provider.GeolocationProvider.__init__', return_value=None)
@@ -72,7 +75,8 @@ class TestApp(unittest.TestCase):
             'country': 'CA',
             'region': 'ON',
         }
-        resp = await self.create_client_no_geo_locs().post('/spocs', json=self.get_request_body(update=country_region))
+        with self.create_client_no_geo_locs() as client:
+            resp = await client.post('/spocs', json=self.get_request_body(update=country_region))
         self.assertEqual(resp.status_code, 200)
 
     @patch('app.provider.geo_provider.GeolocationProvider.__init__', return_value=None)
@@ -82,7 +86,8 @@ class TestApp(unittest.TestCase):
         API version 1 returns the collection as an array for backwards compatibility.
         """
         request_body = self.get_request_body(placements=mock_collection_placements)
-        resp = await self.create_client_no_geo_locs().post('/spocs', json=request_body)
+        with self.create_client_no_geo_locs() as client:
+            resp = await client.post('/spocs', json=request_body)
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.json()['sponsored-collection'][0]['collection_title'], 'Best of the Web')
 
@@ -93,7 +98,8 @@ class TestApp(unittest.TestCase):
         API version 2 returns the collection as an object, with collection-level fields pulled up.
         """
         request_body = self.get_request_body(placements=mock_collection_placements, update={'version': '2'})
-        resp = await self.create_client_no_geo_locs().post('/spocs', json=request_body)
+        with self.create_client_no_geo_locs() as client:
+            resp = await client.post('/spocs', json=request_body)
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.json()['spocs'][0]['title'], 'title 1000')
 
@@ -107,19 +113,22 @@ class TestApp(unittest.TestCase):
     @patch('app.provider.geo_provider.GeolocationProvider.__init__', return_value=None)
     @patch('app.adzerk.api.Api.get_decisions', return_value=mock_response_map)
     def test_app_spocs_production_invalid_no_version(self, mock_geo, mock_adzerk):
-        resp = self.create_client_no_geo_locs().post('/spocs', json=self.get_request_body(without='version'))
+        with self.create_client_no_geo_locs() as client:
+            resp = client.post('/spocs', json=self.get_request_body(without='version'))
         self.assertEqual(resp.status_code, 400)
 
     @patch('app.provider.geo_provider.GeolocationProvider.__init__', return_value=None)
     @patch('app.adzerk.api.Api.get_decisions', return_value=mock_response_map)
     def test_app_spocs_production_invalid_no_pocket_id(self, mock_geo, mock_adzerk):
-        resp = self.create_client_no_geo_locs().post('/spocs', json=self.get_request_body(without='pocket_id'))
+        with self.create_client_no_geo_locs() as client:
+            resp = client.post('/spocs', json=self.get_request_body(without='pocket_id'))
         self.assertEqual(resp.status_code, 400)
 
     @patch('app.provider.geo_provider.GeolocationProvider.__init__', return_value=None)
     @patch('app.adzerk.api.Api.get_decisions', return_value=mock_response_map)
     def test_app_spocs_production_invalid_no_consumer_key(self, mock_geo, mock_adzerk):
-        resp = self.create_client_no_geo_locs().post('/spocs', json=self.get_request_body(without='consumer_key'))
+        with self.create_client_no_geo_locs() as client:
+            resp = client.post('/spocs', json=self.get_request_body(without='consumer_key'))
         self.assertEqual(resp.status_code, 400)
 
     @patch('app.provider.geo_provider.GeolocationProvider.__init__', return_value=None)
@@ -127,7 +136,8 @@ class TestApp(unittest.TestCase):
     def test_app_spocs_production_invalid_pocket_id(self, mock_geo, mock_adzerk):
         data = self.get_request_body()
         data['pocket_id'] = 'invalid'
-        resp = self.create_client_no_geo_locs().post('/spocs', json=data)
+        with self.create_client_no_geo_locs() as client:
+            resp = client.post('/spocs', json=data)
         self.assertEqual(resp.status_code, 400)
 
     @patch('app.provider.geo_provider.GeolocationProvider.__init__', return_value=None)
@@ -135,13 +145,15 @@ class TestApp(unittest.TestCase):
     def test_app_spocs_production_unrecognized_field(self, mock_geo, mock_adzerk):
         data = self.get_request_body()
         data['invalid'] = 'something'
-        resp = self.create_client_no_geo_locs().post('/spocs', json=data)
+        with self.create_client_no_geo_locs() as client:
+            resp = client.post('/spocs', json=data)
         self.assertEqual(resp.status_code, 400)
 
     @patch('app.provider.geo_provider.GeolocationProvider.__init__', return_value=None)
     @patch('app.adzerk.api.Api.get_decisions', return_value=mock_response_map)
     def test_app_spocs_production_invalid_content_type(self, mock_geo, mock_adzerk):
-        resp = self.create_client_no_geo_locs().post(
+        with self.create_client_no_geo_locs() as client:
+            resp = client.post(
             '/spocs',
             headers={'Content-Type': 'text'},
             data=self.get_request_body()
@@ -158,33 +170,38 @@ class TestApp(unittest.TestCase):
         :param mock_adzerk:
         :return:
         """
-        resp = await self.create_client_no_geo_locs().post('/spocs?site=12345', json=self.get_request_body())
+        with self.create_client_no_geo_locs() as client:
+            resp = await client.post('/spocs?site=12345', json=self.get_request_body())
         self.assertEqual(resp.status_code, 200)
 
     @patch('app.provider.geo_provider.GeolocationProvider.__init__', return_value=None)
     def test_app_spocs_production_valid_placements(self, mock_geo):
-        resp = self.create_client_no_geo_locs().post('/spocs', json=self.get_request_body(placements=mock_placements))
+        with self.create_client_no_geo_locs() as client:
+            resp = client.post('/spocs', json=self.get_request_body(placements=mock_placements))
         self.assertEqual(200, resp.status_code)
 
     @patch('app.provider.geo_provider.GeolocationProvider.__init__', return_value=None)
     def test_app_spocs_production_invalid_placement_name(self, mock_geo):
         bad_placements = deepcopy(mock_placements)
         bad_placements[0].pop('name')
-        resp = self.create_client_no_geo_locs().post('/spocs', json=self.get_request_body(placements=bad_placements))
+        with self.create_client_no_geo_locs() as client:
+            resp = client.post('/spocs', json=self.get_request_body(placements=bad_placements))
         self.assertEqual(400, resp.status_code)
 
     @patch('app.provider.geo_provider.GeolocationProvider.__init__', return_value=None)
     def test_app_spocs_production_unknown_placement_field(self, mock_geo):
         bad_placements = deepcopy(mock_placements)
         bad_placements[0]['adTypess'] = ['test']
-        resp = self.create_client_no_geo_locs().post('/spocs', json=self.get_request_body(placements=bad_placements))
+        with self.create_client_no_geo_locs() as client:
+            resp = client.post('/spocs', json=self.get_request_body(placements=bad_placements))
         self.assertEqual(400, resp.status_code)
 
     @patch('app.provider.geo_provider.GeolocationProvider.__init__', return_value=None)
     @patch('app.adzerk.api.Api.get_decisions', return_value=mock_placement_map)
     async def test_app_spocs_production_valid_placements_call(self, mock_geo, mock_dec):
         bad_placements = deepcopy(mock_placements)
-        resp = await self.create_client_no_geo_locs().post('/spocs', json=self.get_request_body(placements=bad_placements))
+        with self.create_client_no_geo_locs() as client:
+            resp = await client.post('/spocs', json=self.get_request_body(placements=bad_placements))
         self.assertEqual(200, resp.status_code)
         result = resp.json()
         self.assertTrue('top-sites' in result)

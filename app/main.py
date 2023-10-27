@@ -5,15 +5,16 @@ from starlette.responses import JSONResponse
 from fastapi import FastAPI, Request
 from app.adzerk.api import Api as AdZerk
 from app.client import Client
-import app.conf
 from app.exceptions.base_exception import BaseException
 from app.exceptions.missing_param import MissingParam
 from app.exceptions.invalid_content_type import InvalidContentType
 from app.exceptions.invalid_param import InvalidParam
 from app.validation import is_valid_pocket_id
 from app.provider.geo_provider import GeolocationProvider
+from app.provider.session_provider import SessionProvider
 from typing import Dict
 from app.middleware.proxy_headers import ProxyHeadersMiddleware
+
 
 app = FastAPI()
 
@@ -21,6 +22,17 @@ app = FastAPI()
 app.add_middleware(ProxyHeadersMiddleware, trusted_hosts="*")
 
 provider = GeolocationProvider()
+
+
+@app.on_event("startup")
+async def on_startup():
+    # Initialize singleton aiohttp client session (called for side effect)
+    SessionProvider.session()
+
+
+@app.on_event("shutdown")
+async def on_shutdown():
+    await SessionProvider.shutdown()
 
 
 @app.post('/spocs')
@@ -79,8 +91,9 @@ async def call(client_ip, req_params, required_params, optional_params=None):
     params.update(other_params)
 
     client = Client(ip=client_ip, geolocation_provider=provider, **params)
+    session = SessionProvider.session()
 
-    return await client.get_spocs()
+    return await client.get_spocs(session)
 
 
 def __validate_required_params(required, params):
