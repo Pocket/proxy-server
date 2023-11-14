@@ -12,7 +12,7 @@ orbs:
 jobs:
   tests_unit:
     docker:
-      - image: circleci/python:3.7.4
+      - image: cimg/python:3.11
         auth:
           username: $DOCKERHUB_USERNAME
           password: $DOCKERHUB_PASSWORD

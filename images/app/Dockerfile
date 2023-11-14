@@ -1,5 +1,5 @@
 ARG GIT_SHA=local
-FROM tiangolo/uvicorn-gunicorn-fastapi:python3.7 as base
+FROM tiangolo/uvicorn-gunicorn-fastapi:python3.11-slim as base
 
 # Based on https://sourcery.ai/blog/python-docker/
 FROM base AS python-deps

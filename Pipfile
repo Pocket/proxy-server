@@ -4,22 +4,18 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-certifi = ">=2020.4.5.1"
-boto3 = "1.13.19"
-requests = "2.22.0"
-geoip2 = "3.0.0"
+certifi = ">=2023.7.22"
+boto3 = "~=1.28.85"
+requests = "~=2.31.0"
+geoip2 = "~=4.7.0"
 # we need to install gunicorn, uvicorn, uvloop, httptools, and fastapi
 # so it starts in the virtualenv instead of the one in the docker image
 gunicorn = "*"
 uvicorn = "*"
-fastapi = "*"
+fastapi = {extras = ["all"], version = "*"}
 uvloop = "*"
 httptools = "*"
 aiohttp = {extras = ["speedups"], version = "*"}
-# Note that this dependency remains even though Sentry has been removed from the code.
-# Attempting to remove it updates many of the other packages that were last updated
-# in July 2020 and it's too much change to test/monitor for not much benefit.
-sentry-sdk = "*"
 brotlipy = "==0.7.0"
 
 [dev-packages]
@@ -28,4 +24,4 @@ pytest = "*"
 pytest-cov = "*"
 
 [requires]
-python_version = "3.7"
+python_version = "3.11"
