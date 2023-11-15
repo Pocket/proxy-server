@@ -1,5 +1,5 @@
 openapi: 3.0.0
-
+security: []
 servers:
   - url:  https://spocs.getpocket.com
 info:
