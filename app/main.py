@@ -1,3 +1,4 @@
+from contextlib import asynccontextmanager
 from json.decoder import JSONDecodeError
 from os import environ
 import uvicorn
@@ -16,23 +17,22 @@ from typing import Dict
 from app.middleware.proxy_headers import ProxyHeadersMiddleware
 
 
-app = FastAPI()
+@asynccontextmanager
+async def lifespan(_: FastAPI) -> None:
+    # Initialize singleton aiohttp client session (called for side effect)
+    SessionProvider.session()
+
+    yield
+
+    await SessionProvider.shutdown()
+
+
+app = FastAPI(lifespan=lifespan)
 
 # Trust the X-Forwarded-For using a middleware. See the middle ware for more info.
 app.add_middleware(ProxyHeadersMiddleware, trusted_hosts="*")
 
 provider = GeolocationProvider()
-
-
-@app.on_event("startup")
-async def on_startup():
-    # Initialize singleton aiohttp client session (called for side effect)
-    SessionProvider.session()
-
-
-@app.on_event("shutdown")
-async def on_shutdown():
-    await SessionProvider.shutdown()
 
 
 @app.post('/spocs')
