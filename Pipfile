@@ -18,6 +18,7 @@ httptools = "*"
 aiohttp = {extras = ["speedups"], version = "*"}
 brotlipy = "==0.7.0"
 schemathesis = "*"
+google-cloud-storage = "*"
 
 [dev-packages]
 responses = "*"
