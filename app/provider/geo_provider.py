@@ -1,7 +1,5 @@
 import logging
-
-import boto3
-from google.cloud import storage
+import os
 
 from app import conf
 from app.geolocation.factory import Factory as GeolocationFactory
@@ -12,10 +10,7 @@ class GeolocationProvider:
 
     def __init__(self):
         if not GeolocationProvider.__PROVIDER_INSTANCE:
-            s3 = boto3.session.Session(**conf.s3["session"]).client(
-                "s3", **conf.s3["client"]
-            )
-            geolocation = GeolocationFactory(s3).get_instance()
+            geolocation = GeolocationFactory().get_instance()
             GeolocationProvider.__PROVIDER_INSTANCE = geolocation
 
     def __setattr__(self, key, value):
