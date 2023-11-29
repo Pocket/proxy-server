@@ -1,12 +1,12 @@
 version: '3.7'
 
 services:
-
   nginx:
     build: images/nginx
     container_name: ng01
     ports:
       - "80:80"
+
     depends_on:
       - app
 
@@ -14,25 +14,31 @@ services:
     build:
       dockerfile: images/app/Dockerfile
       context: .
+
     environment:
       - APP_ENV=development
       - GEOIP_S3_BUCKET=pocket-geoip
       - ADZERK_API_KEY=${ADZERK_API_KEY}
+      - ADZERK_NETWORK_ID=10250
+
     command: /start-reload.sh # Only for development. Reloads Gunicorn when source changes.
     ports:
       - "8000:8000"
+
     volumes:
       - "./app:/app:ro"
       - "./app:/opt/project/src:ro" # PyCharm overrides app to /opt/project/src
+
     depends_on:
       - s3
 
   s3:
     image: pocket/fake-s3:20190604
     ports:
-    - "4569:4569"
+      - "4569:4569"
+
     volumes:
       - "fake_s3_vol:/fakes3/data"
 
 volumes:
-  fake_s3_vol:
+  fake_s3_vol: {}

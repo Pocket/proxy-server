@@ -1,6 +1,8 @@
+import os
+
 from app.telemetry.handler import TELEMETRY_PATH_IDS
 
-network_id = 10250
+network_id = os.environ.get("ADZERK_NETWORK_ID", 10250)
 div_name = "spocs"
 domain = "https://e-{0}.adzerk.net".format(str(network_id))
 
@@ -12,16 +14,18 @@ production = staging = development = test = {
     "decision": {
         "url": "{0}/api/v2".format(domain),
         "body": {
-            "placements": [{
-                "divName": div_name,
-                "networkId": network_id,
-                "siteId": 1070098,
-                "adTypes": [2401, 3617],
-                "zoneIds": [217995],
-                "count": 10,
-                "eventIds": [17, 20],
-            }]
-        }
+            "placements": [
+                {
+                    "divName": div_name,
+                    "networkId": network_id,
+                    "siteId": 1070098,
+                    "adTypes": [2401, 3617],
+                    "zoneIds": [217995],
+                    "count": 10,
+                    "eventIds": [17, 20],
+                }
+            ]
+        },
     },
     # Default priory_id to weight mapping, used during task startup before they are fetched from AdZerk.
     "priority_id_to_weight": {
@@ -30,5 +34,5 @@ production = staging = development = test = {
         147518: 3,
         160722: 9,
         147520: 10,
-    }
+    },
 }
