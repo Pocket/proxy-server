@@ -1,13 +1,11 @@
 openapi: 3.0.0
 security: []
 servers:
-  - url:  https://spocs.getpocket.com
+  - url: https://spocs.getpocket.com
 info:
   description: "APIs to interact with sponsored content (\"spocs\") for Firefox, while preserving privacy."
   version: '2.1'
   title: Firefox Spocs
-  contact:
-    email: mathijs@getpocket.com
 paths:
   /spocs:
     post:
@@ -28,8 +26,6 @@ paths:
                 allOf:
                   - $ref: '#/components/schemas/Success'
                   - type: object
-                    required:
-                      - spocs
                     properties:
                       settings:
                         $ref: '#/components/schemas/Settings'
@@ -45,6 +41,8 @@ paths:
           application/json:
             schema:
               type: object
+              required:
+                - pocket_id
               properties:
                 pocket_id:
                   description: ID that uniquely identifies a session.
@@ -63,6 +61,7 @@ components:
         - consumer_key
         - pocket_id
         - placements
+      additionalProperties: false
       properties:
         version:
           type: integer
@@ -80,6 +79,7 @@ components:
           type: string
           description: ID that uniquely identifies a session.
           example: "{12345678-8901-2345-aaaa-bbbbbbcccccc}"
+          pattern: "\\A{[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}}\\Z"
         placements:
           type: array
           items:
@@ -90,6 +90,7 @@ components:
       description: https://dev.adzerk.com/reference/request
       required:
         - name
+      additionalProperties: false
       properties:
         name:
           type: string
@@ -147,8 +148,6 @@ components:
 
     Settings:
       type: object
-      required:
-        - url
       properties:
         spocsPerNewTabs:
           type: integer
@@ -208,9 +207,9 @@ components:
             $ref: "#/components/schemas/SpocFeedItem"
         - type: object
           required:
-          - title
-          - flight_id
-          - sponsor
+            - title
+            - flight_id
+            - sponsor
           properties:
             title:
               type: string

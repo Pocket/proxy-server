@@ -17,11 +17,13 @@ uvloop = "*"
 httptools = "*"
 aiohttp = {extras = ["speedups"], version = "*"}
 brotlipy = "==0.7.0"
+schemathesis = "*"
 
 [dev-packages]
 responses = "*"
 pytest = "*"
 pytest-cov = "*"
+aioresponses = "*"
 
 [requires]
 python_version = "3.11"
