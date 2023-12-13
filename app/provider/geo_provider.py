@@ -1,5 +1,4 @@
 import logging
-import os
 
 from app import conf
 from app.geolocation.factory import Factory as GeolocationFactory
