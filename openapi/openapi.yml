@@ -101,11 +101,19 @@ components:
           description: https://dev.adzerk.com/docs/ad-sizes
           items:
             type: integer
+            format: int32
+            example: 1234
+            minimum: 1
+            maximum: 2147483647
         zone_ids:
           type: array
           description: https://dev.adzerk.com/docs/zones-overview
           items:
             type: integer
+            format: int32
+            example: 123456
+            minimum: 1
+            maximum: 2147483647
         count:
           type: integer
           example: 20
