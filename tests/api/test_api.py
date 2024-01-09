@@ -49,10 +49,19 @@ def test_delete_api(case: schemathesis.Case) -> None:
 def test_spocs_api(case: schemathesis.Case) -> None:
     with aioresponses() as m:
         # Mock call to decisions API
-        if case.body["version"] == 1:
-            m.post("https://e-10250.adzerk.net/api/v2", payload=MOCK_DECISIONS_RESPONSE)
-        else:
-            m.post("https://e-10250.adzerk.net/api/v2", payload=MOCK_DECISIONS_COLLECTION_RESPONSE)
+        m.post("https://e-10250.adzerk.net/api/v2", payload=MOCK_DECISIONS_RESPONSE)
+
+        # Call Pocket Proxy and validate response
+        response = case.call_asgi()
+        case.validate_response(response)
+
+
+@responses.activate
+@schema.parametrize(endpoint="/spocs")
+def test_spocs_collection_api(case: schemathesis.Case) -> None:
+    with aioresponses() as m:
+        # Mock call to decisions API
+        m.post("https://e-10250.adzerk.net/api/v2", payload=MOCK_DECISIONS_COLLECTION_RESPONSE)
 
         # Call Pocket Proxy and validate response
         response = case.call_asgi()
