@@ -24,12 +24,6 @@ paths:
                   version: 1
                   consumer_key: "40249-e88c401e1b1f2242d9e441c4"
                   pocket_id: "{12345678-8901-2345-aaaa-bbbbbbcccccc}"
-              version_two:
-                summary: Request from client that supports collections, FireFox version >= 75
-                values:
-                  version: 2
-                  consumer_key: "40249-e88c401e1b1f2242d9e441c4"
-                  pocket_id: "{12345678-8901-2345-aaaa-bbbbbbcccccc}"
       responses:
         '200':
           description: Responds with settings and a list of spocs.
