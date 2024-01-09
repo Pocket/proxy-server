@@ -56,12 +56,18 @@ def test_spocs_api(case: schemathesis.Case) -> None:
         case.validate_response(response)
 
 
+def version_two(context, body):
+    return body.get("version") == 2
+
+
+# clients pass in version=2 if they support collections
 @responses.activate
+@schema.hooks.apply(version_two, name="filter_body")
 @schema.parametrize(endpoint="/spocs")
 def test_spocs_collection_api(case: schemathesis.Case) -> None:
     with aioresponses() as m:
         # Mock call to decisions API
-        m.post("https://e-10250.adzerk.net/api/v2", payload=MOCK_DECISIONS_COLLECTION_RESPONSE)
+        m.post("https://e-10250.adzerk.net/api/v2", payload=MOCK_DECISIONS_RESPONSE)
 
         # Call Pocket Proxy and validate response
         response = case.call_asgi()
