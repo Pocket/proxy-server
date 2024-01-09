@@ -1,9 +1,12 @@
 from contextlib import asynccontextmanager
 from json.decoder import JSONDecodeError
 from os import environ
+from typing import Dict
+
 import uvicorn
 from starlette.responses import JSONResponse
 from fastapi import FastAPI, Request
+
 from app.adzerk.api import Api as AdZerk
 from app.client import Client
 from app.exceptions.base_exception import BaseException
@@ -13,12 +16,15 @@ from app.exceptions.invalid_param import InvalidParam
 from app.validation import is_valid_pocket_id
 from app.provider.geo_provider import GeolocationProvider
 from app.provider.session_provider import SessionProvider
-from typing import Dict
+from app.provider.sentry_provider import sentry_init
 from app.middleware.proxy_headers import ProxyHeadersMiddleware
 
 
 @asynccontextmanager
 async def lifespan(_: FastAPI) -> None:
+    # Initialize logging to sentry
+    sentry_init()
+
     # Initialize singleton aiohttp client session (called for side effect)
     SessionProvider.session()
 
