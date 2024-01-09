@@ -24,6 +24,7 @@ services:
       - GEOIP_S3_BUCKET=pocket-geoip
       - ADZERK_API_KEY=${ADZERK_API_KEY}
       - ADZERK_NETWORK_ID=10250
+      - SENTRY_DSN=${SENTRY_DSN}
 
     ports:
       - 8000:8000
