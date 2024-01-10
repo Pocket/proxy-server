@@ -67,7 +67,7 @@ def version_two(context, body):
 def test_spocs_collection_api(case: schemathesis.Case) -> None:
     with aioresponses() as m:
         # Mock call to decisions API
-        m.post("https://e-10250.adzerk.net/api/v2", payload=MOCK_DECISIONS_RESPONSE)
+        m.post("https://e-10250.adzerk.net/api/v2", payload=MOCK_DECISIONS_COLLECTION_RESPONSE)
 
         # Call Pocket Proxy and validate response
         response = case.call_asgi()
