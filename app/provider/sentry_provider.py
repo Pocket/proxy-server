@@ -14,5 +14,6 @@ def sentry_init():
             dsn=dsn,
             traces_sample_rate=traces_sample_rate,
             profiles_sample_rate=profiles_sample_rate,
-            environment=conf.env)
+            environment=conf.env,
+    )
 
