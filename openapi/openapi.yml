@@ -38,7 +38,7 @@ paths:
                         - 5000
                       count: 10
               version_two_collection_req:
-                summary: Request for collection placements with version=1
+                summary: Request for collection placements with version=2
                 value:
                   version: 2
                   consumer_key: "40249-e88c401e1b1f2242d9e441c4"
