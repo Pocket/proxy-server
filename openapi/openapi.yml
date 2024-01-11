@@ -17,6 +17,13 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/SpocRequest'
+            examples:
+              version_one:
+                summary: Request from client that does not support collections, FireFox version <= 74
+                value:
+                  version: 1
+                  consumer_key: "40249-e88c401e1b1f2242d9e441c4"
+                  pocket_id: "{12345678-8901-2345-aaaa-bbbbbbcccccc}"
       responses:
         '200':
           description: Responds with settings and a list of spocs.
@@ -69,7 +76,6 @@ components:
           format: int32
           minimum: 1
           maximum: 2
-          default: 2
           example: 2
         consumer_key:
           type: string
@@ -228,6 +234,9 @@ components:
             sponsor:
               type: string
               example: NextAdvisor
+            context:
+              type: string
+              example: "Sponsored by NextAdvisor"
             items:
               type: array
               items:
