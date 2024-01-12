@@ -56,14 +56,17 @@ paths:
           content:
             application/json:
               schema:
-                allOf:
-                  - $ref: '#/components/schemas/Success'
-                  - type: object
-                    properties:
-                      settings:
-                        $ref: '#/components/schemas/Settings'
-                      spocs:
-                        $ref: "#/components/schemas/SpocFeed"
+                type: object
+                additionalProperties: false
+                properties:
+                  settings:
+                    $ref: '#/components/schemas/Settings'
+                  spocs:
+                    $ref: "#/components/schemas/SpocFeed"
+                  __debug__:
+                    description: Informational object returned in non-prod environments
+                    type: object
+                    additionalProperties: true
   /user:
     delete:
       summary: Delete a user's personal data from AdZerk
@@ -153,41 +156,16 @@ components:
           maximum: 20
           description: number of spocs to return for this placement
 
-
-    Success:
-      type: object
-      properties:
-        status:
-          type: integer
-          description: Indicates the response is successful.
-          enum:
-            - 1
-        error:
-          type: integer
-          enum:
-            - 0
-    Error:
-      type: object
-      properties:
-        status:
-          type: integer
-          enum:
-            - 0
-        error:
-          type: integer
-          description: Indicates the response is an error.
-          enum:
-            - 1
-        errorData:
-          type: string
-          description: Descriptive error message.
-          example: Cannot find layout variant
-
-
     #### Settings ####
 
     Settings:
       type: object
+      additionalProperties: false
+      required:
+        - feature_flags
+        - spocsPerNewTabs
+        - domainAffinityParameterSets
+        - timeSegments
       properties:
         spocsPerNewTabs:
           type: integer
@@ -201,15 +179,32 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/TimeSegment'
-        recsExpireTime:
-          type: integer
-          example: 5400
-        version:
-          type: string
-          example: bc184fc1a56dde7e7879135781932fdb1dd5d235
+        feature_flags:
+          type: object
+          $ref: '#/components/schemas/FeatureFlags'
+
+    FeatureFlags:
+      type: object
+      additionalProperties: false
+      required:
+        - spoc_v2
+        - collections
+      properties:
+        spoc_v2:
+          type: boolean
+        collections:
+          type: boolean
 
     DomainAffinityParameterSet:
       type: object
+      additionalProperties: false
+      required:
+        - recencyFactor
+        - frequencyFactor
+        - combinedDomainFactor
+        - perfectCombinedDomainScore
+        - multiDomainBoost
+        - itemScoreFactor
       properties:
         recencyFactor:
           type: number
@@ -228,6 +223,12 @@ components:
 
     TimeSegment:
       type: object
+      additionalProperties: false
+      required:
+        - id
+        - startTime
+        - endTime
+        - weightPosition
       properties:
         id:
           type: string
@@ -246,10 +247,10 @@ components:
           items:
             $ref: "#/components/schemas/SpocFeedItem"
         - type: object
+          additionalProperties: false
           required:
             - title
             - flight_id
-            - sponsor
           properties:
             title:
               type: string
@@ -268,34 +269,87 @@ components:
               items:
                 $ref: "#/components/schemas/SpocFeedItem"
 
-    FeedItem:
+    Shim:
       type: object
+      additionalProperties: false
       properties:
-        id:
-          type: integer
-          example: 30295
-        title:
+        click:
           type: string
-          example: Why driving is hard—even for AIs
+          example: "1234123asdf4tYadsfQ,xY-01BU12"
+        impression:
+          type: string
+          example: "a0c3943asdf4tYadsf300,xY-01BU9aadc"
+        delete:
+          type: string
+          example: "fdea123asdf4tYadsf1000,xY-01BUa654"
+        save:
+          type: string
+          example: "4567123asdf4tYadsfQcda,xY-01BU123"
+
+    Caps:
+      type: object
+      additionalProperties: false
+      required:
+        - lifetime
+        - flight
+        - campaign
+      properties:
+        lifetime:
+          type: integer
+          example: 50
+        flight:
+          type: object
+          additionalProperties: false
+          require:
+            - count
+            - period
+          properties:
+            count:
+              type: integer
+              example: 10
+            period:
+              type: integer
+              description: Period in seconds
+              example: 86400
+        campaign:
+          type: object
+          additionalProperties: false
+          required:
+            - count
+            - period
+          properties:
+            count:
+              type: integer
+              example: 10
+            period:
+              type: integer
+              description: Period in seconds
+              example: 86400
+
+    SpocFeedItem:
+      type: object
+      additionalProperties: false
+      properties:
+        campaign_id:
+          type: integer
+          example: 784
+        caps:
+          type: object
+          $ref: '#/components/schemas/Caps'
+        collection_title:
+          type: string
+          description: Shared title if all ads are one collection
+        context:
+          type: string
+          description: Deprecated. Use sponsor field instead.
+          example: Sponsored by NextAdvisor
+        cta:
+          type: string
+          description: Text to display on CTA button
+          example: Learn more
         domain:
           type: string
           example: arstechnica.com
-        image:
-          type: string
-          example: "https://img-getpocket.cdn.mozilla.net/direct?url=https%3A%2F%2Fcdn.arstechnica.net%2Fwp-content%2Fuploads%2F2018%2F12%2FGettyImages-898172236-640x427.jpg&resize=w450"
-        raw_image_src:
-          type: string
-          example: "https://cdn.arstechnica.net/wp-content/uploads/2018/12/GettyImages-898172236-640x427.jpg"
-        published_timestamp:
-          type: integer
-          description: Unix timestamp of when this item was published
-          example: 1543471200
-        item_score:
-          type: number
-          example: 0.98
-        parameter_set:
-          type: string
-          example: default
         domain_affinities:
           type: object
           additionalProperties:
@@ -303,85 +357,54 @@ components:
           example:
             vanguard.com: 0.9956
             wealthsimple.com: 0.9193
-
-    SpocFeedItem:
-      type: object
-      allOf:
-        - $ref: '#/components/schemas/FeedItem'
-        - type: object
-          properties:
-            excerpt:
-              type: string
-              example: "Despite promises of 'soon,' the infrastructure to support the driverless future isn't there yet."
-            shim:
-              type: object
-              properties:
-                click:
-                  type: string
-                  example: "1234123asdf4tYadsfQ,xY-01BU12"
-                impression:
-                  type: string
-                  example: "a0c3943asdf4tYadsf300,xY-01BU9aadc"
-                delete:
-                  type: string
-                  example: "fdea123asdf4tYadsf1000,xY-01BUa654"
-                save:
-                  type: string
-                  example: "4567123asdf4tYadsfQcda,xY-01BU123"
-            expiration_timestamp:
-              type: integer
-              example: 1544939940
-            flight_id:
-              type: integer
-              example: 432
-            campaign_id:
-              type: integer
-              example: 784
-            priority:
-              type: integer
-              description: The priority order. 1-100, 1 is highest priority.
-              minimum: 1
-              maximum: 100
-            sponsor:
-              type: string
-              example: NextAdvisor
-            context:
-              type: string
-              description: Deprecated. Use sponsor field instead.
-              example: Sponsored by NextAdvisor
-            cta:
-              type: string
-              description: Text to display on CTA button
-              example: Learn more
-            min_score:
-              type: number
-              example: 0.1
-            parameter_set:
-              type: string
-              example: default
-            caps:
-              type: object
-              properties:
-                lifetime:
-                  type: integer
-                  example: 50
-                flight:
-                  type: object
-                  properties:
-                    count:
-                      type: integer
-                      example: 10
-                    period:
-                      type: integer
-                      description: Period in seconds
-                      example: 86400
-                campaign:
-                  type: object
-                  properties:
-                    count:
-                      type: integer
-                      example: 10
-                    period:
-                      type: integer
-                      description: Period in seconds
-                      example: 86400
+        excerpt:
+          type: string
+          example: Driving excerpt
+        flight_id:
+          type: integer
+          example: 432
+        id:
+          type: integer
+          example: 30295
+        image_src:
+          type: string
+          example: https://img-getpocket.cdn.mozilla.net/ad.gif
+        is_video:
+          type: boolean
+        item_score:
+          type: number
+          format: float
+          example: 0.2
+        min_score:
+          type: number
+          format: float
+          example: 0.1
+        parameter_set:
+          type: string
+          example: default
+        personalization_models:
+          type: object
+          additionalProperties: true
+        priority:
+          type: integer
+          description: The priority order. 1-100, 1 is highest priority.
+          minimum: 1
+          maximum: 100
+        raw_image_src:
+          type: string
+          example: https://kevel/ad.gif
+        shim:
+          type: object
+          $ref: '#/components/schemas/Shim'
+        sponsor:
+          type: string
+          example: NextAdvisor
+        sponsored_by_override:
+          type: string
+          example: NextAdvisor
+        title:
+          type: string
+          example: Why driving is hard—even for AIs
+        url:
+          type: string
+          example: http://url
