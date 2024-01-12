@@ -57,12 +57,11 @@ paths:
             application/json:
               schema:
                 type: object
-                additionalProperties: false
+                additionalProperties:
+                  $ref:  "#/components/schemas/SpocFeed"
                 properties:
                   settings:
                     $ref: '#/components/schemas/Settings'
-                  spocs:
-                    $ref: "#/components/schemas/SpocFeed"
                   __debug__:
                     description: Informational object returned in non-prod environments
                     type: object
