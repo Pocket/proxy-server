@@ -19,16 +19,37 @@ def handle_message(event, context):
     :param event: Event payload.
     :param context: Google Cloud Function metadata.
     """
+
+    namespace_key = "document_namespace"
+    doctype_key = "document_type"
+    user_agent_version_key = "user_agent_version"
+
     decompressed = gzip.decompress(base64.b64decode(event["data"])).decode("utf-8")
     telemetry = json.loads(decompressed)
-    if "tiles" in telemetry:
-        for tile in telemetry["tiles"]:
-            if "shim" in tile:
-                ping_adzerk(tile["shim"])
-    elif "metrics" in telemetry:
-        text_metrics = telemetry["metrics"].get("text", {})
-        if "pocket.spoc_shim" in text_metrics:
-            ping_adzerk(text_metrics["pocket.spoc_shim"])
+    attributes = event["attributes"]
+
+    namespace = attributes.get(namespace_key)
+    doctype = attributes.get(doctype_key)
+    user_agent_version = attributes.get(user_agent_version_key)
+
+    if namespace in ["org-mozilla-firefox", "org-mozilla-firefox-beta", "org-mozilla-fenix"]\
+            and "spoc" == doctype:  # Android/Glean
+        if "metrics" in telemetry:
+            text_metrics = telemetry["metrics"].get("text", {})
+            if "pocket.spoc_shim" in text_metrics:
+                ping_adzerk(text_metrics["pocket.spoc_shim"])
+    elif "firefox-desktop" == namespace and "spoc" == doctype:  # Desktop/Glean
+        if int(user_agent_version) >= 122:
+            if "metrics" in telemetry:
+                text_metrics = telemetry["metrics"].get("text", {})
+                if "pocket.shim" in text_metrics:
+                    ping_adzerk(text_metrics["pocket.shim"])
+    elif "activity-stream" == namespace and "impression-stats" == doctype:
+        if int(user_agent_version) < 122:  # Desktop/Legacy
+            if "tiles" in telemetry:
+                for tile in telemetry["tiles"]:
+                    if "shim" in tile:
+                        ping_adzerk(tile["shim"])
 
 
 def ping_adzerk(shim):
