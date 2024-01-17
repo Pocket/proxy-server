@@ -43,6 +43,16 @@ class TestTelemetryHandler(TestCase):
         mock_ping_adzerk.assert_called_with('0,foo,bar')
 
     @patch('app.telemetry.handler.ping_adzerk')
+    def test_handle_message_desktop_spoc_ping_old_version(self, mock_ping_adzerk):
+        telemetry = {'metrics': {'text': {'pocket.shim': '0,foo,bar'}}}
+        data = base64.b64encode(gzip.compress(json.dumps(telemetry).encode('utf-8')))
+        attributes = {'document_namespace': 'firefox-desktop', 'document_type': 'spoc',
+                      'user_agent_version': 121}
+
+        handle_message(event={'data': data, 'attributes': attributes}, context={})
+        mock_ping_adzerk.assert_not_called()
+
+    @patch('app.telemetry.handler.ping_adzerk')
     def test_handle_unknown_namespace(self, mock_ping_adzerk):
         telemetry = {'metrics': {'text': {'pocket.shim': '0,foo,bar'}}}
         data = base64.b64encode(gzip.compress(json.dumps(telemetry).encode('utf-8')))
