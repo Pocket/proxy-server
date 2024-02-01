@@ -152,6 +152,17 @@ class TestApp(unittest.TestCase):
             resp = client.post('/spocs', json=data)
         self.assertEqual(resp.status_code, 400)
 
+
+    @patch('app.provider.geo_provider.GeolocationProvider.__init__', return_value=None)
+    @patch('app.adzerk.api.Api.get_decisions', return_value=mock_response_map)
+    def test_app_spocs_production_invalid_version_value(self, mock_geo, mock_adzerk):
+        data = self.get_request_body()
+        data['version'] = '2'' /**/ should sanitize input'
+        with self.create_client_no_geo_locs() as client:
+            resp = client.post('/spocs', json=data)
+        self.assertEqual(resp.status_code, 400)
+
+
     @patch('app.provider.geo_provider.GeolocationProvider.__init__', return_value=None)
     @patch('app.adzerk.api.Api.get_decisions', return_value=mock_response_map)
     def test_app_spocs_production_invalid_content_type(self, mock_geo, mock_adzerk):
