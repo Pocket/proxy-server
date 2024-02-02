@@ -96,6 +96,13 @@ async def call(client_ip, req_params, required_params, optional_params=None):
         __validate_placements(other_params['placements'])
     params.update(other_params)
 
+    # validate that the version param is a valid int
+    if 'version' in params:
+        try:
+            int(params['version'])
+        except ValueError:
+            raise InvalidParam('Invalid version')
+
     client = Client(ip=client_ip, geolocation_provider=provider, **params)
     session = SessionProvider.session()
 
