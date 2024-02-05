@@ -21,13 +21,13 @@ paths:
         - in: query
           name: region
           schema:
-            type: integer
+            type: string
           required: false
           description: override region in keywords of ad decision requests for testing
         - in: query
           name: country
           schema:
-            type: integer
+            type: string
           required: false
           description: override country in keywords of ad decision requests for testing
       requestBody:
@@ -137,6 +137,15 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/Placement"
+        site:
+          type: integer
+          description: override siteId in ad decision requests
+        country:
+          type: string
+          description: override country in keywords of ad decision requests for testing
+        region:
+          type: string
+          description: override region in keywords of ad decision requests for testing
 
     Placement:
       type: object

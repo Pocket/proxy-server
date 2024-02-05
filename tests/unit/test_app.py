@@ -83,6 +83,13 @@ class TestApp(unittest.TestCase):
         self.assertEqual(resp.status_code, 200)
 
     @patch('app.provider.geo_provider.GeolocationProvider.__init__', return_value=None)
+    @patch('app.adzerk.api.Api.get_decisions', return_value=mock_response_map)
+    def test_app_spocs_production_valid_with_country_region_query_param(self, mock_geo, mock_adzerk):
+        with self.create_client_no_geo_locs() as client:
+            resp = client.post('/spocs?country=CA&region=ON', json=self.get_request_body())
+        self.assertEqual(resp.status_code, 200)
+
+    @patch('app.provider.geo_provider.GeolocationProvider.__init__', return_value=None)
     @patch('app.adzerk.api.Api.get_decisions', return_value=mock_collection_placement_map)
     def test_app_spocs_collection_v1(self, mock_geo, mock_adzerk):
         """
