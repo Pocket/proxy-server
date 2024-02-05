@@ -129,16 +129,18 @@ def __validate_placements(placements):
 
 
 def __validate_single_placement(placement, required, optional, list_params):
-    for r in required:
-        if r not in placement:
-            raise MissingParam('Missing required parameter {0} in placement field'.format(r))
-    for f in placement.keys():
-        if f not in required and f not in optional:
-            raise InvalidParam('{0} is an unknown placement parameter'.format(f))
-    for l in list_params:
-        if l in placement and type(placement[l]) is not list:
-            raise InvalidParam('{0} must be a list of values in placement field'.format(l))
-
+    try:
+        for r in required:
+            if r not in placement:
+                raise MissingParam('Missing required parameter {0} in placement field'.format(r))
+        for f in placement.keys():
+            if f not in required and f not in optional:
+                raise InvalidParam('{0} is an unknown placement parameter'.format(f))
+        for l in list_params:
+            if l in placement and type(placement[l]) is not list:
+                raise InvalidParam('{0} must be a list of values in placement field'.format(l))
+    except AttributeError:
+        raise InvalidParam('Invalid placements')
 
 async def __get_request_params(request: Request):
     """
@@ -152,11 +154,17 @@ async def __get_request_params(request: Request):
         json = await request.json()
     except JSONDecodeError:
         raise InvalidContentType('Expecting application/json body')
+    except UnicodeDecodeError:
+        raise InvalidContentType('Expecting application/json body')
 
     req_params = dict()
 
-    for k, v in json.items():
-        req_params.update({k: v})
+    try:
+        for k, v in json.items():
+            req_params.update({k: v})
+    except AttributeError:
+        raise InvalidContentType('Expcting application/json body')
+
     for k, v in request.query_params.items():
         if k in ('site', 'country', 'region'):
             req_params.update({k: v})

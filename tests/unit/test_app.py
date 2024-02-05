@@ -228,6 +228,20 @@ class TestApp(unittest.TestCase):
         self.assertEqual(400, resp.status_code)
 
     @patch('app.provider.geo_provider.GeolocationProvider.__init__', return_value=None)
+    def test_app_spocs_production_invalid_json(self, mock_geo):
+        with self.create_client_no_geo_locs() as client:
+            resp = client.post('/spocs', json='${${[]}}')
+        self.assertEqual(400, resp.status_code)
+
+    @patch('app.provider.geo_provider.GeolocationProvider.__init__', return_value=None)
+    def test_app_spocs_production_invalid_placement(self, mock_geo):
+        bad_placements = deepcopy(mock_placements)
+        bad_placements[0] = 'map[ad_types:[3120] name:foo zone_ids:[280143]]'
+        with self.create_client_no_geo_locs() as client:
+            resp = client.post('/spocs', json=self.get_request_body(placements=bad_placements))
+        self.assertEqual(400, resp.status_code)
+
+    @patch('app.provider.geo_provider.GeolocationProvider.__init__', return_value=None)
     @patch('app.adzerk.api.Api.get_decisions', return_value=mock_placement_map)
     def test_app_spocs_production_valid_placements_call(self, mock_geo, mock_dec):
         bad_placements = deepcopy(mock_placements)
