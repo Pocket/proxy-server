@@ -19,6 +19,7 @@ paths:
             format: int32
           required: false
           description: override siteId in ad decision requests
+          example: 2500
         - in: query
           name: region
           schema:
@@ -142,6 +143,7 @@ components:
           type: integer
           format: int32
           description: override siteId in ad decision requests
+          example: 2500
         country:
           type: string
           description: override country in keywords of ad decision requests for testing
