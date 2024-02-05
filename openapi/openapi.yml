@@ -16,6 +16,7 @@ paths:
           name: site
           schema:
             type: integer
+            format: int32
           required: false
           description: override siteId in ad decision requests
         - in: query
@@ -139,6 +140,7 @@ components:
             $ref: "#/components/schemas/Placement"
         site:
           type: integer
+          format: int32
           description: override siteId in ad decision requests
         country:
           type: string
