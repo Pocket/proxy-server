@@ -16,8 +16,12 @@ paths:
           name: site
           schema:
             type: integer
+            format: int32
+            minimum: 1
+            maximum: 2147483647
           required: false
           description: override siteId in ad decision requests
+          example: 2500
         - in: query
           name: region
           schema:
@@ -139,7 +143,11 @@ components:
             $ref: "#/components/schemas/Placement"
         site:
           type: integer
+          format: int32
+          minimum: 1
+          maximum: 2147483647
           description: override siteId in ad decision requests
+          example: 2500
         country:
           type: string
           description: override country in keywords of ad decision requests for testing
