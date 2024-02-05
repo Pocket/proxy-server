@@ -183,7 +183,7 @@ class TestApp(unittest.TestCase):
 
     @patch('app.provider.geo_provider.GeolocationProvider.__init__', return_value=None)
     @patch('app.adzerk.api.Api.get_decisions', return_value=mock_response_map)
-    def test_app_spocs_staging_production_valid(self, mock_geo, mock_adzerk):
+    def test_app_spocs_staging_production_valid_query_param(self, mock_geo, mock_adzerk):
         """
         This test would be more useful if we checked that we got different responses based on the site.
         But currently not sure how to return a mocked response based on site, or even to test
@@ -193,6 +193,16 @@ class TestApp(unittest.TestCase):
         """
         with self.create_client_no_geo_locs() as client:
             resp = client.post('/spocs?site=12345', json=self.get_request_body())
+        self.assertEqual(resp.status_code, 200)
+
+    @patch('app.provider.geo_provider.GeolocationProvider.__init__', return_value=None)
+    @patch('app.adzerk.api.Api.get_decisions', return_value=mock_response_map)
+    def test_app_spocs_staging_production_valid(self, mock_geo, mock_adzerk):
+        site = {
+            'site': '12345'
+        }
+        with self.create_client_no_geo_locs() as client:
+            resp = client.post('/spocs', json=self.get_request_body(update=site))
         self.assertEqual(resp.status_code, 200)
 
     @patch('app.provider.geo_provider.GeolocationProvider.__init__', return_value=None)
