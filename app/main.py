@@ -46,7 +46,11 @@ async def get_spocs(request: Request):
     required_params = set(['version', 'consumer_key', 'pocket_id'])
     optional_params = set(['site', 'placements', 'country', 'region'])
     req_params = await __get_request_params(request)
-    return await call(request.client.host, req_params, required_params, optional_params=optional_params)
+    if request.client is not None:
+        client_host = request.client.host
+    else:
+        client_host = ""
+    return await call(client_host, req_params, required_params, optional_params=optional_params)
 
 
 @app.delete('/user')
