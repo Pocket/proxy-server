@@ -55,7 +55,7 @@ async def get_spocs(request: Request):
             client_host = ""
         return await call(client_host, req_params, required_params, optional_params=optional_params)
     except ClientDisconnect:
-        return Response(status_code=HTTP_204_NO_CONTENT)
+        pass
 
 
 @app.delete('/user')

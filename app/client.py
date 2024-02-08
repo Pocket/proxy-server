@@ -41,7 +41,6 @@ class Client:
             targeting['country'] = self.geolocation.get_country(geo)
             targeting['region'] = self.geolocation.get_region(geo)
         except Exception as e:
-            # logging.warning("Could not target based on geolocation. {0}".format(str(e)))
             pass
 
         if self.country:
