@@ -5,7 +5,9 @@ from typing import Dict
 
 import uvicorn
 from starlette.responses import JSONResponse
-from fastapi import FastAPI, Request
+from starlette.requests import ClientDisconnect
+from starlette.status import HTTP_204_NO_CONTENT
+from fastapi import FastAPI, Request, Response
 
 from app.adzerk.api import Api as AdZerk
 from app.client import Client
@@ -43,14 +45,17 @@ provider = GeolocationProvider()
 
 @app.post('/spocs')
 async def get_spocs(request: Request):
-    required_params = set(['version', 'consumer_key', 'pocket_id'])
-    optional_params = set(['site', 'placements', 'country', 'region'])
-    req_params = await __get_request_params(request)
-    if request.client is not None:
-        client_host = request.client.host
-    else:
-        client_host = ""
-    return await call(client_host, req_params, required_params, optional_params=optional_params)
+    try:
+        required_params = set(['version', 'consumer_key', 'pocket_id'])
+        optional_params = set(['site', 'placements', 'country', 'region'])
+        req_params = await __get_request_params(request)
+        if request.client is not None:
+            client_host = request.client.host
+        else:
+            client_host = ""
+        return await call(client_host, req_params, required_params, optional_params=optional_params)
+    except ClientDisconnect:
+        return Response(status_code=HTTP_204_NO_CONTENT)
 
 
 @app.delete('/user')
