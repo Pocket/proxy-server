@@ -1676,11 +1676,12 @@
         },
         "starlette": {
             "hashes": [
-                "sha256:3e2639dac3520e4f58734ed22553f950d3f3cb1001cd2eaac4d57e8cdc5f66bc",
-                "sha256:50bbbda9baa098e361f398fda0928062abbaf1f54f4fadcbe17c092a01eb9a25"
+                "sha256:4134757b950f027c8f16028ec81787751bb44145df17c8b0fa84087b9851b42d",
+                "sha256:e53e086e620ba715f0c187daca92927b722484d148e70921f0de075936119536"
             ],
+            "index": "pypi",
             "markers": "python_version >= '3.8'",
-            "version": "==0.35.1"
+            "version": "==0.36.2"
         },
         "starlette-testclient": {
             "hashes": [
