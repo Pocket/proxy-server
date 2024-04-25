@@ -2,17 +2,13 @@
 #
 # Check https://circleci.com/docs/2.0/language-python/ for more details
 #
+#
 version: 2.1
-
-orbs:
-  aws-cli: circleci/aws-cli@0.1.13
-  aws-ecr: circleci/aws-ecr@6.5.0
-  assume-role: airswap/assume-role@0.2.0
 
 jobs:
   tests_unit:
     docker:
-      - image: cimg/python:3.11
+      - image: cimg/python:3.11.8
         auth:
           username: $DOCKERHUB_USERNAME
           password: $DOCKERHUB_PASSWORD
@@ -54,106 +50,11 @@ jobs:
       - store_artifacts:
           path: proxy-server-coverage
 
-  build:
-    parameters:
-      env:
-        description: Deployment environment
-        type: enum
-        enum: ["dev", "prod", "staging"]
-        default: dev
-      main_image_name:
-        description: Main Docker image name
-        type: string
-        default: proxy
-      nginx_image_name:
-        description: Nginx Docker image name
-        type: string
-        default: nginx
-    docker:
-      - image: pocket/ops-cli:v0.0.5
-        auth:
-          username: $DOCKERHUB_USERNAME
-          password: $DOCKERHUB_PASSWORD
-        environment:
-          MAIN_IMAGE_NAME: << parameters.main_image_name >>
-          NGINX_IMAGE_NAME: << parameters.nginx_image_name >>
-    steps:
-      - checkout
-      - when:
-          condition:
-            equal: ["dev", << parameters.env >>]
-          steps:
-            - run:
-                name: Setup common environment variables
-                command: |
-                  echo "building for dev...main image name is $MAIN_IMAGE_NAME"
-                  echo 'export AWS_ECR_ACCOUNT_DEV_URL="${ACCOUNT_ID_DEV}.dkr.ecr.us-east-1.amazonaws.com"' >> $BASH_ENV
-                  echo 'export AWS_ECR_ACCOUNT_URL="${AWS_ECR_ACCOUNT_DEV_URL}"' >> $BASH_ENV
-            - assume-role/assume-role:
-                account-id: $ACCOUNT_ID_DEV
-      - when:
-          condition:
-            equal: ["prod", << parameters.env >>]
-          steps:
-            - run:
-                name: Setup common environment variables
-                command: |
-                  echo "building for prod...main image name is $MAIN_IMAGE_NAME"
-                  echo 'export AWS_ECR_ACCOUNT_PROD_URL="${ACCOUNT_ID_PROXY}.dkr.ecr.us-east-1.amazonaws.com"' >> $BASH_ENV
-                  echo 'export AWS_ECR_ACCOUNT_URL="${AWS_ECR_ACCOUNT_PROD_URL}"' >> $BASH_ENV
-            - assume-role/assume-role:
-                account-id: $ACCOUNT_ID_PROXY
-      - aws-ecr/ecr-login
-      - aws-ecr/build-and-push-image:
-          checkout: false
-          repo: $MAIN_IMAGE_NAME
-          setup-remote-docker: true
-          tag: $CIRCLE_SHA1,latest
-          dockerfile: ./images/app/Dockerfile
-          extra-build-args: --build-arg GIT_SHA=${CIRCLE_SHA1}
-      - aws-ecr/build-and-push-image:
-          checkout: false
-          repo: $NGINX_IMAGE_NAME
-          setup-remote-docker: false
-          tag: $CIRCLE_SHA1,latest
-          path: ./images/nginx/
-          dockerfile: ./images/nginx/Dockerfile
-          extra-build-args: --build-arg GIT_SHA=${CIRCLE_SHA1}
-
-
 
 # Workflow shortcuts
-not_main: &not_main
-  filters:
-    branches:
-      ignore:
-        - main
-
-only_main: &only_main
-  filters:
-    branches:
-      only:
-        - main
-
 workflows:
   version: 2
   build_and_test:
     jobs:
       - tests_unit:
           context: pocket-proxy
-      - build:
-          <<: *not_main
-          env: dev
-          main_image_name: proxy-server-dev
-          nginx_image_name: proxy-server-nginx-dev
-          context: pocket-proxy
-          requires:
-            - tests_unit
-      - build:
-          <<: *only_main
-          env: prod
-          context: pocket-proxy
-          requires:
-            - tests_unit
-
-
