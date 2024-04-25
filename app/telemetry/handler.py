@@ -16,8 +16,6 @@ TELEMETRY_PATH_IDS = {
     "/i.gif": "1",
     "/e.gif": "2",
 }
-# range of 0-1000, to sample in increments of 1/1000
-METRIC_SAMPLE_RATE = os.environ.get("METRIC_SAMPLE_RATE", "0")
 
 
 def handle_message(event, context):
@@ -86,7 +84,7 @@ def get_path(path_id):
 
 
 def record_metrics(shim, submission_timestamp):
-    """If METRIC_SAMPLE_RATE is set and greater than 0, then log metrics for the event.
+    """If METRICS_SAMPLE_RATE is set and greater than 0, then log metrics for the event.
         The metrics are logged in a structured event to enable google cloud log-based metrics to aggregate them
 
         metrics sampled:
@@ -94,10 +92,13 @@ def record_metrics(shim, submission_timestamp):
             time from telemetry submission to now
     """
     try:
-        if not METRIC_SAMPLE_RATE.isdecimal():
+        # range of 0-1000, to sample in increments of 1/1000
+        metrics_sample_rate = os.environ.get("METRICS_SAMPLE_RATE", "0")
+
+        if not metrics_sample_rate.isdecimal():
             return
 
-        if int(METRIC_SAMPLE_RATE) <= 0 or random.randrange(0, 1000) >= int(METRIC_SAMPLE_RATE):
+        if int(metrics_sample_rate) <= 0 or random.randrange(0, 1000) >= int(metrics_sample_rate):
             return
 
         log_client = google.cloud.logging.Client()
@@ -119,4 +120,5 @@ def record_metrics(shim, submission_timestamp):
 
         return
     except:
+        logging.info("exception gathering log data")
         return
