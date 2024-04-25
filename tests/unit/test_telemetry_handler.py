@@ -5,7 +5,7 @@ import logging
 import os
 import random
 
-from unittest import TestCase
+from unittest import mock, TestCase
 from unittest.mock import patch, call
 from app.telemetry.handler import handle_message, ping_adzerk, record_metrics
 
@@ -96,33 +96,34 @@ class TestTelemetryHandler(TestCase):
 
     @patch('google.cloud.logging')
     @patch('logging.info')
-    def test_record_metrics_no_sampling(self, mock_logging, mock_google_cloud_logging):
+    def test_record_metrics_no_sampling(self, mock_logging, mock_google_logging):
         os.environ["METRICS_SAMPLE_RATE"] = "0"
-        record_metrics('2,foo,bar', '2024-04-25T21:02:18.123456Z')
+        record_metrics(make_encoded_shim(1713971071000), '2024-04-24T21:02:18.123456Z')
         mock_logging.assert_not_called()
 
     @patch('google.cloud.logging')
     @patch('logging.info')
-    def test_record_metrics_sampling_misconfigured(self, mock_logging, mock_google_cloud_logging):
+    def test_record_metrics_sampling_misconfigured(self, mock_logging, mock_google_logging):
         os.environ["METRICS_SAMPLE_RATE"] = "true"
-        record_metrics('2,foo,bar', '2024-04-25T21:02:18.123456Z')
+        record_metrics(make_encoded_shim(1713971071000), '2024-04-24T21:02:18.123456Z')
         mock_logging.assert_not_called()
 
     @patch('google.cloud.logging')
     @patch('logging.info')
-    def test_record_metrics_sample_rate_excluded(self, mock_logging, mock_google_cloud_logging):
-        # seed random to have consistent results in the test
+    def test_record_metrics_sample_rate_excluded(self, mock_logging, mock_google_logging):
+        # seed random to ensure random sample is excluded
         random.seed(0)
         os.environ["METRICS_SAMPLE_RATE"] = "500"
-        record_metrics('2,foo,bar', '2024-04-25T21:02:18.123456Z')
+        record_metrics(make_encoded_shim(1713971071000), '2024-04-24T21:02:18.123456Z')
         mock_logging.assert_not_called()
 
+    @patch('time.time', mock.MagicMock(return_value=1714060184.319715))
     @patch('google.cloud.logging')
     @patch('logging.info')
-    def test_log_metrics_sample_rate_included(self, mock_logging, mock_google_cloud_logging):
-        # seed random to have consistent results in the test
+    def test_log_metrics_sample_rate_included(self, mock_logging, mock_google_logging):
+        # seed random to ensure random sample is included
         random.seed(0)
         os.environ["METRICS_SAMPLE_RATE"] = "900"
-        shim = make_encoded_shim(1714057472)
-        record_metrics(f'2,{shim},bar', '2024-04-25T21:02:18.123456Z')
-        mock_logging.assert_called_once_with("metrics", extra={"json_fields": {"glean_latency": 0, "adserver_latency": 0}})
+        shim = make_encoded_shim(1713971071000)
+        record_metrics(shim, '2024-04-24T21:02:18.123456Z')
+        mock_logging.assert_called_once_with("metrics", extra={"json_fields": {"glean_latency": 67646196, "adserver_latency": 89113319}})
