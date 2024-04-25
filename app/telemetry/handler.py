@@ -106,7 +106,8 @@ def record_metrics(shim, submission_timestamp):
 
         submission_timestamp_millis = int(datetime.fromisoformat(submission_timestamp).timestamp() * 1000)
 
-        padded_data = shim + '=' * (-len(shim)%4)
+        _, encoded_data, _ = shim.split(",")
+        padded_data = encoded_data + '=' * (-len(encoded_data)%4)
         kevel_json = json.loads(base64.b64decode(padded_data))
 
         kevel_timestamp = kevel_json['ts']
@@ -120,5 +121,4 @@ def record_metrics(shim, submission_timestamp):
 
         return
     except:
-        logging.info("exception gathering log data")
         return

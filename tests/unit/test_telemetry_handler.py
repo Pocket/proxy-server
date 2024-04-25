@@ -15,12 +15,14 @@ def make_encoded_shim(timestamp_millis):
     return base64.b64encode(bytes(kevel_shim, 'utf-8')).rstrip(b'=').decode()
 
 class TestTelemetryHandler(TestCase):
+    @patch('app.telemetry.handler.record_metrics')
     @patch('app.telemetry.handler.ping_adzerk')
-    def test_handle_message_legacy_ping(self, mock_ping_adzerk):
+    def test_handle_message_legacy_ping(self, mock_ping_adzerk, mock_record_metrics):
         telemetry = {'tiles': [{'shim': '0,foo,bar'}, {'shim': '1,1,2'}, {'shim': '2,a,b'}]}
         data = base64.b64encode(gzip.compress(json.dumps(telemetry).encode('utf-8')))
+        submission_timestamp = '2024-04-24T21:02:18.123456Z'
         attributes = {'document_namespace': 'activity-stream', 'document_type': 'impression-stats',
-                      'user_agent_version': 121}
+                      'user_agent_version': 121, 'submission_timestamp': submission_timestamp}
 
         handle_message(event={'data': data, 'attributes': attributes}, context={})
         mock_ping_adzerk.assert_has_calls([
@@ -28,26 +30,37 @@ class TestTelemetryHandler(TestCase):
             call('1,1,2'),
             call('2,a,b'),
         ])
+        mock_record_metrics.assert_has_calls([
+            call('0,foo,bar', submission_timestamp),
+            call('1,1,2', submission_timestamp),
+            call('2,a,b', submission_timestamp),
+        ])
 
+    @patch('app.telemetry.handler.record_metrics')
     @patch('app.telemetry.handler.ping_adzerk')
-    def test_handle_message_android_spoc_ping(self, mock_ping_adzerk):
+    def test_handle_message_android_spoc_ping(self, mock_ping_adzerk, mock_record_metrics):
         telemetry = {'metrics': {'text': {'pocket.spoc_shim': '0,foo,bar'}}}
         data = base64.b64encode(gzip.compress(json.dumps(telemetry).encode('utf-8')))
+        submission_timestamp = '2024-04-24T21:02:18.123456Z'
         attributes = {'document_namespace': 'org-mozilla-firefox', 'document_type': 'spoc',
-                      'user_agent_version': 121}
+                      'user_agent_version': 121, 'submission_timestamp': submission_timestamp}
 
         handle_message(event={'data': data, 'attributes': attributes}, context={})
         mock_ping_adzerk.assert_called_with('0,foo,bar')
+        mock_record_metrics.assert_called_with('0,foo,bar', submission_timestamp)
 
+    @patch('app.telemetry.handler.record_metrics')
     @patch('app.telemetry.handler.ping_adzerk')
-    def test_handle_message_desktop_spoc_ping(self, mock_ping_adzerk):
+    def test_handle_message_desktop_spoc_ping(self, mock_ping_adzerk, mock_record_metrics):
         telemetry = {'metrics': {'text': {'pocket.shim': '0,foo,bar'}}}
         data = base64.b64encode(gzip.compress(json.dumps(telemetry).encode('utf-8')))
+        submission_timestamp = '2024-04-24T21:02:18.123456Z'
         attributes = {'document_namespace': 'firefox-desktop', 'document_type': 'spoc',
-                      'user_agent_version': 122}
+                      'user_agent_version': 122, 'submission_timestamp': submission_timestamp}
 
         handle_message(event={'data': data, 'attributes': attributes}, context={})
         mock_ping_adzerk.assert_called_with('0,foo,bar')
+        mock_record_metrics.assert_called_with('0,foo,bar', submission_timestamp)
 
     @patch('app.telemetry.handler.ping_adzerk')
     def test_handle_message_desktop_spoc_ping_old_version(self, mock_ping_adzerk):
@@ -98,14 +111,16 @@ class TestTelemetryHandler(TestCase):
     @patch('logging.info')
     def test_record_metrics_no_sampling(self, mock_logging, mock_google_logging):
         os.environ["METRICS_SAMPLE_RATE"] = "0"
-        record_metrics(make_encoded_shim(1713971071000), '2024-04-24T21:02:18.123456Z')
+        shim = make_encoded_shim(1713971071000)
+        record_metrics(f'2,{shim},bar', '2024-04-24T21:02:18.123456Z')
         mock_logging.assert_not_called()
 
     @patch('google.cloud.logging')
     @patch('logging.info')
     def test_record_metrics_sampling_misconfigured(self, mock_logging, mock_google_logging):
         os.environ["METRICS_SAMPLE_RATE"] = "true"
-        record_metrics(make_encoded_shim(1713971071000), '2024-04-24T21:02:18.123456Z')
+        shim = make_encoded_shim(1713971071000)
+        record_metrics(f'2,{shim},bar', '2024-04-24T21:02:18.123456Z')
         mock_logging.assert_not_called()
 
     @patch('google.cloud.logging')
@@ -114,7 +129,27 @@ class TestTelemetryHandler(TestCase):
         # seed random to ensure random sample is excluded
         random.seed(0)
         os.environ["METRICS_SAMPLE_RATE"] = "500"
-        record_metrics(make_encoded_shim(1713971071000), '2024-04-24T21:02:18.123456Z')
+        shim = make_encoded_shim(1713971071000)
+        record_metrics(f'2,{shim},bar', '2024-04-24T21:02:18.123456Z')
+        mock_logging.assert_not_called()
+
+    @patch('google.cloud.logging')
+    @patch('logging.info')
+    def test_record_metrics_shim_not_parsable(self, mock_logging, mock_google_logging):
+        # seed random to ensure random sample is excluded
+        random.seed(0)
+        os.environ["METRICS_SAMPLE_RATE"] = "900"
+        record_metrics(f'2,shim,bar', '2024-04-24T21:02:18.123456Z')
+        mock_logging.assert_not_called()
+
+    @patch('google.cloud.logging')
+    @patch('logging.info')
+    def test_record_metrics_timestamp_not_parsable(self, mock_logging, mock_google_logging):
+        # seed random to ensure random sample is excluded
+        random.seed(0)
+        os.environ["METRICS_SAMPLE_RATE"] = "900"
+        shim = make_encoded_shim(1713971071000)
+        record_metrics(f'2,{shim},bar', 'invalid-timestamp')
         mock_logging.assert_not_called()
 
     @patch('time.time', mock.MagicMock(return_value=1714060184.319715))
@@ -125,5 +160,5 @@ class TestTelemetryHandler(TestCase):
         random.seed(0)
         os.environ["METRICS_SAMPLE_RATE"] = "900"
         shim = make_encoded_shim(1713971071000)
-        record_metrics(shim, '2024-04-24T21:02:18.123456Z')
+        record_metrics(f'2,{shim},bar', '2024-04-24T21:02:18.123456Z')
         mock_logging.assert_called_once_with("metrics", extra={"json_fields": {"glean_latency": 67646196, "adserver_latency": 89113319}})
