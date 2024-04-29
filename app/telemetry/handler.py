@@ -45,21 +45,21 @@ def handle_message(event, context):
             text_metrics = telemetry["metrics"].get("text", {})
             if "pocket.spoc_shim" in text_metrics:
                 ping_adzerk(text_metrics["pocket.spoc_shim"])
-                record_metrics(text_metrics["pocket.spoc_shim"], submission_timestamp)
+                record_metrics(text_metrics["pocket.spoc_shim"], submission_timestamp, namespace, user_agent_version)
     elif "firefox-desktop" == namespace and "spoc" == doctype:  # Desktop/Glean
         if int(user_agent_version) >= 122:
             if "metrics" in telemetry:
                 text_metrics = telemetry["metrics"].get("text", {})
                 if "pocket.shim" in text_metrics:
                     ping_adzerk(text_metrics["pocket.shim"])
-                    record_metrics(text_metrics["pocket.shim"], submission_timestamp)
+                    record_metrics(text_metrics["pocket.shim"], submission_timestamp, namespace, user_agent_version)
     elif "activity-stream" == namespace and "impression-stats" == doctype:
         if int(user_agent_version) < 122:  # Desktop/Legacy
             if "tiles" in telemetry:
                 for tile in telemetry["tiles"]:
                     if "shim" in tile:
                         ping_adzerk(tile["shim"])
-                        record_metrics(tile["shim"], submission_timestamp)
+                        record_metrics(tile["shim"], submission_timestamp, namespace, user_agent_version)
 
 
 def ping_adzerk(shim):
@@ -83,7 +83,7 @@ def get_path(path_id):
             return k
 
 
-def record_metrics(shim, submission_timestamp):
+def record_metrics(shim, submission_timestamp, namespace, user_agent_version):
     """If METRICS_SAMPLE_RATE is set and greater than 0, then log metrics for the event.
         The metrics are logged in a structured event to enable google cloud log-based metrics to aggregate them
 
@@ -117,7 +117,13 @@ def record_metrics(shim, submission_timestamp):
         glean_latency_millis = int(glean_latency.total_seconds() * 1000)
         adserver_latency_millis = int(now.timestamp() * 1000) - kevel_timestamp_millis
 
-        logging.info("metrics", extra={"json_fields": {"glean_latency": glean_latency_millis, "adserver_latency": adserver_latency_millis}})
+        json_fields = {
+            "glean_latency": glean_latency_millis,
+            "adserver_latency": adserver_latency_millis,
+            "namespace": namespace,
+            "user_agent_version": user_agent_version,
+        }
+        logging.info("metrics", extra={"json_fields": json_fields})
 
         return
     except:

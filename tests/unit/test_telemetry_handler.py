@@ -32,9 +32,9 @@ class TestTelemetryHandler(TestCase):
             call('2,a,b'),
         ])
         mock_record_metrics.assert_has_calls([
-            call('0,foo,bar', submission_timestamp),
-            call('1,1,2', submission_timestamp),
-            call('2,a,b', submission_timestamp),
+            call('0,foo,bar', submission_timestamp, 'activity-stream', 121),
+            call('1,1,2', submission_timestamp, 'activity-stream', 121),
+            call('2,a,b', submission_timestamp, 'activity-stream', 121),
         ])
 
     @patch('app.telemetry.handler.record_metrics')
@@ -48,7 +48,7 @@ class TestTelemetryHandler(TestCase):
 
         handle_message(event={'data': data, 'attributes': attributes}, context={})
         mock_ping_adzerk.assert_called_with('0,foo,bar')
-        mock_record_metrics.assert_called_with('0,foo,bar', submission_timestamp)
+        mock_record_metrics.assert_called_with('0,foo,bar', submission_timestamp, 'org-mozilla-firefox', 121)
 
     @patch('app.telemetry.handler.record_metrics')
     @patch('app.telemetry.handler.ping_adzerk')
@@ -61,7 +61,7 @@ class TestTelemetryHandler(TestCase):
 
         handle_message(event={'data': data, 'attributes': attributes}, context={})
         mock_ping_adzerk.assert_called_with('0,foo,bar')
-        mock_record_metrics.assert_called_with('0,foo,bar', submission_timestamp)
+        mock_record_metrics.assert_called_with('0,foo,bar', submission_timestamp, 'firefox-desktop', 122)
 
     @patch('app.telemetry.handler.ping_adzerk')
     def test_handle_message_desktop_spoc_ping_old_version(self, mock_ping_adzerk):
@@ -113,7 +113,7 @@ class TestTelemetryHandler(TestCase):
     def test_record_metrics_no_sampling(self, mock_logging, mock_google_logging):
         os.environ["METRICS_SAMPLE_RATE"] = "0"
         shim = make_encoded_shim(1713971071000)
-        record_metrics(f'2,{shim},bar', '2024-04-24T21:02:18.123456Z')
+        record_metrics(f'2,{shim},bar', '2024-04-24T21:02:18.123456Z', "firefox-desktop", 125)
         mock_logging.assert_not_called()
 
     @patch('google.cloud.logging')
@@ -121,7 +121,7 @@ class TestTelemetryHandler(TestCase):
     def test_record_metrics_sampling_misconfigured(self, mock_logging, mock_google_logging):
         os.environ["METRICS_SAMPLE_RATE"] = "true"
         shim = make_encoded_shim(1713971071000)
-        record_metrics(f'2,{shim},bar', '2024-04-24T21:02:18.123456Z')
+        record_metrics(f'2,{shim},bar', '2024-04-24T21:02:18.123456Z', "firefox-desktop", 125)
         mock_logging.assert_not_called()
 
     @patch('google.cloud.logging')
@@ -131,14 +131,14 @@ class TestTelemetryHandler(TestCase):
         random.seed(0)
         os.environ["METRICS_SAMPLE_RATE"] = "500"
         shim = make_encoded_shim(1713971071000)
-        record_metrics(f'2,{shim},bar', '2024-04-24T21:02:18.123456Z')
+        record_metrics(f'2,{shim},bar', '2024-04-24T21:02:18.123456Z', "firefox-desktop", 125)
         mock_logging.assert_not_called()
 
     @patch('google.cloud.logging')
     @patch('logging.info')
     def test_record_metrics_shim_not_parsable(self, mock_logging, mock_google_logging):
         os.environ["METRICS_SAMPLE_RATE"] = "1000"
-        record_metrics(f'2,shim,bar', '2024-04-24T21:02:18.123456Z')
+        record_metrics(f'2,shim,bar', '2024-04-24T21:02:18.123456Z', "firefox-desktop", 125)
         mock_logging.assert_not_called()
 
     @patch('google.cloud.logging')
@@ -146,7 +146,7 @@ class TestTelemetryHandler(TestCase):
     def test_record_metrics_timestamp_not_parsable(self, mock_logging, mock_google_logging):
         os.environ["METRICS_SAMPLE_RATE"] = "1000"
         shim = make_encoded_shim(1713971071000)
-        record_metrics(f'2,{shim},bar', 'invalid-timestamp')
+        record_metrics(f'2,{shim},bar', 'invalid-timestamp', "firefox-desktop", 125)
         mock_logging.assert_not_called()
 
     @patch('app.telemetry.handler.get_now', mock.MagicMock(return_value=datetime(2024, 4, 25, 15, 4, 44, 686803, tzinfo=timezone.utc)))
@@ -157,5 +157,11 @@ class TestTelemetryHandler(TestCase):
         random.seed(0)
         os.environ["METRICS_SAMPLE_RATE"] = "900"
         shim = make_encoded_shim(1713971071000)
-        record_metrics(f'2,{shim},bar', '2024-04-24T21:02:18.123456Z')
-        mock_logging.assert_called_once_with("metrics", extra={"json_fields": {"glean_latency": 64946563, "adserver_latency": 86413686}})
+        record_metrics(f'2,{shim},bar', '2024-04-24T21:02:18.123456Z', "firefox-desktop", 125)
+        json_fields = {
+            "glean_latency": 64946563,
+            "adserver_latency": 86413686,
+            "namespace": "firefox-desktop",
+            "user_agent_version": 125
+        }
+        mock_logging.assert_called_once_with("metrics", extra={"json_fields": json_fields})
