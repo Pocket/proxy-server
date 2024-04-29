@@ -5,6 +5,7 @@ import logging
 import os
 import random
 
+from datetime import datetime, timezone
 from unittest import mock, TestCase
 from unittest.mock import patch, call
 from app.telemetry.handler import handle_message, ping_adzerk, record_metrics
@@ -136,23 +137,19 @@ class TestTelemetryHandler(TestCase):
     @patch('google.cloud.logging')
     @patch('logging.info')
     def test_record_metrics_shim_not_parsable(self, mock_logging, mock_google_logging):
-        # seed random to ensure random sample is excluded
-        random.seed(0)
-        os.environ["METRICS_SAMPLE_RATE"] = "900"
+        os.environ["METRICS_SAMPLE_RATE"] = "1000"
         record_metrics(f'2,shim,bar', '2024-04-24T21:02:18.123456Z')
         mock_logging.assert_not_called()
 
     @patch('google.cloud.logging')
     @patch('logging.info')
     def test_record_metrics_timestamp_not_parsable(self, mock_logging, mock_google_logging):
-        # seed random to ensure random sample is excluded
-        random.seed(0)
-        os.environ["METRICS_SAMPLE_RATE"] = "900"
+        os.environ["METRICS_SAMPLE_RATE"] = "1000"
         shim = make_encoded_shim(1713971071000)
         record_metrics(f'2,{shim},bar', 'invalid-timestamp')
         mock_logging.assert_not_called()
 
-    @patch('time.time', mock.MagicMock(return_value=1714060184.319715))
+    @patch('app.telemetry.handler.get_now', mock.MagicMock(return_value=datetime(2024, 4, 25, 15, 4, 44, 686803, tzinfo=timezone.utc)))
     @patch('google.cloud.logging')
     @patch('logging.info')
     def test_log_metrics_sample_rate_included(self, mock_logging, mock_google_logging):
@@ -161,4 +158,4 @@ class TestTelemetryHandler(TestCase):
         os.environ["METRICS_SAMPLE_RATE"] = "900"
         shim = make_encoded_shim(1713971071000)
         record_metrics(f'2,{shim},bar', '2024-04-24T21:02:18.123456Z')
-        mock_logging.assert_called_once_with("metrics", extra={"json_fields": {"glean_latency": 67646196, "adserver_latency": 89113319}})
+        mock_logging.assert_called_once_with("metrics", extra={"json_fields": {"glean_latency": 64946563, "adserver_latency": 86413686}})

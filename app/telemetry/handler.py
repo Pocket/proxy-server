@@ -7,7 +7,7 @@ import os
 import random
 import time
 import urllib.request
-from datetime import datetime
+from datetime import datetime, timezone
 from urllib.parse import urlencode
 
 NETWORK_ID = os.environ.get("ADZERK_NETWORK_ID", 10250)
@@ -104,21 +104,25 @@ def record_metrics(shim, submission_timestamp):
         log_client = google.cloud.logging.Client()
         log_client.setup_logging()
 
-        submission_timestamp_millis = int(datetime.fromisoformat(submission_timestamp).timestamp() * 1000)
+        submission_timestamp = datetime.fromisoformat(submission_timestamp)
 
         _, encoded_data, _ = shim.split(",")
         padded_data = encoded_data + '=' * (-len(encoded_data)%4)
         kevel_json = json.loads(base64.b64decode(padded_data))
+        kevel_timestamp_millis = kevel_json['ts']
 
-        kevel_timestamp = kevel_json['ts']
+        now = get_now()
 
-        now_millis = int(time.time() * 1000)
-
-        glean_latency_millis = now_millis - submission_timestamp_millis
-        adserver_latency_millis = now_millis - kevel_timestamp
+        glean_latency = now - submission_timestamp
+        glean_latency_millis = int(glean_latency.total_seconds() * 1000)
+        adserver_latency_millis = int(now.timestamp() * 1000) - kevel_timestamp_millis
 
         logging.info("metrics", extra={"json_fields": {"glean_latency": glean_latency_millis, "adserver_latency": adserver_latency_millis}})
 
         return
     except:
         return
+
+
+def get_now():
+    return datetime.now(timezone.utc)
