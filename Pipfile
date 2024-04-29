@@ -16,10 +16,10 @@ fastapi = {extras = ["all"], version = "*"}
 uvloop = "*"
 httptools = "*"
 aiohttp = {extras = ["speedups"], version = "*"}
-brotlipy = "==0.7.0"
 schemathesis = "*"
 google-cloud-storage = "*"
 sentry-sdk = {extras = ["fastapi"], version = "*"}
+google-cloud-logging = "*"
 
 [dev-packages]
 responses = "*"
