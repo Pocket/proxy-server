@@ -39,6 +39,19 @@ class TestTelemetryHandler(TestCase):
 
     @patch('app.telemetry.handler.record_metrics')
     @patch('app.telemetry.handler.ping_adzerk')
+    def test_handle_message_legacy_ping_no_version(self, mock_ping_adzerk, mock_record_metrics):
+        telemetry = {'tiles': [{'shim': '0,foo,bar'}, {'shim': '1,1,2'}, {'shim': '2,a,b'}]}
+        data = base64.b64encode(gzip.compress(json.dumps(telemetry).encode('utf-8')))
+        submission_timestamp = '2024-04-24T21:02:18.123456Z'
+        attributes = {'document_namespace': 'activity-stream', 'document_type': 'impression-stats',
+                      'submission_timestamp': submission_timestamp}
+
+        handle_message(event={'data': data, 'attributes': attributes}, context={})
+        mock_ping_adzerk.assert_not_called()
+        mock_record_metrics.assert_not_called()
+
+    @patch('app.telemetry.handler.record_metrics')
+    @patch('app.telemetry.handler.ping_adzerk')
     def test_handle_message_android_spoc_ping(self, mock_ping_adzerk, mock_record_metrics):
         telemetry = {'metrics': {'text': {'pocket.spoc_shim': '0,foo,bar'}}}
         data = base64.b64encode(gzip.compress(json.dumps(telemetry).encode('utf-8')))
@@ -69,6 +82,15 @@ class TestTelemetryHandler(TestCase):
         data = base64.b64encode(gzip.compress(json.dumps(telemetry).encode('utf-8')))
         attributes = {'document_namespace': 'firefox-desktop', 'document_type': 'spoc',
                       'user_agent_version': 121}
+
+        handle_message(event={'data': data, 'attributes': attributes}, context={})
+        mock_ping_adzerk.assert_not_called()
+
+    @patch('app.telemetry.handler.ping_adzerk')
+    def test_handle_message_desktop_spoc_ping_no_version(self, mock_ping_adzerk):
+        telemetry = {'metrics': {'text': {'pocket.shim': '0,foo,bar'}}}
+        data = base64.b64encode(gzip.compress(json.dumps(telemetry).encode('utf-8')))
+        attributes = {'document_namespace': 'firefox-desktop', 'document_type': 'spoc'}
 
         handle_message(event={'data': data, 'attributes': attributes}, context={})
         mock_ping_adzerk.assert_not_called()
