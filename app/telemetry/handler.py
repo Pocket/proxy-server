@@ -47,14 +47,14 @@ def handle_message(event, context):
                 ping_adzerk(text_metrics["pocket.spoc_shim"])
                 record_metrics(text_metrics["pocket.spoc_shim"], submission_timestamp, namespace, user_agent_version)
     elif "firefox-desktop" == namespace and "spoc" == doctype:  # Desktop/Glean
-        if user_agent_version != None and int(user_agent_version) >= 122:
+        if user_agent_version is not None and int(user_agent_version) >= 122:
             if "metrics" in telemetry:
                 text_metrics = telemetry["metrics"].get("text", {})
                 if "pocket.shim" in text_metrics:
                     ping_adzerk(text_metrics["pocket.shim"])
                     record_metrics(text_metrics["pocket.shim"], submission_timestamp, namespace, user_agent_version)
     elif "activity-stream" == namespace and "impression-stats" == doctype:
-        if user_agent_version != None and int(user_agent_version) < 122:  # Desktop/Legacy
+        if user_agent_version is not None and int(user_agent_version) < 122:  # Desktop/Legacy
             if "tiles" in telemetry:
                 for tile in telemetry["tiles"]:
                     if "shim" in tile:
