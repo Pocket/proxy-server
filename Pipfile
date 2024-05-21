@@ -6,7 +6,7 @@ name = "pypi"
 [packages]
 certifi = ">=2023.7.22"
 boto3 = "~=1.28.85"
-requests = "~=2.31.0"
+requests = "~=2.32.0"
 geoip2 = "~=4.7.0"
 # we need to install gunicorn, uvicorn, uvloop, httptools, and fastapi
 # so it starts in the virtualenv instead of the one in the docker image
